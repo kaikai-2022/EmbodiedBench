@@ -40,7 +40,7 @@ def main():
         
         vlm = initialize_model(args.vlm_name) 
         
-        if args.task_list_json is not None:
+        if hasattr(args, 'task_list_json') and args.task_list_json is not None:
             try:
                 pwd = os.getcwd()
                 task_list_path = os.path.join(pwd, "../../configs/benchmark/taskList", args.task_list_json)
@@ -59,8 +59,10 @@ def main():
             eval_dim=eval_dim,
         )
         result=evaluator.get_final_score_dict(args.vlm_name)
-        os.makedirs(os.path.join(args.save_dir, args.vlm_name), exist_ok=True)
-        with open(os.path.join(args.save_dir, args.vlm_name, f"{eval_dim}_result.json"), "w") as f:
+        # Save results
+        save_dir = evaluator.save_path
+        os.makedirs(os.path.join(save_dir, args.vlm_name), exist_ok=True)
+        with open(os.path.join(save_dir, args.vlm_name, f"{eval_dim}_result.json"), "w") as f:
             json.dump(result, f, indent=4)
 
 if __name__ == "__main__":

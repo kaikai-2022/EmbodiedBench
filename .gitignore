@@ -177,9 +177,32 @@ scripts/paper_scripts
 # *sh
 *csv
 
-dataset
-logs
-test
+# Datasets
+dataset/
+**/dataset/
+
+# Logs and outputs
+logs/
+**/logs/
+output/
+**/output/
+*.log
+
+# Model weights and checkpoints
+models/
+*.pt
+*.pth
+*.ckpt
+*.bin
+*.safetensors
+**/.cache/
+
+# Test outputs
+test/
+**/test/
+
+# Temporary test scripts (optional - remove if you want to keep them)
+test_*.py
 
 ssh/
 gitconfig

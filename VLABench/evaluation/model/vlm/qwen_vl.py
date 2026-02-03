@@ -14,10 +14,11 @@ class Qwen2_VL(BaseVLM):
         # )
 
         # We recommend enabling flash_attention_2 for better acceleration and memory saving, especially in multi-image and video scenarios.
+        # 如果没有安装 flash_attn，使用普通的 attention（会慢一些但能运行）
         self.model = Qwen2VLForConditionalGeneration.from_pretrained(
             model_dir,
             torch_dtype=torch.bfloat16,
-            attn_implementation="flash_attention_2",
+            attn_implementation="eager",  # 使用 eager 模式，不依赖 flash_attn
             device_map="auto",
         )
 
