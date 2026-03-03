@@ -1,0 +1,15 @@
+Model UID: d8563064e64d45459b86281613ea4732
+Model Name: Centrifuge pieces (Food processor hack)
+
+Source Information:
+============================================================
+Source: unknown
+Objaverse UID: d8563064e64d45459b86281613ea4732
+
+HuggingFace Objaverse:
+Dataset: https://huggingface.co/datasets/allenai/objaverse
+Object Path: glbs/d8/d8563064e64d45459b86281613ea4732.glb
+
+Additional Metadata:
+Tags: hack, science, centrifuge
+Description: These pieces are made to hack a Princess High Speed Deluxe blender into a centrifuge. The small piece is placed to rotate a metallic bar in the middle and the bigger one maintains the rotor in place. ...

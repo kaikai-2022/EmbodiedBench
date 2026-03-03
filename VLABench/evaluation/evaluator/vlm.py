@@ -3,6 +3,7 @@ import json
 import time
 import random
 import traceback
+import torch
 from VLABench.evaluation.utils import *
 from VLABench.evaluation.evaluator.base import Evaluator
 import warnings
@@ -191,6 +192,9 @@ class VLMEvaluator(Evaluator):
                 #   if format_error is not in dict, it means the answer is not valid
                 answer = self.get_single_anwer(task_name, example_num, vlm, few_shot_num, with_CoT)
                 model_output[task_name][example_num] = answer
+
+                # Clean up GPU memory after each example
+                torch.cuda.empty_cache()
             except Exception as e:
                 print("\n\nError in task: ", task_name, " example: ", example_num)
                 print(e)
@@ -201,7 +205,7 @@ class VLMEvaluator(Evaluator):
                 with open(model_result_output_save_file, 'w', encoding="utf-8") as f:
                     json.dump(model_output, f, ensure_ascii=False, indent=4)
                 raise e
-            
+
             if len(model_output) % save_interval == 0:
                 new_existing_num = existing_num + working_number
                 model_output["benchmeatinfo"]["existing_num"] = new_existing_num
@@ -230,8 +234,8 @@ class VLMEvaluator(Evaluator):
             json.dump(model_output, f, ensure_ascii=False, indent=4)
         print(Fore.YELLOW + Style.BRIGHT + "working end at " + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
 
-    def get_final_score_dict(self, vlm_name, few_shot_num=0, with_CoT=False):
-        output_file = os.path.join(self.get_result_save_path(vlm_name, few_shot_num, with_CoT), "output.json")
+    def get_final_score_dict(self, vlm_name, few_shot_num=0, with_CoT=False, eval_dim="default"):
+        output_file = os.path.join(self.get_result_save_path(vlm_name, few_shot_num, with_CoT, eval_dim), "output.json")
         if not os.path.exists(output_file):
             print(Fore.RED + Style.BRIGHT + "output file not exist for model: ", vlm_name, " few_shot_num: ", few_shot_num, " with_CoT: ", with_CoT)
             return None
@@ -273,22 +277,22 @@ class VLMEvaluator(Evaluator):
                         "total_score": 0
                     }
                 
-        final_score_dict_save_path = os.path.join(self.get_result_save_path(vlm_name, few_shot_num, with_CoT), "final_score.json")
+        final_score_dict_save_path = os.path.join(self.get_result_save_path(vlm_name, few_shot_num, with_CoT, eval_dim), "final_score.json")
         with open(final_score_dict_save_path, 'w', encoding="utf-8") as f:
             json.dump(final_score_dict, f, ensure_ascii=False, indent=4)
         return final_score_dict
 
-    def get_six_dim_result(self, vlm_name, few_shot_num = 0, with_CoT=False):
-        six_dim_result_save_path = os.path.join(self.get_result_save_path(vlm_name, few_shot_num, with_CoT), "six_dim_result.json")
+    def get_six_dim_result(self, vlm_name, few_shot_num = 0, with_CoT=False, eval_dim="default"):
+        six_dim_result_save_path = os.path.join(self.get_result_save_path(vlm_name, few_shot_num, with_CoT, eval_dim), "six_dim_result.json")
         if os.path.exists(six_dim_result_save_path):
             with open(six_dim_result_save_path) as f:
                 six_dim_result = json.load(f)
             return six_dim_result
         
-        final_score_file = os.path.join(self.get_result_save_path(vlm_name, few_shot_num, with_CoT), "final_score.json")
+        final_score_file = os.path.join(self.get_result_save_path(vlm_name, few_shot_num, with_CoT, eval_dim), "final_score.json")
         final_score_dict = None
         if not os.path.exists(final_score_file):
-            final_score_dict = self.get_final_score_dict(vlm_name, few_shot_num=few_shot_num, with_CoT=with_CoT)
+            final_score_dict = self.get_final_score_dict(vlm_name, few_shot_num=few_shot_num, with_CoT=with_CoT, eval_dim=eval_dim)
         else:
             with open(final_score_file) as f:
                 final_score_dict = json.load(f)
@@ -320,7 +324,7 @@ class VLMEvaluator(Evaluator):
                 if key != "example_num":
                     six_dim_result[dim][key] = six_dim_result[dim][key] / six_dim_result[dim]["example_num"]
 
-        six_dim_result_save_path = os.path.join(self.get_result_save_path(vlm_name, few_shot_num, with_CoT), "six_dim_result.json")
+        six_dim_result_save_path = os.path.join(self.get_result_save_path(vlm_name, few_shot_num, with_CoT, eval_dim), "six_dim_result.json")
         with open(six_dim_result_save_path, 'w', encoding="utf-8") as f:
             json.dump(six_dim_result, f, ensure_ascii=False, indent=4)
         return six_dim_result

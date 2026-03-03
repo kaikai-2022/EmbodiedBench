@@ -1,0 +1,181 @@
+{
+  "uri": "https://api.sketchfab.com/v3/models/7e17299c2cdd42ea9686e48a1089790c",
+  "uid": "7e17299c2cdd42ea9686e48a1089790c",
+  "name": "Pipet/Pipette",
+  "staffpickedAt": null,
+  "viewCount": 575,
+  "likeCount": 3,
+  "animationCount": 0,
+  "viewerUrl": "https://sketchfab.com/3d-models/7e17299c2cdd42ea9686e48a1089790c",
+  "embedUrl": "https://sketchfab.com/models/7e17299c2cdd42ea9686e48a1089790c/embed",
+  "commentCount": 0,
+  "isDownloadable": true,
+  "publishedAt": "2016-04-09T13:13:55.417852",
+  "tags": [
+    {
+      "name": "biology",
+      "slug": "biology",
+      "uri": "https://api.sketchfab.com/v3/tags/biology"
+    },
+    {
+      "name": "science",
+      "slug": "science",
+      "uri": "https://api.sketchfab.com/v3/tags/science"
+    },
+    {
+      "name": "chemistry",
+      "slug": "chemistry",
+      "uri": "https://api.sketchfab.com/v3/tags/chemistry"
+    },
+    {
+      "name": "pipette",
+      "slug": "pipette",
+      "uri": "https://api.sketchfab.com/v3/tags/pipette"
+    },
+    {
+      "name": "pipete",
+      "slug": "pipete",
+      "uri": "https://api.sketchfab.com/v3/tags/pipete"
+    },
+    {
+      "name": "blender",
+      "slug": "blender",
+      "uri": "https://api.sketchfab.com/v3/tags/blender"
+    }
+  ],
+  "categories": [
+    {
+      "name": "science-technology"
+    }
+  ],
+  "thumbnails": {
+    "images": [
+      {
+        "uid": "432b542d3fef4cc5b7e193cc78985912",
+        "size": 918,
+        "width": 100,
+        "url": "https://media.sketchfab.com/models/7e17299c2cdd42ea9686e48a1089790c/thumbnails/0accc1fe347d45aca2faaf0a68d561e4/100x100.jpeg",
+        "height": 100
+      },
+      {
+        "uid": "1892011050fa4ab5b2674e2066c6ceab",
+        "size": 555,
+        "width": 50,
+        "url": "https://media.sketchfab.com/models/7e17299c2cdd42ea9686e48a1089790c/thumbnails/0accc1fe347d45aca2faaf0a68d561e4/50x50.jpeg",
+        "height": 50
+      },
+      {
+        "uid": "1a8a5316f63f464fa37286661f7c4df6",
+        "size": 1892,
+        "width": 200,
+        "url": "https://media.sketchfab.com/models/7e17299c2cdd42ea9686e48a1089790c/thumbnails/0accc1fe347d45aca2faaf0a68d561e4/200x200.jpeg",
+        "height": 200
+      },
+      {
+        "uid": "10e44885c3594cd8a6a97b243d94e87f",
+        "size": 3208,
+        "width": 448,
+        "url": "https://media.sketchfab.com/models/7e17299c2cdd42ea9686e48a1089790c/thumbnails/0accc1fe347d45aca2faaf0a68d561e4/448x252.jpeg",
+        "height": 252
+      },
+      {
+        "uid": "6b415efae6634441b75b22d8b7257a5e",
+        "size": 5535,
+        "width": 640,
+        "url": "https://media.sketchfab.com/models/7e17299c2cdd42ea9686e48a1089790c/thumbnails/0accc1fe347d45aca2faaf0a68d561e4/640x360.jpeg",
+        "height": 360
+      },
+      {
+        "uid": "54d20a9ee86c468e8ee5974f34856f0f",
+        "size": 8465,
+        "width": 864,
+        "url": "https://media.sketchfab.com/models/7e17299c2cdd42ea9686e48a1089790c/thumbnails/0accc1fe347d45aca2faaf0a68d561e4/864x486.jpeg",
+        "height": 486
+      },
+      {
+        "uid": "dce71a26058c43579735a68e2a1a8ae9",
+        "size": 10641,
+        "width": 1024,
+        "url": "https://media.sketchfab.com/models/7e17299c2cdd42ea9686e48a1089790c/thumbnails/0accc1fe347d45aca2faaf0a68d561e4/1024x576.jpeg",
+        "height": 576
+      }
+    ]
+  },
+  "user": {
+    "uid": "4c7cfb17de144deda0647f14618c05cd",
+    "username": "denis98",
+    "displayName": "denis98",
+    "profileUrl": "https://sketchfab.com/denis98",
+    "account": "basic",
+    "avatar": {
+      "uri": "https://api.sketchfab.com/v3/avatars/56c045ad19fb40f7aa6a45c33dc45e44",
+      "images": [
+        {
+          "size": 626,
+          "width": 32,
+          "url": "https://media.sketchfab.com/avatars/56c045ad19fb40f7aa6a45c33dc45e44/4d212a5a4be84a24b24984aa0c85bf2c.jpeg",
+          "height": 32
+        },
+        {
+          "size": 836,
+          "width": 48,
+          "url": "https://media.sketchfab.com/avatars/56c045ad19fb40f7aa6a45c33dc45e44/6a1d32d3a4004106bc57461a9bad2e8e.jpeg",
+          "height": 48
+        },
+        {
+          "size": 1580,
+          "width": 90,
+          "url": "https://media.sketchfab.com/avatars/56c045ad19fb40f7aa6a45c33dc45e44/117de6dc38bc4cb6b8be2631a652a2ea.jpeg",
+          "height": 90
+        },
+        {
+          "size": 1813,
+          "width": 100,
+          "url": "https://media.sketchfab.com/avatars/56c045ad19fb40f7aa6a45c33dc45e44/cb5ea54a17814c57862282386cc8fd30.jpeg",
+          "height": 100
+        }
+      ]
+    },
+    "uri": "https://api.sketchfab.com/v3/users/4c7cfb17de144deda0647f14618c05cd"
+  },
+  "description": "Pipet/Pipette made in Blender3D",
+  "faceCount": 29824,
+  "createdAt": "2016-04-09T13:08:05.431630",
+  "vertexCount": 29826,
+  "isAgeRestricted": false,
+  "archives": {
+    "glb": {
+      "textureCount": 0,
+      "size": 1434528,
+      "type": "glb",
+      "textureMaxResolution": 0,
+      "faceCount": 59648,
+      "vertexCount": 29826
+    },
+    "gltf": {
+      "textureCount": 0,
+      "size": 480510,
+      "type": "gltf",
+      "textureMaxResolution": 0,
+      "faceCount": 59648,
+      "vertexCount": 29826
+    },
+    "source": {
+      "textureCount": null,
+      "size": 560674,
+      "type": "source",
+      "textureMaxResolution": null,
+      "faceCount": null,
+      "vertexCount": null
+    },
+    "usdz": {
+      "textureCount": null,
+      "size": 800286,
+      "type": "usdz",
+      "textureMaxResolution": null,
+      "faceCount": null,
+      "vertexCount": null
+    }
+  },
+  "license": "by"
+}

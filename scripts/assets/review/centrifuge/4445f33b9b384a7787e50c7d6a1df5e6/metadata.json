@@ -1,0 +1,177 @@
+{
+  "uri": "https://api.sketchfab.com/v3/models/4445f33b9b384a7787e50c7d6a1df5e6",
+  "uid": "4445f33b9b384a7787e50c7d6a1df5e6",
+  "name": "Centrifuge JET ENGINE [ATMOS PROJECT]",
+  "staffpickedAt": null,
+  "viewCount": 1074,
+  "likeCount": 23,
+  "animationCount": 1,
+  "viewerUrl": "https://sketchfab.com/3d-models/4445f33b9b384a7787e50c7d6a1df5e6",
+  "embedUrl": "https://sketchfab.com/models/4445f33b9b384a7787e50c7d6a1df5e6/embed",
+  "commentCount": 2,
+  "isDownloadable": true,
+  "publishedAt": "2018-12-15T18:22:36.344965",
+  "tags": [
+    {
+      "name": "university",
+      "slug": "university",
+      "uri": "https://api.sketchfab.com/v3/tags/university"
+    },
+    {
+      "name": "impeller",
+      "slug": "impeller",
+      "uri": "https://api.sketchfab.com/v3/tags/impeller"
+    },
+    {
+      "name": "engine",
+      "slug": "engine",
+      "uri": "https://api.sketchfab.com/v3/tags/engine"
+    },
+    {
+      "name": "jetengine",
+      "slug": "jetengine",
+      "uri": "https://api.sketchfab.com/v3/tags/jetengine"
+    },
+    {
+      "name": "toulon",
+      "slug": "toulon",
+      "uri": "https://api.sketchfab.com/v3/tags/toulon"
+    },
+    {
+      "name": "vaptor",
+      "slug": "vaptor",
+      "uri": "https://api.sketchfab.com/v3/tags/vaptor"
+    },
+    {
+      "name": "engineering",
+      "slug": "engineering",
+      "uri": "https://api.sketchfab.com/v3/tags/engineering"
+    },
+    {
+      "name": "university-of-toulon",
+      "slug": "university-of-toulon",
+      "uri": "https://api.sketchfab.com/v3/tags/university-of-toulon"
+    }
+  ],
+  "categories": [
+    {
+      "name": "electronics-gadgets"
+    }
+  ],
+  "thumbnails": {
+    "images": [
+      {
+        "uid": "fec81b44246b4f608a5be08d1f8d3694",
+        "size": 6027,
+        "width": 256,
+        "url": "https://media.sketchfab.com/models/4445f33b9b384a7787e50c7d6a1df5e6/thumbnails/6fc5f5acc9e54da19770db7d08398d5e/7cd11a7729334e47bc423a4253b90597.jpeg",
+        "height": 144
+      },
+      {
+        "uid": "eda7b2f92e4a46afa9a96ea6d352e5cf",
+        "size": 26989,
+        "width": 720,
+        "url": "https://media.sketchfab.com/models/4445f33b9b384a7787e50c7d6a1df5e6/thumbnails/6fc5f5acc9e54da19770db7d08398d5e/58bd621093bd4e2fb1b9c656174dc3e8.jpeg",
+        "height": 405
+      },
+      {
+        "uid": "20ca79aeb28743998ce1688452d08fd9",
+        "size": 44820,
+        "width": 1024,
+        "url": "https://media.sketchfab.com/models/4445f33b9b384a7787e50c7d6a1df5e6/thumbnails/6fc5f5acc9e54da19770db7d08398d5e/7013b6eff84c4cdb8eadd426a9adb83f.jpeg",
+        "height": 576
+      },
+      {
+        "uid": "5c8ad035082e47eea2e0baec8143e773",
+        "size": 263315,
+        "width": 1920,
+        "url": "https://media.sketchfab.com/models/4445f33b9b384a7787e50c7d6a1df5e6/thumbnails/6fc5f5acc9e54da19770db7d08398d5e/81baaee8616d4a73bf110ea880ebfc6c.jpeg",
+        "height": 1080
+      },
+      {
+        "uid": "2e52b877864b482f829542b53ebdf292",
+        "size": 1008,
+        "width": 64,
+        "url": "https://media.sketchfab.com/models/4445f33b9b384a7787e50c7d6a1df5e6/thumbnails/6fc5f5acc9e54da19770db7d08398d5e/94d16c0e3ac543899b424fd4c2f811a8.jpeg",
+        "height": 36
+      }
+    ]
+  },
+  "user": {
+    "uid": "3ca73b55b52a4125bebb85248213fff3",
+    "username": "VapTor",
+    "displayName": "BlueMesh",
+    "profileUrl": "https://sketchfab.com/VapTor",
+    "account": "basic",
+    "avatar": {
+      "uri": "https://api.sketchfab.com/v3/avatars/a2cf8634c2de40c0892f5a9a66448210",
+      "images": [
+        {
+          "size": 1140,
+          "width": 32,
+          "url": "https://media.sketchfab.com/avatars/a2cf8634c2de40c0892f5a9a66448210/0985133f9bb64fb090ae259b362c8ff2.png",
+          "height": 32
+        },
+        {
+          "size": 1969,
+          "width": 48,
+          "url": "https://media.sketchfab.com/avatars/a2cf8634c2de40c0892f5a9a66448210/c1a35312a45b4479b18899eef35bd82a.png",
+          "height": 48
+        },
+        {
+          "size": 4334,
+          "width": 90,
+          "url": "https://media.sketchfab.com/avatars/a2cf8634c2de40c0892f5a9a66448210/a39ec3e7906c4abaad1578fc0ff166e6.png",
+          "height": 90
+        },
+        {
+          "size": 5021,
+          "width": 100,
+          "url": "https://media.sketchfab.com/avatars/a2cf8634c2de40c0892f5a9a66448210/a21f4657a62648aa9fcc7abed782d3cb.png",
+          "height": 100
+        }
+      ]
+    },
+    "uri": "https://api.sketchfab.com/v3/users/3ca73b55b52a4125bebb85248213fff3"
+  },
+  "description": "ATMOS PROJECT _ JET ENGINE\n-------------------------------------------------------------------------------------------",
+  "faceCount": 317398,
+  "createdAt": "2018-12-15T18:12:19.325657",
+  "vertexCount": 154242,
+  "isAgeRestricted": false,
+  "archives": {
+    "glb": {
+      "textureCount": 0,
+      "size": 8370768,
+      "type": "glb",
+      "textureMaxResolution": 0,
+      "faceCount": 317398,
+      "vertexCount": 187127
+    },
+    "gltf": {
+      "textureCount": 0,
+      "size": 3620475,
+      "type": "gltf",
+      "textureMaxResolution": 0,
+      "faceCount": 317398,
+      "vertexCount": 187127
+    },
+    "source": {
+      "textureCount": null,
+      "size": 14605118,
+      "type": "source",
+      "textureMaxResolution": null,
+      "faceCount": null,
+      "vertexCount": null
+    },
+    "usdz": {
+      "textureCount": null,
+      "size": 3977970,
+      "type": "usdz",
+      "textureMaxResolution": null,
+      "faceCount": null,
+      "vertexCount": null
+    }
+  },
+  "license": "by"
+}

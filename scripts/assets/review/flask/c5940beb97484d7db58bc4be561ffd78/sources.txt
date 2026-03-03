@@ -1,0 +1,15 @@
+Model UID: c5940beb97484d7db58bc4be561ffd78
+Model Name: Flask
+
+Source Information:
+============================================================
+Source: unknown
+Objaverse UID: c5940beb97484d7db58bc4be561ffd78
+
+HuggingFace Objaverse:
+Dataset: https://huggingface.co/datasets/allenai/objaverse
+Object Path: glbs/c5/c5940beb97484d7db58bc4be561ffd78.glb
+
+Additional Metadata:
+Tags: assets, clean, water, holy, assets-game
+Description: Holy Water for a game....

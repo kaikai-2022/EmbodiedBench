@@ -22,3 +22,10 @@ colorlog
 colorama
 peft
 gdown
+
+# Asset download pipeline dependencies (新增：模型下载Pipeline依赖)
+objaverse>=0.1.0          # 新增：Objaverse 3D模型数据集下载
+obj2mjcf>=0.0.22          # 新增：OBJ到MJCF格式转换工具
+trimesh>=4.0.0            # 新增：3D模型处理（GLB到OBJ转换，无需Blender）
+tqdm>=4.65.0              # 新增：进度条显示
+pillow>=9.0.0             # 新增：图像处理（预览图生成）

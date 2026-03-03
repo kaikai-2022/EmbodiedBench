@@ -1,0 +1,150 @@
+{
+  "uri": "https://api.sketchfab.com/v3/models/c7cbe0b2ea1c416e8729ea0a200335b8",
+  "uid": "c7cbe0b2ea1c416e8729ea0a200335b8",
+  "name": "Bottle With Pipette",
+  "staffpickedAt": null,
+  "viewCount": 20,
+  "likeCount": 0,
+  "animationCount": 0,
+  "viewerUrl": "https://sketchfab.com/3d-models/c7cbe0b2ea1c416e8729ea0a200335b8",
+  "embedUrl": "https://sketchfab.com/models/c7cbe0b2ea1c416e8729ea0a200335b8/embed",
+  "commentCount": 0,
+  "isDownloadable": true,
+  "publishedAt": "2022-03-24T11:32:05.392227",
+  "tags": [
+    {
+      "name": "pipette",
+      "slug": "pipette",
+      "uri": "https://api.sketchfab.com/v3/tags/pipette"
+    },
+    {
+      "name": "bottle",
+      "slug": "bottle",
+      "uri": "https://api.sketchfab.com/v3/tags/bottle"
+    }
+  ],
+  "categories": [
+    {
+      "name": "furniture-home"
+    },
+    {
+      "name": "science-technology"
+    }
+  ],
+  "thumbnails": {
+    "images": [
+      {
+        "uid": "e656a0a0793848f4ac34cf2450821ee7",
+        "size": 47913,
+        "width": 1920,
+        "url": "https://media.sketchfab.com/models/c7cbe0b2ea1c416e8729ea0a200335b8/thumbnails/b2ad356e22d049dcbc8daebaa48f9cd6/1a3a3aae03aa4edbbe71c55a5842813d.jpeg",
+        "height": 1080
+      },
+      {
+        "uid": "911c7b4585a34d8997b124b4ed68148b",
+        "size": 16020,
+        "width": 1024,
+        "url": "https://media.sketchfab.com/models/c7cbe0b2ea1c416e8729ea0a200335b8/thumbnails/b2ad356e22d049dcbc8daebaa48f9cd6/7d150b377d0743c9bfebf5e78479d967.jpeg",
+        "height": 576
+      },
+      {
+        "uid": "7a62c9f9331e494391ca39018d001b4b",
+        "size": 9397,
+        "width": 720,
+        "url": "https://media.sketchfab.com/models/c7cbe0b2ea1c416e8729ea0a200335b8/thumbnails/b2ad356e22d049dcbc8daebaa48f9cd6/3a58d227f94e4cda9723aaeee95e2fc3.jpeg",
+        "height": 405
+      },
+      {
+        "uid": "3111be9c86a947bda47e9be9017e07cd",
+        "size": 2297,
+        "width": 256,
+        "url": "https://media.sketchfab.com/models/c7cbe0b2ea1c416e8729ea0a200335b8/thumbnails/b2ad356e22d049dcbc8daebaa48f9cd6/e05bb60a4eb84e9194d9f2b3cc06c403.jpeg",
+        "height": 144
+      },
+      {
+        "uid": "ca3e6c1a7d5141ba904cf1ffbb06bef6",
+        "size": 888,
+        "width": 64,
+        "url": "https://media.sketchfab.com/models/c7cbe0b2ea1c416e8729ea0a200335b8/thumbnails/b2ad356e22d049dcbc8daebaa48f9cd6/386f9939085c4851aca64fd03b613266.jpeg",
+        "height": 36
+      }
+    ]
+  },
+  "user": {
+    "uid": "11ce03edd06245628a426a1dfa8f132b",
+    "username": "lancer454",
+    "displayName": "lancer454",
+    "profileUrl": "https://sketchfab.com/lancer454",
+    "account": "basic",
+    "avatar": {
+      "uri": "https://api.sketchfab.com/v3/avatars/78fa317e46024a5283765aa34df5e508",
+      "images": [
+        {
+          "size": 6421,
+          "width": 100,
+          "url": "https://media.sketchfab.com/avatars/78fa317e46024a5283765aa34df5e508/aec92fe9a74e499c98d759362cd7f02f.jpeg",
+          "height": 100
+        },
+        {
+          "size": 2518,
+          "width": 48,
+          "url": "https://media.sketchfab.com/avatars/78fa317e46024a5283765aa34df5e508/17fa177ffaa344a2b2fc8e78efd40fbb.jpeg",
+          "height": 48
+        },
+        {
+          "size": 5653,
+          "width": 90,
+          "url": "https://media.sketchfab.com/avatars/78fa317e46024a5283765aa34df5e508/02162695bdc840faa3bcb2d418309c5e.jpeg",
+          "height": 90
+        },
+        {
+          "size": 1350,
+          "width": 32,
+          "url": "https://media.sketchfab.com/avatars/78fa317e46024a5283765aa34df5e508/6fde876cbded4cd48d36a76029e3aa02.jpeg",
+          "height": 32
+        }
+      ]
+    },
+    "uri": "https://api.sketchfab.com/v3/users/11ce03edd06245628a426a1dfa8f132b"
+  },
+  "description": "I am from Ukraine, due to the difficult situation in the country, I need support.\nMy paypal Lancer454@gmail.com\nThank you!",
+  "faceCount": 3444,
+  "createdAt": "2022-03-24T11:29:26.347895",
+  "vertexCount": 1748,
+  "isAgeRestricted": false,
+  "archives": {
+    "glb": {
+      "textureCount": 0,
+      "size": 109468,
+      "type": "glb",
+      "textureMaxResolution": 0,
+      "faceCount": 3444,
+      "vertexCount": 1982
+    },
+    "gltf": {
+      "textureCount": 0,
+      "size": 43864,
+      "type": "gltf",
+      "textureMaxResolution": 0,
+      "faceCount": 3444,
+      "vertexCount": 1982
+    },
+    "source": {
+      "textureCount": null,
+      "size": 99438,
+      "type": "source",
+      "textureMaxResolution": null,
+      "faceCount": null,
+      "vertexCount": null
+    },
+    "usdz": {
+      "textureCount": null,
+      "size": 58564,
+      "type": "usdz",
+      "textureMaxResolution": null,
+      "faceCount": null,
+      "vertexCount": null
+    }
+  },
+  "license": "by"
+}

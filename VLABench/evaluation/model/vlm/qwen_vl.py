@@ -28,7 +28,7 @@ class Qwen2_VL(BaseVLM):
     def evaluate(self, input_dict, language, with_CoT=False):
         from qwen_vl_utils import process_vision_info
         ti_list = get_ti_list(input_dict, language, with_CoT=with_CoT)
-        
+
         content = self.build_prompt_with_tilist(ti_list)
 
         # Messages containing multiple images and a text query
@@ -53,8 +53,16 @@ class Qwen2_VL(BaseVLM):
         )
         inputs = inputs.to("cuda")
 
-        # Inference
-        generated_ids = self.model.generate(**inputs, max_new_tokens=128)
+        # Inference with optimized memory settings
+        with torch.no_grad():
+            generated_ids = self.model.generate(
+                **inputs,
+                max_new_tokens=128,
+                do_sample=False,
+                use_cache=True,
+                temperature=1.0,
+                top_p=1.0,
+            )
         generated_ids_trimmed = [
             out_ids[len(in_ids) :] for in_ids, out_ids in zip(inputs.input_ids, generated_ids)
         ]
@@ -72,6 +80,11 @@ class Qwen2_VL(BaseVLM):
         except:
             # print("No json data found")
             output["format_error"] = "format_error"
+
+        # Clean up memory
+        del inputs, generated_ids, generated_ids_trimmed
+        torch.cuda.empty_cache()
+
         return output
 
     def build_prompt_with_tilist(self, ti_list):

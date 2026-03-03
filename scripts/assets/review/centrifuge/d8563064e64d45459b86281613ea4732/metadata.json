@@ -1,0 +1,152 @@
+{
+  "uri": "https://api.sketchfab.com/v3/models/d8563064e64d45459b86281613ea4732",
+  "uid": "d8563064e64d45459b86281613ea4732",
+  "name": "Centrifuge pieces (Food processor hack)",
+  "staffpickedAt": null,
+  "viewCount": 19,
+  "likeCount": 1,
+  "animationCount": 0,
+  "viewerUrl": "https://sketchfab.com/3d-models/d8563064e64d45459b86281613ea4732",
+  "embedUrl": "https://sketchfab.com/models/d8563064e64d45459b86281613ea4732/embed",
+  "commentCount": 0,
+  "isDownloadable": true,
+  "publishedAt": "2022-03-08T11:40:38.496549",
+  "tags": [
+    {
+      "name": "hack",
+      "slug": "hack",
+      "uri": "https://api.sketchfab.com/v3/tags/hack"
+    },
+    {
+      "name": "science",
+      "slug": "science",
+      "uri": "https://api.sketchfab.com/v3/tags/science"
+    },
+    {
+      "name": "centrifuge",
+      "slug": "centrifuge",
+      "uri": "https://api.sketchfab.com/v3/tags/centrifuge"
+    }
+  ],
+  "categories": [
+    {
+      "name": "science-technology"
+    }
+  ],
+  "thumbnails": {
+    "images": [
+      {
+        "uid": "24f6497f92244e80a48d56174778f657",
+        "size": 52018,
+        "width": 1920,
+        "url": "https://media.sketchfab.com/models/d8563064e64d45459b86281613ea4732/thumbnails/b44cc26fc3c44e4cb702a998a01fdc6d/e15a9b4e38cf45b19dd418990c4dce56.jpeg",
+        "height": 1080
+      },
+      {
+        "uid": "47cf3fbc31a04e6c93da345a3c5e0e4c",
+        "size": 17796,
+        "width": 1024,
+        "url": "https://media.sketchfab.com/models/d8563064e64d45459b86281613ea4732/thumbnails/b44cc26fc3c44e4cb702a998a01fdc6d/e21959f6bf0b434b84642f5a6fa38741.jpeg",
+        "height": 576
+      },
+      {
+        "uid": "7d5d5a0fdb5b4893aa73b600150b66a6",
+        "size": 10515,
+        "width": 720,
+        "url": "https://media.sketchfab.com/models/d8563064e64d45459b86281613ea4732/thumbnails/b44cc26fc3c44e4cb702a998a01fdc6d/789c8e4b47cd4238a4c9e18284128a92.jpeg",
+        "height": 405
+      },
+      {
+        "uid": "7bfea3227ffa42dbb795372513ef9b99",
+        "size": 2684,
+        "width": 256,
+        "url": "https://media.sketchfab.com/models/d8563064e64d45459b86281613ea4732/thumbnails/b44cc26fc3c44e4cb702a998a01fdc6d/ae6a6576fc224d1fabbc76a6e8634429.jpeg",
+        "height": 144
+      },
+      {
+        "uid": "2bc5b286439047669dafeac7c7b5c562",
+        "size": 925,
+        "width": 64,
+        "url": "https://media.sketchfab.com/models/d8563064e64d45459b86281613ea4732/thumbnails/b44cc26fc3c44e4cb702a998a01fdc6d/787edd7fb4d6467b909968df01849687.jpeg",
+        "height": 36
+      }
+    ]
+  },
+  "user": {
+    "uid": "a811c62da0134b0492d3d1dc8485e896",
+    "username": "lolaconchichouk",
+    "displayName": "Annah",
+    "profileUrl": "https://sketchfab.com/lolaconchichouk",
+    "account": "basic",
+    "avatar": {
+      "uri": "https://api.sketchfab.com/v3/avatars/3ef1bd11d3eb4b57a0b353e8f2e5fc3e",
+      "images": [
+        {
+          "size": 680,
+          "width": 32,
+          "url": "https://media.sketchfab.com/avatars/3ef1bd11d3eb4b57a0b353e8f2e5fc3e/116042a0854e40538adab302b593683d.jpeg",
+          "height": 32
+        },
+        {
+          "size": 1253,
+          "width": 48,
+          "url": "https://media.sketchfab.com/avatars/3ef1bd11d3eb4b57a0b353e8f2e5fc3e/efea16be51d04eb7a00cb9ea0b43b87f.jpeg",
+          "height": 48
+        },
+        {
+          "size": 2797,
+          "width": 90,
+          "url": "https://media.sketchfab.com/avatars/3ef1bd11d3eb4b57a0b353e8f2e5fc3e/ac9b469ccec74caf923a81fb2f0be3ed.jpeg",
+          "height": 90
+        },
+        {
+          "size": 3215,
+          "width": 100,
+          "url": "https://media.sketchfab.com/avatars/3ef1bd11d3eb4b57a0b353e8f2e5fc3e/a075e1d43d2f446c949b5967b470c757.jpeg",
+          "height": 100
+        }
+      ]
+    },
+    "uri": "https://api.sketchfab.com/v3/users/a811c62da0134b0492d3d1dc8485e896"
+  },
+  "description": "These pieces are made to hack a Princess High Speed Deluxe blender into a centrifuge. The small piece is placed to rotate a metallic bar in the middle and the bigger one maintains the rotor in place. The two holes on the sides are for mainatining the piece with straps. The rotor I used was found on thingiverse https://www.thingiverse.com/thing:4583027. \nMore documentation on  how the centrifuge was made on my documentation page https://class.textile-academy.org/2022/annah-sangosanya/FinalProject/04_MachineMaking/",
+  "faceCount": 105750,
+  "createdAt": "2022-03-08T11:28:19.202775",
+  "vertexCount": 52867,
+  "isAgeRestricted": false,
+  "archives": {
+    "glb": {
+      "textureCount": 0,
+      "size": 2380260,
+      "type": "glb",
+      "textureMaxResolution": 0,
+      "faceCount": 96688,
+      "vertexCount": 50769
+    },
+    "gltf": {
+      "textureCount": 0,
+      "size": 1253958,
+      "type": "gltf",
+      "textureMaxResolution": 0,
+      "faceCount": 96688,
+      "vertexCount": 50769
+    },
+    "source": {
+      "textureCount": null,
+      "size": 4834806,
+      "type": "source",
+      "textureMaxResolution": null,
+      "faceCount": null,
+      "vertexCount": null
+    },
+    "usdz": {
+      "textureCount": null,
+      "size": 1370448,
+      "type": "usdz",
+      "textureMaxResolution": null,
+      "faceCount": null,
+      "vertexCount": null
+    }
+  },
+  "license": "by"
+}

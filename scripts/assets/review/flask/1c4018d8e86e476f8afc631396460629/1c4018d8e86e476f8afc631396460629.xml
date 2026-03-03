@@ -1,0 +1,69 @@
+<mujoco model="1c4018d8e86e476f8afc631396460629">
+  <default>
+    <default class="visual">
+      <geom group="2" type="mesh" contype="0" conaffinity="0"/>
+    </default>
+    <default class="collision">
+      <geom group="3" type="mesh"/>
+    </default>
+  </default>
+  <asset>
+    <texture type="2d" name="Matara_Low_Model_4_u1_v1" file="Matara_Low_Model_4_u1_v1.png"/>
+    <material name="Matara_Low_Model_4_u1_v1" texture="Matara_Low_Model_4_u1_v1" specular="0.4000000000000001" shininess="0.001"/>
+    <mesh file="1c4018d8e86e476f8afc631396460629.obj"/>
+    <mesh file="1c4018d8e86e476f8afc631396460629_collision_0.obj"/>
+    <mesh file="1c4018d8e86e476f8afc631396460629_collision_1.obj"/>
+    <mesh file="1c4018d8e86e476f8afc631396460629_collision_2.obj"/>
+    <mesh file="1c4018d8e86e476f8afc631396460629_collision_3.obj"/>
+    <mesh file="1c4018d8e86e476f8afc631396460629_collision_4.obj"/>
+    <mesh file="1c4018d8e86e476f8afc631396460629_collision_5.obj"/>
+    <mesh file="1c4018d8e86e476f8afc631396460629_collision_6.obj"/>
+    <mesh file="1c4018d8e86e476f8afc631396460629_collision_7.obj"/>
+    <mesh file="1c4018d8e86e476f8afc631396460629_collision_8.obj"/>
+    <mesh file="1c4018d8e86e476f8afc631396460629_collision_9.obj"/>
+    <mesh file="1c4018d8e86e476f8afc631396460629_collision_10.obj"/>
+    <mesh file="1c4018d8e86e476f8afc631396460629_collision_11.obj"/>
+    <mesh file="1c4018d8e86e476f8afc631396460629_collision_12.obj"/>
+    <mesh file="1c4018d8e86e476f8afc631396460629_collision_13.obj"/>
+    <mesh file="1c4018d8e86e476f8afc631396460629_collision_14.obj"/>
+    <mesh file="1c4018d8e86e476f8afc631396460629_collision_15.obj"/>
+    <mesh file="1c4018d8e86e476f8afc631396460629_collision_16.obj"/>
+    <mesh file="1c4018d8e86e476f8afc631396460629_collision_17.obj"/>
+    <mesh file="1c4018d8e86e476f8afc631396460629_collision_18.obj"/>
+    <mesh file="1c4018d8e86e476f8afc631396460629_collision_19.obj"/>
+    <mesh file="1c4018d8e86e476f8afc631396460629_collision_20.obj"/>
+    <mesh file="1c4018d8e86e476f8afc631396460629_collision_21.obj"/>
+    <mesh file="1c4018d8e86e476f8afc631396460629_collision_22.obj"/>
+    <mesh file="1c4018d8e86e476f8afc631396460629_collision_23.obj"/>
+  </asset>
+  <worldbody>
+    <body name="1c4018d8e86e476f8afc631396460629">
+      <freejoint/>
+      <geom material="Matara_Low_Model_4_u1_v1" mesh="1c4018d8e86e476f8afc631396460629" class="visual"/>
+      <geom mesh="1c4018d8e86e476f8afc631396460629_collision_0" rgba="0.46615441218146203 0.409015276552118 0.3611623751487433 1" class="collision"/>
+      <geom mesh="1c4018d8e86e476f8afc631396460629_collision_1" rgba="0.6604387358286913 0.2793759997034786 0.41879804085582095 1" class="collision"/>
+      <geom mesh="1c4018d8e86e476f8afc631396460629_collision_2" rgba="0.7398903242324257 0.03373790786228181 0.9294674581784772 1" class="collision"/>
+      <geom mesh="1c4018d8e86e476f8afc631396460629_collision_3" rgba="0.6847473348618445 0.3148415378660179 0.15874303332350603 1" class="collision"/>
+      <geom mesh="1c4018d8e86e476f8afc631396460629_collision_4" rgba="0.84422711877056 0.04987857198578971 0.6982986195215916 1" class="collision"/>
+      <geom mesh="1c4018d8e86e476f8afc631396460629_collision_5" rgba="0.8484811994191401 0.12049569165925922 0.41401174461062706 1" class="collision"/>
+      <geom mesh="1c4018d8e86e476f8afc631396460629_collision_6" rgba="0.17414378563669908 0.15489986842282877 0.5505518816998264 1" class="collision"/>
+      <geom mesh="1c4018d8e86e476f8afc631396460629_collision_7" rgba="0.6899052729895571 0.40141782713453933 0.30713977033253403 1" class="collision"/>
+      <geom mesh="1c4018d8e86e476f8afc631396460629_collision_8" rgba="0.9500665315251337 0.09022227614341372 0.8799609701317361 1" class="collision"/>
+      <geom mesh="1c4018d8e86e476f8afc631396460629_collision_9" rgba="0.5595560339212277 0.7028441698895951 0.9754403179498935 1" class="collision"/>
+      <geom mesh="1c4018d8e86e476f8afc631396460629_collision_10" rgba="0.4960718780286545 0.2619304516053679 0.8899654303981903 1" class="collision"/>
+      <geom mesh="1c4018d8e86e476f8afc631396460629_collision_11" rgba="0.8945914614913056 0.6900186341958824 0.3997518735463993 1" class="collision"/>
+      <geom mesh="1c4018d8e86e476f8afc631396460629_collision_12" rgba="0.2672124645701879 0.5900393752435645 0.006202249818984762 1" class="collision"/>
+      <geom mesh="1c4018d8e86e476f8afc631396460629_collision_13" rgba="0.8555692853332023 0.8030073920148274 0.06310966100756688 1" class="collision"/>
+      <geom mesh="1c4018d8e86e476f8afc631396460629_collision_14" rgba="0.21362562665796636 0.2815075744628319 0.5329840779136354 1" class="collision"/>
+      <geom mesh="1c4018d8e86e476f8afc631396460629_collision_15" rgba="0.7217668847680156 0.06280935246424946 0.8370143202099999 1" class="collision"/>
+      <geom mesh="1c4018d8e86e476f8afc631396460629_collision_16" rgba="0.3693446653794247 0.2383541114687575 0.3776622751568727 1" class="collision"/>
+      <geom mesh="1c4018d8e86e476f8afc631396460629_collision_17" rgba="0.5470263474557098 0.8632644544754893 0.584797727901723 1" class="collision"/>
+      <geom mesh="1c4018d8e86e476f8afc631396460629_collision_18" rgba="0.37320731696216813 0.7358773054838499 0.7822148429676581 1" class="collision"/>
+      <geom mesh="1c4018d8e86e476f8afc631396460629_collision_19" rgba="0.36988408619044144 0.9881584984734728 0.40849034878906465 1" class="collision"/>
+      <geom mesh="1c4018d8e86e476f8afc631396460629_collision_20" rgba="0.4461227485916881 0.3627766882153044 0.504739511238903 1" class="collision"/>
+      <geom mesh="1c4018d8e86e476f8afc631396460629_collision_21" rgba="0.9766951431670939 0.9277678716340699 0.027766619734168496 1" class="collision"/>
+      <geom mesh="1c4018d8e86e476f8afc631396460629_collision_22" rgba="0.24287977252279225 0.09296766840910575 0.9772244698756914 1" class="collision"/>
+      <geom mesh="1c4018d8e86e476f8afc631396460629_collision_23" rgba="0.1536504832250566 0.9493364588096291 0.3534276993301768 1" class="collision"/>
+    </body>
+  </worldbody>
+</mujoco>

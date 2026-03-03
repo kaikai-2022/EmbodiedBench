@@ -58,7 +58,7 @@ def main():
             with_CoT=args.with_cot,
             eval_dim=eval_dim,
         )
-        result=evaluator.get_final_score_dict(args.vlm_name)
+        result=evaluator.get_final_score_dict(args.vlm_name, eval_dim=eval_dim)
         # Save results
         save_dir = evaluator.save_path
         os.makedirs(os.path.join(save_dir, args.vlm_name), exist_ok=True)

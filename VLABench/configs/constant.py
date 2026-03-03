@@ -134,6 +134,7 @@ name2class_xml = {
     "chemistry_tube_stand": [components.TubeStand, "obj/meshes/tube/tube_container/tube_stand.xml"],
     "nametag": [components.NameTag, "obj/meshes/tube/nametag/nametag.xml"],
     "flask": [components.CommonContainer, "obj/meshes/tube/flask/flask.xml"],
+    "centrifuge": [components.CommonContainer, "obj/meshes/lab_equipment/centrifuge/centrifuge.xml"],
     
     # breads
     "bagel": [components.Bread, get_object_list(os.path.join(xml_root, "obj/meshes/breads/bagel"))],

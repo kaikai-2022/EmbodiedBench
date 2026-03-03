@@ -1,0 +1,175 @@
+{
+  "uri": "https://api.sketchfab.com/v3/models/5a32697c3c7b4ee7ac0b6c400c4d7544",
+  "uid": "5a32697c3c7b4ee7ac0b6c400c4d7544",
+  "name": "microscope",
+  "staffpickedAt": null,
+  "viewCount": 69,
+  "likeCount": 5,
+  "animationCount": 0,
+  "viewerUrl": "https://sketchfab.com/3d-models/5a32697c3c7b4ee7ac0b6c400c4d7544",
+  "embedUrl": "https://sketchfab.com/models/5a32697c3c7b4ee7ac0b6c400c4d7544/embed",
+  "commentCount": 0,
+  "isDownloadable": true,
+  "publishedAt": "2021-12-23T18:39:39.441518",
+  "tags": [
+    {
+      "name": "tower",
+      "slug": "tower",
+      "uri": "https://api.sketchfab.com/v3/tags/tower"
+    },
+    {
+      "name": "microscope",
+      "slug": "microscope",
+      "uri": "https://api.sketchfab.com/v3/tags/microscope"
+    },
+    {
+      "name": "cat",
+      "slug": "cat",
+      "uri": "https://api.sketchfab.com/v3/tags/cat"
+    },
+    {
+      "name": "cathedral",
+      "slug": "cathedral",
+      "uri": "https://api.sketchfab.com/v3/tags/cathedral"
+    },
+    {
+      "name": "printing",
+      "slug": "printing",
+      "uri": "https://api.sketchfab.com/v3/tags/printing"
+    },
+    {
+      "name": "medieval",
+      "slug": "medieval",
+      "uri": "https://api.sketchfab.com/v3/tags/medieval"
+    },
+    {
+      "name": "cyclops",
+      "slug": "cyclops",
+      "uri": "https://api.sketchfab.com/v3/tags/cyclops"
+    }
+  ],
+  "categories": [
+    {
+      "name": "architecture"
+    },
+    {
+      "name": "weapons-military"
+    }
+  ],
+  "thumbnails": {
+    "images": [
+      {
+        "uid": "f6540f21a7ca48fbb39bf272d26bc0e5",
+        "size": 210174,
+        "width": 1920,
+        "url": "https://media.sketchfab.com/models/5a32697c3c7b4ee7ac0b6c400c4d7544/thumbnails/514b273fcb0b4855be237b05bce1e8da/e94df6047f854cb69a5181e13ac64f9e.jpeg",
+        "height": 1080
+      },
+      {
+        "uid": "10cf912055e946749972e7f6c845801e",
+        "size": 35489,
+        "width": 1024,
+        "url": "https://media.sketchfab.com/models/5a32697c3c7b4ee7ac0b6c400c4d7544/thumbnails/514b273fcb0b4855be237b05bce1e8da/734f5bdaa7904233844427c2c5f7b407.jpeg",
+        "height": 576
+      },
+      {
+        "uid": "3b13b4decdf04b9aa30dd660c4c550e6",
+        "size": 17874,
+        "width": 720,
+        "url": "https://media.sketchfab.com/models/5a32697c3c7b4ee7ac0b6c400c4d7544/thumbnails/514b273fcb0b4855be237b05bce1e8da/63a229035006420b8ca57085278e7c58.jpeg",
+        "height": 405
+      },
+      {
+        "uid": "6b4926401a294d2dbb2085307fda5c63",
+        "size": 3909,
+        "width": 256,
+        "url": "https://media.sketchfab.com/models/5a32697c3c7b4ee7ac0b6c400c4d7544/thumbnails/514b273fcb0b4855be237b05bce1e8da/ef06d6bb2170424d91227f8482f8f6af.jpeg",
+        "height": 144
+      },
+      {
+        "uid": "e67e754ffed24d30983ccd4e8620cb5b",
+        "size": 1062,
+        "width": 64,
+        "url": "https://media.sketchfab.com/models/5a32697c3c7b4ee7ac0b6c400c4d7544/thumbnails/514b273fcb0b4855be237b05bce1e8da/b63c9ac2d35a499ab9e381d78cad6bdc.jpeg",
+        "height": 36
+      }
+    ]
+  },
+  "user": {
+    "uid": "c44d6e395a894978aa1d0c596efffbed",
+    "username": "Serafim123",
+    "displayName": "Serafim123",
+    "profileUrl": "https://sketchfab.com/Serafim123",
+    "account": "basic",
+    "avatar": {
+      "uri": "https://api.sketchfab.com/v3/avatars/c11b7bb92fb84cbab661595f5ba712c7",
+      "images": [
+        {
+          "size": 967,
+          "width": 32,
+          "url": "https://media.sketchfab.com/avatars/c11b7bb92fb84cbab661595f5ba712c7/58e9e80db9994ce89f7b13231d9409b3.jpeg",
+          "height": 32
+        },
+        {
+          "size": 1314,
+          "width": 48,
+          "url": "https://media.sketchfab.com/avatars/c11b7bb92fb84cbab661595f5ba712c7/717d9e4d5e784a44b7e5e9add31f3b32.jpeg",
+          "height": 48
+        },
+        {
+          "size": 2373,
+          "width": 90,
+          "url": "https://media.sketchfab.com/avatars/c11b7bb92fb84cbab661595f5ba712c7/34face9d67574a7bbcf10a4fefbf1782.jpeg",
+          "height": 90
+        },
+        {
+          "size": 2721,
+          "width": 100,
+          "url": "https://media.sketchfab.com/avatars/c11b7bb92fb84cbab661595f5ba712c7/51ad98ba5e6446a084073b9ff2da9bac.jpeg",
+          "height": 100
+        }
+      ]
+    },
+    "uri": "https://api.sketchfab.com/v3/users/c44d6e395a894978aa1d0c596efffbed"
+  },
+  "description": "# microscope![![![![![![![![![](http://)](http://)](http://)](http://)](http://)](http://)](http://)](http://)](http://)",
+  "faceCount": 7932,
+  "createdAt": "2021-12-23T18:39:13.308025",
+  "vertexCount": 4089,
+  "isAgeRestricted": false,
+  "archives": {
+    "glb": {
+      "textureCount": 0,
+      "size": 287156,
+      "type": "glb",
+      "textureMaxResolution": 0,
+      "faceCount": 7366,
+      "vertexCount": 4719
+    },
+    "gltf": {
+      "textureCount": 0,
+      "size": 93633,
+      "type": "gltf",
+      "textureMaxResolution": 0,
+      "faceCount": 7366,
+      "vertexCount": 4719
+    },
+    "source": {
+      "textureCount": null,
+      "size": 1690064,
+      "type": "source",
+      "textureMaxResolution": null,
+      "faceCount": null,
+      "vertexCount": null
+    },
+    "usdz": {
+      "textureCount": null,
+      "size": 144534,
+      "type": "usdz",
+      "textureMaxResolution": null,
+      "faceCount": null,
+      "vertexCount": null
+    }
+  },
+  "license": "by"
+}

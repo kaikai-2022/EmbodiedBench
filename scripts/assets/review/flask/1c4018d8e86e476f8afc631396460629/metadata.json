@@ -1,0 +1,227 @@
+{
+  "uri": "https://api.sketchfab.com/v3/models/1c4018d8e86e476f8afc631396460629",
+  "uid": "1c4018d8e86e476f8afc631396460629",
+  "name": "Flask Photoscan",
+  "staffpickedAt": null,
+  "viewCount": 1361,
+  "likeCount": 94,
+  "animationCount": 0,
+  "viewerUrl": "https://sketchfab.com/3d-models/1c4018d8e86e476f8afc631396460629",
+  "embedUrl": "https://sketchfab.com/models/1c4018d8e86e476f8afc631396460629/embed",
+  "commentCount": 0,
+  "isDownloadable": true,
+  "publishedAt": "2020-06-15T12:09:32.487638",
+  "tags": [
+    {
+      "name": "ww2",
+      "slug": "ww2",
+      "uri": "https://api.sketchfab.com/v3/tags/ww2"
+    },
+    {
+      "name": "soldier",
+      "slug": "soldier",
+      "uri": "https://api.sketchfab.com/v3/tags/soldier"
+    },
+    {
+      "name": "prop",
+      "slug": "prop",
+      "uri": "https://api.sketchfab.com/v3/tags/prop"
+    },
+    {
+      "name": "shell",
+      "slug": "shell",
+      "uri": "https://api.sketchfab.com/v3/tags/shell"
+    },
+    {
+      "name": "photogrametry",
+      "slug": "photogrametry",
+      "uri": "https://api.sketchfab.com/v3/tags/photogrametry"
+    },
+    {
+      "name": "metal",
+      "slug": "metal",
+      "uri": "https://api.sketchfab.com/v3/tags/metal"
+    },
+    {
+      "name": "water",
+      "slug": "water",
+      "uri": "https://api.sketchfab.com/v3/tags/water"
+    },
+    {
+      "name": "old",
+      "slug": "old",
+      "uri": "https://api.sketchfab.com/v3/tags/old"
+    },
+    {
+      "name": "fabric",
+      "slug": "fabric",
+      "uri": "https://api.sketchfab.com/v3/tags/fabric"
+    },
+    {
+      "name": "rawscan",
+      "slug": "rawscan",
+      "uri": "https://api.sketchfab.com/v3/tags/rawscan"
+    },
+    {
+      "name": "botle",
+      "slug": "botle",
+      "uri": "https://api.sketchfab.com/v3/tags/botle"
+    },
+    {
+      "name": "photoscan",
+      "slug": "photoscan",
+      "uri": "https://api.sketchfab.com/v3/tags/photoscan"
+    },
+    {
+      "name": "realitycapture",
+      "slug": "realitycapture",
+      "uri": "https://api.sketchfab.com/v3/tags/realitycapture"
+    },
+    {
+      "name": "photogrammetry",
+      "slug": "photogrammetry",
+      "uri": "https://api.sketchfab.com/v3/tags/photogrammetry"
+    },
+    {
+      "name": "asset",
+      "slug": "asset",
+      "uri": "https://api.sketchfab.com/v3/tags/asset"
+    },
+    {
+      "name": "blender",
+      "slug": "blender",
+      "uri": "https://api.sketchfab.com/v3/tags/blender"
+    },
+    {
+      "name": "military",
+      "slug": "military",
+      "uri": "https://api.sketchfab.com/v3/tags/military"
+    },
+    {
+      "name": "flask",
+      "slug": "flask",
+      "uri": "https://api.sketchfab.com/v3/tags/flask"
+    }
+  ],
+  "categories": [
+    {
+      "name": "weapons-military"
+    }
+  ],
+  "thumbnails": {
+    "images": [
+      {
+        "uid": "7b5e5ebce8b64be9a0c3d86182b5755d",
+        "size": 159073,
+        "width": 1920,
+        "url": "https://media.sketchfab.com/models/1c4018d8e86e476f8afc631396460629/thumbnails/8f3d37b999ad4d19bc2cee498c693ac2/91f1b33dab5c4e24b59c0975a9d00f6d.jpeg",
+        "height": 1080
+      },
+      {
+        "uid": "252f7c66975740d99db51f7ae995c033",
+        "size": 40670,
+        "width": 1024,
+        "url": "https://media.sketchfab.com/models/1c4018d8e86e476f8afc631396460629/thumbnails/8f3d37b999ad4d19bc2cee498c693ac2/3a2b9e7cb96749b6a155b5cfa372c081.jpeg",
+        "height": 576
+      },
+      {
+        "uid": "eb81568b61db4464ae518880fcdc911d",
+        "size": 19482,
+        "width": 720,
+        "url": "https://media.sketchfab.com/models/1c4018d8e86e476f8afc631396460629/thumbnails/8f3d37b999ad4d19bc2cee498c693ac2/608046afd72147da9857442dd7799d54.jpeg",
+        "height": 405
+      },
+      {
+        "uid": "21501c6898c245188dc3d6f2fbc6dc83",
+        "size": 3463,
+        "width": 256,
+        "url": "https://media.sketchfab.com/models/1c4018d8e86e476f8afc631396460629/thumbnails/8f3d37b999ad4d19bc2cee498c693ac2/e8e35bd2bb034a3a9e3ee8c0fcfda09d.jpeg",
+        "height": 144
+      },
+      {
+        "uid": "34a1fa6806b34bd29a4decb35bd15929",
+        "size": 653,
+        "width": 64,
+        "url": "https://media.sketchfab.com/models/1c4018d8e86e476f8afc631396460629/thumbnails/8f3d37b999ad4d19bc2cee498c693ac2/9f022344a6a2473395ae28eb6b359921.jpeg",
+        "height": 36
+      }
+    ]
+  },
+  "user": {
+    "uid": "5ce8867c4bb4416fa849ca7a50b8c497",
+    "username": "berkgedik",
+    "displayName": "Berk Gedik",
+    "profileUrl": "https://sketchfab.com/berkgedik",
+    "account": "basic",
+    "avatar": {
+      "uri": "https://api.sketchfab.com/v3/avatars/dc0a8714289b4f9fa65f82b4fe128b9a",
+      "images": [
+        {
+          "size": 2600,
+          "width": 32,
+          "url": "https://media.sketchfab.com/avatars/dc0a8714289b4f9fa65f82b4fe128b9a/84453c566b5a41c0bc1321a8d4650da2.png",
+          "height": 32
+        },
+        {
+          "size": 5283,
+          "width": 48,
+          "url": "https://media.sketchfab.com/avatars/dc0a8714289b4f9fa65f82b4fe128b9a/ad8ab9bd431f467381db007bbd02ec67.png",
+          "height": 48
+        },
+        {
+          "size": 15825,
+          "width": 90,
+          "url": "https://media.sketchfab.com/avatars/dc0a8714289b4f9fa65f82b4fe128b9a/e38236a38122485f9487dfab8d31318d.png",
+          "height": 90
+        },
+        {
+          "size": 18994,
+          "width": 100,
+          "url": "https://media.sketchfab.com/avatars/dc0a8714289b4f9fa65f82b4fe128b9a/2cdf7b2c851d49ff822e35077a44aceb.png",
+          "height": 100
+        }
+      ]
+    },
+    "uri": "https://api.sketchfab.com/v3/users/5ce8867c4bb4416fa849ca7a50b8c497"
+  },
+  "description": "Scanning with RealityCapture",
+  "faceCount": 59986,
+  "createdAt": "2020-06-15T11:08:21.126269",
+  "vertexCount": 29977,
+  "isAgeRestricted": false,
+  "archives": {
+    "glb": {
+      "textureCount": 1,
+      "size": 26462936,
+      "type": "glb",
+      "textureMaxResolution": 4096,
+      "faceCount": 59986,
+      "vertexCount": 44251
+    },
+    "gltf": {
+      "textureCount": 1,
+      "size": 25568326,
+      "type": "gltf",
+      "textureMaxResolution": 4096,
+      "faceCount": 59986,
+      "vertexCount": 44251
+    },
+    "source": {
+      "textureCount": null,
+      "size": 60085085,
+      "type": "source",
+      "textureMaxResolution": null,
+      "faceCount": null,
+      "vertexCount": null
+    },
+    "usdz": {
+      "textureCount": null,
+      "size": 5395246,
+      "type": "usdz",
+      "textureMaxResolution": null,
+      "faceCount": null,
+      "vertexCount": null
+    }
+  },
+  "license": "by"
+}

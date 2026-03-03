@@ -1,0 +1,16 @@
+Model UID: 4445f33b9b384a7787e50c7d6a1df5e6
+Model Name: Centrifuge JET ENGINE [ATMOS PROJECT]
+
+Source Information:
+============================================================
+Source: unknown
+Objaverse UID: 4445f33b9b384a7787e50c7d6a1df5e6
+
+HuggingFace Objaverse:
+Dataset: https://huggingface.co/datasets/allenai/objaverse
+Object Path: glbs/44/4445f33b9b384a7787e50c7d6a1df5e6.glb
+
+Additional Metadata:
+Tags: university, impeller, engine, jetengine, toulon
+Description: ATMOS PROJECT _ JET ENGINE
+-------------------------------------------------------------------------------------------...

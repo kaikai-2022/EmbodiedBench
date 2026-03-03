@@ -1,0 +1,145 @@
+<mujoco model="0c3fcd7771574e63aa252d02712e80d6">
+  <default>
+    <default class="visual">
+      <geom group="2" type="mesh" contype="0" conaffinity="0"/>
+    </default>
+    <default class="collision">
+      <geom group="3" type="mesh"/>
+    </default>
+  </default>
+  <asset>
+    <texture type="2d" name="default" file="default.png"/>
+    <material name="default" texture="default" specular="0.4000000000000001" shininess="0.001"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_0.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_1.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_2.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_3.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_4.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_5.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_6.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_7.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_8.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_9.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_10.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_11.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_12.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_13.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_14.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_15.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_16.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_17.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_18.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_19.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_20.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_21.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_22.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_23.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_24.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_25.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_26.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_27.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_28.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_29.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_30.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_31.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_32.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_33.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_34.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_35.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_36.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_37.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_38.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_39.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_40.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_41.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_42.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_43.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_44.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_45.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_46.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_47.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_48.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_49.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_50.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_51.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_52.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_53.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_54.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_55.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_56.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_57.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_58.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_59.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_60.obj"/>
+    <mesh file="0c3fcd7771574e63aa252d02712e80d6_collision_61.obj"/>
+  </asset>
+  <worldbody>
+    <body name="0c3fcd7771574e63aa252d02712e80d6">
+      <freejoint/>
+      <geom material="default" mesh="0c3fcd7771574e63aa252d02712e80d6" class="visual"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_0" rgba="0.4216143307879263 0.2640308841908239 0.7116445002912323 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_1" rgba="0.7950609696834937 0.16896053360152696 0.455055234618692 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_2" rgba="0.7654829535488101 0.6199594572348844 0.30810804998471397 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_3" rgba="0.37155464768571966 0.8533899654691666 0.13897400885663236 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_4" rgba="0.9160897608303327 0.38882396567265665 0.07963817623052005 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_5" rgba="0.8894522464290449 0.6609077560021299 0.23264245903188774 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_6" rgba="0.9520114610032465 0.17740047885692345 0.8169069814900487 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_7" rgba="0.76749048260309 0.6503482822706995 0.23121225332881268 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_8" rgba="0.22715532015560447 0.6770895631864021 0.6011278684743933 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_9" rgba="0.977352340234347 0.44785957675954 0.2621252328562479 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_10" rgba="0.27557037804386997 0.8095996815123866 0.8577492329451444 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_11" rgba="0.23547384043636876 0.4913627696088104 0.7832539564692156 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_12" rgba="0.9366449100005139 0.3776990699074928 0.8443262775211643 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_13" rgba="0.47114790237771975 0.39016018981400247 0.8437209082156056 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_14" rgba="0.6014899587108375 0.05222581069191823 0.16179103133787165 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_15" rgba="0.27847212458012427 0.4472470515578302 0.2971058220380175 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_16" rgba="0.20698013287869643 0.7940177686740264 0.9609791797920509 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_17" rgba="0.011935961934463557 0.4692937494987057 0.11670696889158227 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_18" rgba="0.32898320751912247 0.7103472927985619 0.2749797256333866 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_19" rgba="0.513148123281222 0.9475199099319279 0.07657675923237595 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_20" rgba="0.007447088662230317 0.4021113885272659 0.5457782543380647 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_21" rgba="0.0215115577775864 0.39861911649574444 0.7635960977945138 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_22" rgba="0.27610468743822514 0.7048474103061736 0.47667543783762456 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_23" rgba="0.8705705395182467 0.08637914805761893 0.8420953902954905 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_24" rgba="0.8146380662414479 0.6510710957664485 0.5630834796864814 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_25" rgba="0.9955918747795938 0.9371672974041692 0.2007027601996273 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_26" rgba="0.6648990899889472 0.5353572167984716 0.7505074721101698 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_27" rgba="0.9329906198331028 0.24839002752980066 0.11844438016075531 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_28" rgba="0.0795921653553352 0.4911317606265244 0.6135384414491146 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_29" rgba="0.23672478268391917 0.6018923101529852 0.5978471118109899 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_30" rgba="0.7404699598621517 0.4075023125621168 0.7304388977642947 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_31" rgba="0.5958802567432819 0.9159435931748833 0.6783556188316512 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_32" rgba="0.5032007204627723 0.3954944480616993 0.16660048016447382 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_33" rgba="0.6887503005936358 0.7401853193753094 0.0718670177570424 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_34" rgba="0.43044290769860405 0.591901148625729 0.9739863896603403 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_35" rgba="0.8992400274095498 0.3883132497216689 0.13588647754305827 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_36" rgba="0.30534836461313497 0.6923755471867151 0.2712756470094173 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_37" rgba="0.19688523421965887 0.29809067803371103 0.23990561477026962 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_38" rgba="0.8158108747463596 0.09005774415148926 0.028434227877816576 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_39" rgba="0.5149171441521722 0.7710941037030649 0.17453320953257878 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_40" rgba="0.761914513748318 0.6515475477033033 0.9658659754789384 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_41" rgba="0.004501416082545506 0.7735708291089527 0.6534982185557625 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_42" rgba="0.23303560199277362 0.9291196550908597 0.26249001459090093 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_43" rgba="0.6854784603726218 0.2720524775104245 0.8678080220644087 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_44" rgba="0.31712724255332825 0.4897979319639304 0.9815969999792146 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_45" rgba="0.15206635185226414 0.13344587456486712 0.27846794815072407 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_46" rgba="0.1325051291957211 0.22796789601107292 0.9402413376624319 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_47" rgba="0.36321737954159594 0.07536809758196283 0.17841800072619474 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_48" rgba="0.022864274846269517 0.6813342588300486 0.9795007275752244 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_49" rgba="0.8893339992457802 0.6373537526900528 0.29865733576267195 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_50" rgba="0.5661618386490225 0.5684447934556713 0.35554137453728996 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_51" rgba="0.9607397198332057 0.4026326718073433 0.32927499815718475 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_52" rgba="0.48536452425771925 0.8664243820004847 0.37699596422222936 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_53" rgba="0.47148941262077426 0.431619454930244 0.0638090613128256 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_54" rgba="0.9048795250013181 0.051156764128432286 0.39767790673120373 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_55" rgba="0.42607880557866773 0.9622223433980333 0.3135299363691446 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_56" rgba="0.015230231649219439 0.02215729672623612 0.7025720917151549 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_57" rgba="0.654452625978847 0.18587937331023918 0.6509560290074161 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_58" rgba="0.96547404060458 0.9491841900015973 0.802741840497028 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_59" rgba="0.010114198481264713 0.958874065856613 0.45461132561933704 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_60" rgba="0.2832431897624409 0.3105398007853092 0.6028293947284661 1" class="collision"/>
+      <geom mesh="0c3fcd7771574e63aa252d02712e80d6_collision_61" rgba="0.5733678727192016 0.8289226215049843 0.41466343373205683 1" class="collision"/>
+    </body>
+  </worldbody>
+</mujoco>

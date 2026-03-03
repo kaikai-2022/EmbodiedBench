@@ -1,0 +1,15 @@
+Model UID: c7ab97fb91b14e7f9a539ef9a62d4fbb
+Model Name: MicroScope
+
+Source Information:
+============================================================
+Source: unknown
+Objaverse UID: c7ab97fb91b14e7f9a539ef9a62d4fbb
+
+HuggingFace Objaverse:
+Dataset: https://huggingface.co/datasets/allenai/objaverse
+Object Path: glbs/c7/c7ab97fb91b14e7f9a539ef9a62d4fbb.glb
+
+Additional Metadata:
+Tags: microscope, pipe, rust, trash, junk
+Description: MicroScope made from some stuff....

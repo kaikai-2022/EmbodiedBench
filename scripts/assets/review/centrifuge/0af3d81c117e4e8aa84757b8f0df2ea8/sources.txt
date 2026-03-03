@@ -1,0 +1,15 @@
+Model UID: 0af3d81c117e4e8aa84757b8f0df2ea8
+Model Name: Centrifuge
+
+Source Information:
+============================================================
+Source: unknown
+Objaverse UID: 0af3d81c117e4e8aa84757b8f0df2ea8
+
+HuggingFace Objaverse:
+Dataset: https://huggingface.co/datasets/allenai/objaverse
+Object Path: glbs/0a/0af3d81c117e4e8aa84757b8f0df2ea8.glb
+
+Additional Metadata:
+Tags: 
+Description: for some reason the glass is missing, also there are supposed to be flasks in the holders they are also missing...

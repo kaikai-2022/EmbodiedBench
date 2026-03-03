@@ -8,7 +8,9 @@
         "select_toy_spatial",
         "add_condiment",
         "insert_flower",
-        "select_chemistry_tube"
+        "select_chemistry_tube",
+        "pick_tube",
+        "insert_tube_centrifuge"
 
     ],
     "Spatial":[

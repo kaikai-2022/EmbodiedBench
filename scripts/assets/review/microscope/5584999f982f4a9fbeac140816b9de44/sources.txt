@@ -1,0 +1,15 @@
+Model UID: 5584999f982f4a9fbeac140816b9de44
+Model Name: Microscope
+
+Source Information:
+============================================================
+Source: unknown
+Objaverse UID: 5584999f982f4a9fbeac140816b9de44
+
+HuggingFace Objaverse:
+Dataset: https://huggingface.co/datasets/allenai/objaverse
+Object Path: glbs/55/5584999f982f4a9fbeac140816b9de44.glb
+
+Additional Metadata:
+Tags: microscope, lab, tech, laboratory, equipment
+Description: Had a microscope when i was little, so I thought I would make another one. Pretty close to what mine was, and I am happy with the result....
