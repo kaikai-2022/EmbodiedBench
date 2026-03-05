@@ -1,0 +1,225 @@
+{
+  "uri": "https://api.sketchfab.com/v3/models/0c3fcd7771574e63aa252d02712e80d6",
+  "uid": "0c3fcd7771574e63aa252d02712e80d6",
+  "name": "Beaker-Shaped Vase, From a Five-Piece Garniture",
+  "staffpickedAt": null,
+  "viewCount": 1996,
+  "likeCount": 74,
+  "animationCount": 0,
+  "viewerUrl": "https://sketchfab.com/3d-models/0c3fcd7771574e63aa252d02712e80d6",
+  "embedUrl": "https://sketchfab.com/models/0c3fcd7771574e63aa252d02712e80d6/embed",
+  "commentCount": 0,
+  "isDownloadable": true,
+  "publishedAt": "2020-02-20T21:54:33.216135",
+  "tags": [
+    {
+      "name": "vase",
+      "slug": "vase",
+      "uri": "https://api.sketchfab.com/v3/tags/vase"
+    },
+    {
+      "name": "porcelain",
+      "slug": "porcelain",
+      "uri": "https://api.sketchfab.com/v3/tags/porcelain"
+    },
+    {
+      "name": "ceramic",
+      "slug": "ceramic",
+      "uri": "https://api.sketchfab.com/v3/tags/ceramic"
+    },
+    {
+      "name": "smithsonian",
+      "slug": "smithsonian",
+      "uri": "https://api.sketchfab.com/v3/tags/smithsonian"
+    },
+    {
+      "name": "baluster",
+      "slug": "baluster",
+      "uri": "https://api.sketchfab.com/v3/tags/baluster"
+    },
+    {
+      "name": "cobalt",
+      "slug": "cobalt",
+      "uri": "https://api.sketchfab.com/v3/tags/cobalt"
+    },
+    {
+      "name": "chinese-art",
+      "slug": "chinese-art",
+      "uri": "https://api.sketchfab.com/v3/tags/chinese-art"
+    },
+    {
+      "name": "jingdezhen",
+      "slug": "jingdezhen",
+      "uri": "https://api.sketchfab.com/v3/tags/jingdezhen"
+    },
+    {
+      "name": "smithsonian-institution",
+      "slug": "smithsonian-institution",
+      "uri": "https://api.sketchfab.com/v3/tags/smithsonian-institution"
+    },
+    {
+      "name": "art",
+      "slug": "art",
+      "uri": "https://api.sketchfab.com/v3/tags/art"
+    },
+    {
+      "name": "freer-sackler",
+      "slug": "freer-sackler",
+      "uri": "https://api.sketchfab.com/v3/tags/freer-sackler"
+    },
+    {
+      "name": "smithsonian-digitization-program_office",
+      "slug": "smithsonian-digitization-program_office",
+      "uri": "https://api.sketchfab.com/v3/tags/smithsonian-digitization-program_office"
+    },
+    {
+      "name": "freer-sackler-gallery",
+      "slug": "freer-sackler-gallery",
+      "uri": "https://api.sketchfab.com/v3/tags/freer-sackler-gallery"
+    },
+    {
+      "name": "qing-dynasty",
+      "slug": "qing-dynasty",
+      "uri": "https://api.sketchfab.com/v3/tags/qing-dynasty"
+    },
+    {
+      "name": "kangxi-reign",
+      "slug": "kangxi-reign",
+      "uri": "https://api.sketchfab.com/v3/tags/kangxi-reign"
+    },
+    {
+      "name": "jingdezhen-ware",
+      "slug": "jingdezhen-ware",
+      "uri": "https://api.sketchfab.com/v3/tags/jingdezhen-ware"
+    },
+    {
+      "name": "blue-and-white",
+      "slug": "blue-and-white",
+      "uri": "https://api.sketchfab.com/v3/tags/blue-and-white"
+    }
+  ],
+  "categories": [
+    {
+      "name": "art-abstract"
+    },
+    {
+      "name": "cultural-heritage-history"
+    }
+  ],
+  "thumbnails": {
+    "images": [
+      {
+        "uid": "c519381299514b7299f063b5ef08f317",
+        "size": 89542,
+        "width": 1920,
+        "url": "https://media.sketchfab.com/models/0c3fcd7771574e63aa252d02712e80d6/thumbnails/2da79d5c7230404fa2b7bacfe59a6159/af6c223130724225884ca16b8260072c.jpeg",
+        "height": 1080
+      },
+      {
+        "uid": "15eaa831f7b043209ac6e0986b994a25",
+        "size": 29873,
+        "width": 1024,
+        "url": "https://media.sketchfab.com/models/0c3fcd7771574e63aa252d02712e80d6/thumbnails/2da79d5c7230404fa2b7bacfe59a6159/e49bd5c16add46c68923fbd124bb0093.jpeg",
+        "height": 576
+      },
+      {
+        "uid": "65799d8fa12c4ca8815960b90c7fada8",
+        "size": 16871,
+        "width": 720,
+        "url": "https://media.sketchfab.com/models/0c3fcd7771574e63aa252d02712e80d6/thumbnails/2da79d5c7230404fa2b7bacfe59a6159/f4bc8d93a6324ecba786770650e8ba90.jpeg",
+        "height": 405
+      },
+      {
+        "uid": "a52a1e4f35724f25971017e7f22c4bb7",
+        "size": 3185,
+        "width": 256,
+        "url": "https://media.sketchfab.com/models/0c3fcd7771574e63aa252d02712e80d6/thumbnails/2da79d5c7230404fa2b7bacfe59a6159/ecad7785a8044787bd48d29d9ee868be.jpeg",
+        "height": 144
+      },
+      {
+        "uid": "b4e8646760984e06ae2ec6479a1bb0b4",
+        "size": 643,
+        "width": 64,
+        "url": "https://media.sketchfab.com/models/0c3fcd7771574e63aa252d02712e80d6/thumbnails/2da79d5c7230404fa2b7bacfe59a6159/27924287b3f34aaa88c47acafbebec27.jpeg",
+        "height": 36
+      }
+    ]
+  },
+  "user": {
+    "uid": "27357ad36f1b4038aa95f6290e6e39be",
+    "username": "Smithsonian",
+    "displayName": "The Smithsonian Institution",
+    "profileUrl": "https://sketchfab.com/Smithsonian",
+    "account": "prem",
+    "avatar": {
+      "uri": "https://api.sketchfab.com/v3/avatars/109093e6abba4781a75084e1dc91c376",
+      "images": [
+        {
+          "size": 2136,
+          "width": 32,
+          "url": "https://media.sketchfab.com/avatars/109093e6abba4781a75084e1dc91c376/18cb53437afe4f98a725796fda1a1e7d.png",
+          "height": 32
+        },
+        {
+          "size": 3919,
+          "width": 48,
+          "url": "https://media.sketchfab.com/avatars/109093e6abba4781a75084e1dc91c376/2d43972de92144f6ac8d16d20fcd0b0c.png",
+          "height": 48
+        },
+        {
+          "size": 9057,
+          "width": 90,
+          "url": "https://media.sketchfab.com/avatars/109093e6abba4781a75084e1dc91c376/0dcfb687b639447087c3dbbe1f3aaf6a.png",
+          "height": 90
+        },
+        {
+          "size": 10340,
+          "width": 100,
+          "url": "https://media.sketchfab.com/avatars/109093e6abba4781a75084e1dc91c376/c82e2b497da1474da172b359c070e517.png",
+          "height": 100
+        }
+      ]
+    },
+    "uri": "https://api.sketchfab.com/v3/users/27357ad36f1b4038aa95f6290e6e39be"
+  },
+  "description": "Smithsonian source data can be found [here](https://ids.si.edu/ids/media_view?id=3d_package:d8c63a70-4ebc-11ea-b77f-2e728ce88125)\n\nThis media file is in the public domain (free of copyright restrictions). You can copy, modify, and distribute this work without contacting the Smithsonian. For more information and to review the 3D disclaimer, visit the Smithsonian’s [Terms of Use](https://www.si.edu/Termsofuse) page.\n\nBeaker-shaped vase, from a five-piece garniture (F1980.190-.194)\n\nMedium: Porcelain with cobalt pigment under clear colorless glaze\n\nDimensions: H x Diam: 42.5 × 21.2 cm (16 3/4 × 8 3/8 in)\n\nStyle: Jingdezhen ware\n\nType: Ceramic, Vessel\n\nOrigin:  Jingdezhen, Jiangxi province, China\n\nDate: 1662-1722\n\nPeriod: Qing dynasty\n    \nCredit Line: Gift of Myron S. Falk, Jr. and his sisters, Mrs. Mildred F. Loew and Mrs. Eleanor F. Lenzner\n\nAccession Number: F1980.193a-b\n\nEDAN-URL: edanmdm:fsg_F1980.193a-b",
+  "faceCount": 150000,
+  "createdAt": "2020-02-20T21:45:06.201958",
+  "vertexCount": 75148,
+  "isAgeRestricted": false,
+  "archives": {
+    "glb": {
+      "textureCount": 3,
+      "size": 11430208,
+      "type": "glb",
+      "textureMaxResolution": 4096,
+      "faceCount": 150000,
+      "vertexCount": 88220
+    },
+    "gltf": {
+      "textureCount": 3,
+      "size": 8844521,
+      "type": "gltf",
+      "textureMaxResolution": 4096,
+      "faceCount": 150000,
+      "vertexCount": 88220
+    },
+    "source": {
+      "textureCount": null,
+      "size": 9703678,
+      "type": "source",
+      "textureMaxResolution": null,
+      "faceCount": null,
+      "vertexCount": null
+    },
+    "usdz": {
+      "textureCount": null,
+      "size": 6226192,
+      "type": "usdz",
+      "textureMaxResolution": null,
+      "faceCount": null,
+      "vertexCount": null
+    }
+  },
+  "license": "cc0"
+}

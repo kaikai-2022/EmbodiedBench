@@ -18,6 +18,19 @@ import sys
 from pathlib import Path
 from typing import Optional, Tuple
 
+# ==================== 重要：HF镜像配置 ====================
+# 必须在导入 objaverse 之前设置环境变量
+# 如果环境中已经设置了 HF_ENDPOINT，优先使用环境变量
+# 否则，检查是否在中国大陆，如果是则使用镜像
+if 'HF_ENDPOINT' not in os.environ:
+    # 可以根据需要设置默认镜像
+    # os.environ['HF_ENDPOINT'] = 'https://hf-mirror.com'
+    pass  # 使用官方源
+else:
+    logger_temp = logging.getLogger(__name__)
+    logger_temp.info(f"检测到 HF_ENDPOINT 环境变量: {os.environ['HF_ENDPOINT']}")
+# =========================================================
+
 # 可选依赖 - 在需要时才导入
 try:
     from tqdm import tqdm
@@ -290,11 +303,21 @@ class AssetPipeline:
             return {}
 
         try:
+            # 显示下载的 UID 信息
+            logger.info(f"准备下载的模型 UID: {uids}")
+
             objects = load_objects(uids=uids, download_processes=6)
             logger.info(f"成功下载 {len(objects)} 个模型")
+
+            # 显示下载结果
+            for uid, path in objects.items():
+                logger.debug(f"已下载: {uid} -> {path}")
+
             return objects
         except Exception as e:
             logger.error(f"下载失败: {e}")
+            import traceback
+            logger.error(f"详细错误:\n{traceback.format_exc()}")
             return {}
 
     def convert_obj_to_mjcf(self, obj_dir: Path) -> Optional[Path]:

@@ -1,0 +1,15 @@
+Model UID: cd6bb83c37374fe9ba15cbc3451e5180
+Model Name: Beaker with flat base - PG.41.1.197
+
+Source Information:
+============================================================
+Source: unknown
+Objaverse UID: cd6bb83c37374fe9ba15cbc3451e5180
+
+HuggingFace Objaverse:
+Dataset: https://huggingface.co/datasets/allenai/objaverse
+Object Path: glbs/cd/cd6bb83c37374fe9ba15cbc3451e5180.glb
+
+Additional Metadata:
+Tags: spain, vase, ceramics, prehistory, beaker
+Description: It concerns a type 8b beaker in the typology of the El Argar culture of the Siret brothers, excavated in the southeast of Spain. These hand shaped beakers are associated with funerary contexts and are...

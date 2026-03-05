@@ -1,0 +1,15 @@
+Model UID: 673e3474c582434eab60687f56e7ab70
+Model Name: Beaker on foot - PG.2000.1477
+
+Source Information:
+============================================================
+Source: unknown
+Objaverse UID: 673e3474c582434eab60687f56e7ab70
+
+HuggingFace Objaverse:
+Dataset: https://huggingface.co/datasets/allenai/objaverse
+Object Path: glbs/67/673e3474c582434eab60687f56e7ab70.glb
+
+Additional Metadata:
+Tags: spain, bowl, ceramics, prehistory, beaker
+Description: It concerns a beaker on foot (missing) associated with the El Argar culture, excavated by the Siret brothers in the southeast of Spain. These hand shaped vessels are associated with funerary contexts....

@@ -1,0 +1,200 @@
+{
+  "uri": "https://api.sketchfab.com/v3/models/efcae774d5eb42bfb72db0f7f592cc92",
+  "uid": "efcae774d5eb42bfb72db0f7f592cc92",
+  "name": "Beaker with concave wall - PG.2807.193",
+  "staffpickedAt": null,
+  "viewCount": 9,
+  "likeCount": 0,
+  "animationCount": 0,
+  "viewerUrl": "https://sketchfab.com/3d-models/efcae774d5eb42bfb72db0f7f592cc92",
+  "embedUrl": "https://sketchfab.com/models/efcae774d5eb42bfb72db0f7f592cc92/embed",
+  "commentCount": 0,
+  "isDownloadable": true,
+  "publishedAt": "2020-03-31T14:20:16.075264",
+  "tags": [
+    {
+      "name": "spain",
+      "slug": "spain",
+      "uri": "https://api.sketchfab.com/v3/tags/spain"
+    },
+    {
+      "name": "ceramics",
+      "slug": "ceramics",
+      "uri": "https://api.sketchfab.com/v3/tags/ceramics"
+    },
+    {
+      "name": "prehistory",
+      "slug": "prehistory",
+      "uri": "https://api.sketchfab.com/v3/tags/prehistory"
+    },
+    {
+      "name": "beaker",
+      "slug": "beaker",
+      "uri": "https://api.sketchfab.com/v3/tags/beaker"
+    },
+    {
+      "name": "protohistory",
+      "slug": "protohistory",
+      "uri": "https://api.sketchfab.com/v3/tags/protohistory"
+    },
+    {
+      "name": "brussels",
+      "slug": "brussels",
+      "uri": "https://api.sketchfab.com/v3/tags/brussels"
+    },
+    {
+      "name": "archaeology",
+      "slug": "archaeology",
+      "uri": "https://api.sketchfab.com/v3/tags/archaeology"
+    },
+    {
+      "name": "siret",
+      "slug": "siret",
+      "uri": "https://api.sketchfab.com/v3/tags/siret"
+    },
+    {
+      "name": "artandhistorymuseum",
+      "slug": "artandhistorymuseum",
+      "uri": "https://api.sketchfab.com/v3/tags/artandhistorymuseum"
+    },
+    {
+      "name": "europeanaarchaeology",
+      "slug": "europeanaarchaeology",
+      "uri": "https://api.sketchfab.com/v3/tags/europeanaarchaeology"
+    },
+    {
+      "name": "argaricculture",
+      "slug": "argaricculture",
+      "uri": "https://api.sketchfab.com/v3/tags/argaricculture"
+    },
+    {
+      "name": "rmah-133829-fr",
+      "slug": "rmah-133829-fr",
+      "uri": "https://api.sketchfab.com/v3/tags/rmah-133829-fr"
+    }
+  ],
+  "categories": [
+    {
+      "name": "art-abstract"
+    },
+    {
+      "name": "cultural-heritage-history"
+    }
+  ],
+  "thumbnails": {
+    "images": [
+      {
+        "uid": "675376c8875a453dafe42a65b59a13e7",
+        "size": 122964,
+        "width": 1920,
+        "url": "https://media.sketchfab.com/models/efcae774d5eb42bfb72db0f7f592cc92/thumbnails/c12b0cf0ec2340d5b6f5f3dd1111b780/35d5171b432e47a5bd6fd3bb07818690.jpeg",
+        "height": 1080
+      },
+      {
+        "uid": "7e72a895884a46d99939aa23a117c46d",
+        "size": 34901,
+        "width": 1024,
+        "url": "https://media.sketchfab.com/models/efcae774d5eb42bfb72db0f7f592cc92/thumbnails/c12b0cf0ec2340d5b6f5f3dd1111b780/e7211f58b00b434fb149178b632ce95c.jpeg",
+        "height": 576
+      },
+      {
+        "uid": "661ba93942b7415983f3ab1d6c959a5c",
+        "size": 18166,
+        "width": 720,
+        "url": "https://media.sketchfab.com/models/efcae774d5eb42bfb72db0f7f592cc92/thumbnails/c12b0cf0ec2340d5b6f5f3dd1111b780/95f8e9fc4e074ee4b1199ea8cc76d7c8.jpeg",
+        "height": 405
+      },
+      {
+        "uid": "26e36701ca714f7db02ad1d9cf2fb223",
+        "size": 3094,
+        "width": 256,
+        "url": "https://media.sketchfab.com/models/efcae774d5eb42bfb72db0f7f592cc92/thumbnails/c12b0cf0ec2340d5b6f5f3dd1111b780/7c0bdfd02ef24c42833d6f2fc7478d69.jpeg",
+        "height": 144
+      },
+      {
+        "uid": "d574fa4ce1174e88ac4c7ae48d1a19e6",
+        "size": 662,
+        "width": 64,
+        "url": "https://media.sketchfab.com/models/efcae774d5eb42bfb72db0f7f592cc92/thumbnails/c12b0cf0ec2340d5b6f5f3dd1111b780/4516f85c4b4a4a36ad4a6e023ebd1f95.jpeg",
+        "height": 36
+      }
+    ]
+  },
+  "user": {
+    "uid": "5efa119f5b60448d94e02729d6d066a0",
+    "username": "kmkg-mrah",
+    "displayName": "The Royal Museums of Art and History",
+    "profileUrl": "https://sketchfab.com/kmkg-mrah",
+    "account": "prem",
+    "avatar": {
+      "uri": "https://api.sketchfab.com/v3/avatars/53988eaad0f64ffb89cb0e50e7592f04",
+      "images": [
+        {
+          "size": 937,
+          "width": 32,
+          "url": "https://media.sketchfab.com/avatars/53988eaad0f64ffb89cb0e50e7592f04/52873f3af15d4a9491da9ee355994838.jpeg",
+          "height": 32
+        },
+        {
+          "size": 1418,
+          "width": 48,
+          "url": "https://media.sketchfab.com/avatars/53988eaad0f64ffb89cb0e50e7592f04/ba6cabba4e2a4c199a2fcbcdfb2246ee.jpeg",
+          "height": 48
+        },
+        {
+          "size": 2899,
+          "width": 90,
+          "url": "https://media.sketchfab.com/avatars/53988eaad0f64ffb89cb0e50e7592f04/e200e70dc2644991899a98d0d3b87f6d.jpeg",
+          "height": 90
+        },
+        {
+          "size": 3262,
+          "width": 100,
+          "url": "https://media.sketchfab.com/avatars/53988eaad0f64ffb89cb0e50e7592f04/77728c3c53c84f5e9fe4942ca96c43e8.jpeg",
+          "height": 100
+        }
+      ]
+    },
+    "uri": "https://api.sketchfab.com/v3/users/5efa119f5b60448d94e02729d6d066a0"
+  },
+  "description": "It concerns a type 8 beaker with concave wall in the typology of the El Argar culture of the Siret brothers, excavated in the southeast of Spain. These hand shaped beakers are associated with funerary contexts and are regularly found together with type 4 egg-shaped pots. This type of ceramic is characterized by a dark, polished, metallic surface. In this case the recipient was reddish-brown. (Argaric culture, 2300 BC - 1600 BC). Inv n.: PG.2807.193\n\nFind this object in the museum’s online catalog [Carmentis](https://www.carmentis.be:443/eMP/eMuseumPlus?service=ExternalInterface&module=collection&objectId=133829&viewType=detailView)",
+  "faceCount": 117758,
+  "createdAt": "2020-03-26T13:54:07.271842",
+  "vertexCount": 58881,
+  "isAgeRestricted": false,
+  "archives": {
+    "glb": {
+      "textureCount": 1,
+      "size": 7623128,
+      "type": "glb",
+      "textureMaxResolution": 4096,
+      "faceCount": 117758,
+      "vertexCount": 61626
+    },
+    "gltf": {
+      "textureCount": 1,
+      "size": 6340662,
+      "type": "gltf",
+      "textureMaxResolution": 4096,
+      "faceCount": 117758,
+      "vertexCount": 61626
+    },
+    "source": {
+      "textureCount": null,
+      "size": 12306408,
+      "type": "source",
+      "textureMaxResolution": null,
+      "faceCount": null,
+      "vertexCount": null
+    },
+    "usdz": {
+      "textureCount": null,
+      "size": 6709575,
+      "type": "usdz",
+      "textureMaxResolution": null,
+      "faceCount": null,
+      "vertexCount": null
+    }
+  },
+  "license": "by-nc-sa"
+}

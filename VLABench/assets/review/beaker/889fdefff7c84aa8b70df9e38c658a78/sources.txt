@@ -1,0 +1,19 @@
+Model UID: 889fdefff7c84aa8b70df9e38c658a78
+Model Name: Beaker on foot - PG.2000.109
+
+Source Information:
+============================================================
+Source: unknown
+Objaverse UID: 889fdefff7c84aa8b70df9e38c658a78
+
+HuggingFace Objaverse:
+Dataset: https://huggingface.co/datasets/allenai/objaverse
+Object Path: glbs/88/889fdefff7c84aa8b70df9e38c658a78.glb
+
+Additional Metadata:
+Tags: spain, vase, ceramics, prehistory, beaker
+Description: Beaker on foot. Argaric culture. Early-Middle Bronze Age (2300-1600 BC).
+
+Inventory number: PG.2000.109
+
+Find this object in the museum’s online catalog [Carmentis](https://www.carmentis.be:443/eMP/eM...

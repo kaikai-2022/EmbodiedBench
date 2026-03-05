@@ -15,11 +15,11 @@ env_var_name = 'VLABENCH_ROOT'
 
 
 if is_windows:
-    logging.info("Detect Windows, add LM4root as environment variable: ", package_root)
+    logging.info("Detect Windows, add LM4root as environment variable: %s", package_root)
     os.environ.setdefault(env_var_name, package_root)
 elif is_linux:
-    logging.info("Detect Linux, add LM4root as environment variable: ", package_root)
-    os.environ[env_var_name] =  package_root
+    logging.info("Detect Linux, add LM4root as environment variable: %s", package_root)
+    os.environ[env_var_name] = package_root  # Restore original behavior
 elif is_mac:
-    logging.info("Detect Linux, add LM4root as environment variable: ", package_root)
+    logging.info("Detect Mac, add LM4root as environment variable: %s", package_root)
     os.environ.setdefault(env_var_name, package_root)
