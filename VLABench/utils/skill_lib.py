@@ -15,10 +15,10 @@ PRIOR_EULERS = [[np.pi, 0, -np.pi/2], # face down, horizontal
 
 class SkillLib:
     @staticmethod
-    def step_trajectory(env, 
-                        points, 
-                        quats, 
-                        gripper_state, 
+    def step_trajectory(env,
+                        points,
+                        quats,
+                        gripper_state,
                         max_n_substep=1,
                         tolerance=0.01):
         """
@@ -36,37 +36,77 @@ class SkillLib:
             stage_success: bool, whether the stage is successful
             task_success: bool, whether the task is successful
         """
+        print(f"\nDEBUG [step_trajectory]: 开始执行轨迹")
+        print(f"  总路径点数: {len(points)}")
+        print(f"  容差阈值: {tolerance}")
+        print(f"  每步最大子步数: {max_n_substep}")
+
         observations = []
         waypoints = []
         stage_success = False
         task_success = False
+        last_executed_waypoint = -1
+
         for i, (point, quat) in enumerate(zip(points, quats)):
             success, action = env.robot.get_qpos_from_ee_pos(physics=env.physics, pos=point, quat=quat)
             # if not success: # a wrong action beyond the embodied limit
             #     return None, None, False, False
             action = np.concatenate([action, gripper_state])
             waypoint = np.concatenate([point, quaternion_to_euler(quat), gripper_state])
-            for _ in range(max_n_substep):
+
+            for substep_idx in range(max_n_substep):
                 timestep = env.step(action)
+
+                # 检查任务是否完成
                 if timestep.last():
+                    print(f"DEBUG [step_trajectory]: 在路径点 {i}/{len(points)} 处任务完成 (timestep.last())")
                     task_success = True
                     break
+
+                # 检查关节位置收敛
                 current_qpos = np.array(env.task.robot.get_qpos(env.physics)).reshape(-1)
-                if np.max(current_qpos - np.array(action[:7])) < tolerance \
-                    and np.min(current_qpos - np.array(action[:7])) > -tolerance:
-                  break
+                qpos_max_error = np.max(current_qpos - np.array(action[:7]))
+                qpos_min_error = np.min(current_qpos - np.array(action[:7]))
+
+                if qpos_max_error < tolerance and qpos_min_error > -tolerance:
+                    if i % 10 == 0 or i == len(points) - 1:  # 只打印部分点避免输出过多
+                        current_ee_pos = env.robot.get_end_effector_pos(env.physics)
+                        ee_error = distance(point, current_ee_pos)
+                        print(f"DEBUG [step_trajectory]: 路径点 {i}/{len(points)} - 关节收敛")
+                        print(f"  目标末端位置: {point}")
+                        print(f"  当前末端位置: {current_ee_pos}")
+                        print(f"  末端位置误差: {ee_error:.4f}m")
+                        print(f"  qpos 误差范围: [{qpos_min_error:.6f}, {qpos_max_error:.6f}]")
+                    break
+
+            last_executed_waypoint = i
+
             if task_success:
+                print(f"DEBUG [step_trajectory]: 提前退出 - 任务已完成")
                 break
+
             obs = env.get_observation()
             observations.append(obs)
-            waypoints.append(waypoint) 
+            waypoints.append(waypoint)
+
+        # 最终检查
+        final_ee_pos = env.robot.get_end_effector_pos(env.physics)
+        final_distance = distance(points[-1], final_ee_pos)
+
+        print(f"\nDEBUG [step_trajectory]: 轨迹执行完成")
+        print(f"  执行了 {last_executed_waypoint + 1}/{len(points)} 个路径点")
+        print(f"  最终末端位置: {final_ee_pos}")
+        print(f"  目标末端位置 (最后路径点): {points[-1]}")
+        print(f"  最终距离误差: {final_distance:.4f}m")
+        print(f"  stage_success 判定: {final_distance} < {tolerance} = {final_distance < tolerance}")
+
         assert len(observations) == len(waypoints), f"observations and waypoints should have the same length, {len(observations)} and {len(waypoints)}"
-        if distance(points[-1], env.robot.get_end_effector_pos(env.physics)) < tolerance:
+        if final_distance < tolerance:
             stage_success = True
         return observations, waypoints, stage_success, task_success
             
     @staticmethod
-    def moveto(env, 
+    def moveto(env,
                target_pos,
                target_quat=None,
                target_velocity=0.05,
@@ -74,6 +114,15 @@ class SkillLib:
                **kwargs
                ):
         start_pos, start_quat = env.robot.get_end_effector_pos(env.physics), env.robot.get_end_effector_quat(env.physics)
+
+        # DEBUG: 打印 moveto 开始信息
+        print(f"\n{'='*60}")
+        print(f"DEBUG [moveto]: 开始移动")
+        print(f"  起始位置: {start_pos}")
+        print(f"  目标位置: {target_pos}")
+        print(f"  移动距离: {np.linalg.norm(target_pos - start_pos):.4f}m")
+        print(f"{'='*60}\n")
+
         observations = [env.get_observation()]
         waypoints = []
         task_success = False
@@ -85,23 +134,35 @@ class SkillLib:
         # obstacle_pcd = np.asarray(env_pcd.points)
 
         obstacle_pcd = np.asarray(env.get_obstacle_pcd().points)
+        print(f"DEBUG [moveto]: 障碍物点云数量: {len(obstacle_pcd)}")
 
         if target_quat is None:
             target_quat = start_quat
-        motion_planning_path = rrt_motion_planning(tuple(start_pos), 
-                                                tuple(target_pos), 
+
+        print(f"DEBUG [moveto]: 开始 RRT 运动规划...")
+        motion_planning_path = rrt_motion_planning(tuple(start_pos),
+                                                tuple(target_pos),
                                                 obstacle_pcd)
         if motion_planning_path is None:
+            print(f"DEBUG [moveto]: ⚠️  RRT 规划失败，使用直线路径")
             motion_planning_path = [start_pos, target_pos]
+        else:
+            print(f"DEBUG [moveto]: ✓ RRT 规划成功，路径点数: {len(motion_planning_path)}")
+
         quats_in_path = []
         for t in np.linspace(0, 1, len(motion_planning_path), endpoint=False):
             quats_in_path.append(qauternion_slerp(start_quat, target_quat, t))
-        interplate_path, interplate_quat = interpolate_path(np.array(motion_planning_path), 
-                                                            np.array(quats_in_path), 
+
+        print(f"DEBUG [moveto]: 插值路径...")
+        interplate_path, interplate_quat = interpolate_path(np.array(motion_planning_path),
+                                                            np.array(quats_in_path),
                                                             target_velocity)
-        new_obs, new_waypoints, stage_success, task_success = SkillLib.step_trajectory(env, 
-                                                                   interplate_path, 
-                                                                   interplate_quat, 
+        print(f"DEBUG [moveto]: 插值后路径点数: {len(interplate_path)}")
+
+        print(f"DEBUG [moveto]: 执行轨迹...")
+        new_obs, new_waypoints, stage_success, task_success = SkillLib.step_trajectory(env,
+                                                                   interplate_path,
+                                                                   interplate_quat,
                                                                    gripper_state,
                                                                    **kwargs)
         # if new_obs is None:
@@ -109,6 +170,18 @@ class SkillLib:
         observations.extend(new_obs)
         waypoints.extend(new_waypoints)
         observations.pop(-1)
+
+        # DEBUG: 打印执行结果
+        final_pos = env.robot.get_end_effector_pos(env.physics)
+        pos_error = np.linalg.norm(final_pos - target_pos)
+        print(f"\nDEBUG [moveto]: 执行完成")
+        print(f"  最终位置: {final_pos}")
+        print(f"  目标位置: {target_pos}")
+        print(f"  位置误差: {pos_error:.4f}m")
+        print(f"  Stage success: {stage_success}")
+        print(f"  Task success: {task_success}")
+        print(f"{'='*60}\n")
+
         assert len(observations) == len(waypoints), f"observations and waypoints should have the same length, {len(observations)} and {len(waypoints)}"
         return observations, waypoints, stage_success, task_success
     
@@ -139,11 +212,25 @@ class SkillLib:
             key_frames: list of key action such as move to prepare point, grasp
         """
         target_entity = env.task.entities[target_entity_name]
+
+        # DEBUG: 打印实体位置信息
+        print(f"\n{'='*60}")
+        print(f"DEBUG [pick]: 目标实体 = {target_entity_name}")
+        print(f"实体 worldbody 位置: {target_entity.get_xpos(env.physics)}")
+        print(f"实体抓取点: {target_entity.get_grasped_keypoints(env.physics)}")
+        print(f"机械臂起始位置: {env.robot.get_end_effector_pos(env.physics)}")
+        print(f"{'='*60}\n")
+
         if target_pos is None or target_quat is None:
             key_pos, prepare_key_pos, key_quat = find_keypoint_and_prepare_grasp(env, target_entity, prior_eulers, specific_keypoint_id=specific_keypoint, move_vector=prepare_quat)
             if key_pos is None or prepare_key_pos is None:
-                print("can not find valid keypoint and prepare point, reset the env")
+                print("DEBUG [pick]: can not find valid keypoint and prepare point, reset the env")
                 return None
+            else:
+                print(f"DEBUG [pick]: 找到有效抓取点!")
+                print(f"  抓取点位置 (key_pos): {key_pos}")
+                print(f"  准备点位置 (prepare_pos): {prepare_key_pos}")
+                print(f"  抓取姿态 (key_quat): {key_quat}")
         else:
             key_pos, key_quat = target_pos, target_quat
             if prepare_quat is None:
@@ -158,13 +245,22 @@ class SkillLib:
         obstacle_pcd = np.asarray(env.get_obstacle_pcd().points)
 
         start_pos, start_quat, key_quat, prepare_pos, key_pos = np.array(start_pos), np.array(start_quat), np.array(key_quat), np.array(prepare_key_pos), np.array(key_pos)
+
+        print(f"DEBUG [pick]: 运动规划路径")
+        print(f"  起始位置: {start_pos}")
+        print(f"  准备位置: {prepare_pos}")
+        print(f"  抓取位置: {key_pos}")
+
         # motion planning -> path(start, prepare_point) & path(prepare_point, key_point)
-        init2prepare_path = rrt_motion_planning(tuple(start_pos), 
-                                                tuple(prepare_pos), 
+        init2prepare_path = rrt_motion_planning(tuple(start_pos),
+                                                tuple(prepare_pos),
                                                 obstacle_pcd,
                                                 **motion_planning_kwargs)
         if init2prepare_path is None:
             init2prepare_path = [start_pos, prepare_pos]
+            print(f"DEBUG [pick]: RRT规划失败，使用直线路径")
+        else:
+            print(f"DEBUG [pick]: RRT规划成功，路径点数: {len(init2prepare_path)}")
         quats_in_path = [start_quat for _ in range(len(init2prepare_path)-1)]
         quats_in_path.append(key_quat)
         # quats_in_path = []
@@ -175,17 +271,31 @@ class SkillLib:
         quats_in_path.append(key_quat)
         
         interplate_path, interplate_quat = interpolate_path(path, quats_in_path, target_velocity)
+
+        print(f"DEBUG [pick]: 插值后的路径")
+        print(f"  路径点数: {len(interplate_path)}")
+        print(f"  最后5个路径点:")
+        for i, p in enumerate(interplate_path[-5:]):
+            print(f"    [{len(interplate_path)-5+i}]: {p}")
+
         waypoints = []
         stage_success = False
         task_success = False
         observations = [env.get_observation()]
         # move along the interplated path
         gripper_state = np.ones(2) * 0.04
-        new_obs, new_waypoints, _, task_success = SkillLib.step_trajectory(env, 
-                                                                   interplate_path, 
-                                                                   interplate_quat, 
+        new_obs, new_waypoints, _, task_success = SkillLib.step_trajectory(env,
+                                                                   interplate_path,
+                                                                   interplate_quat,
                                                                    gripper_state,
                                                                    **kwargs)
+
+        print(f"DEBUG [pick]: step_trajectory 完成")
+        print(f"  执行了 {len(new_waypoints)} 个路径点")
+        print(f"  当前末端位置: {env.robot.get_end_effector_pos(env.physics)}")
+        print(f"  目标位置: {key_pos}")
+        print(f"  XY误差: {np.linalg.norm(env.robot.get_end_effector_pos(env.physics)[:2] - key_pos[:2])}")
+        print(f"  Z误差: {abs(env.robot.get_end_effector_pos(env.physics)[2] - key_pos[2])}")
         observations.extend(new_obs)
         waypoints.extend(new_waypoints)
         if task_success:
@@ -200,6 +310,12 @@ class SkillLib:
         assert len(observations) == len(waypoints), f"observations and waypoints should have the same length, {len(observations)} and {len(waypoints)}"
         if env.task.entities[target_entity_name].is_grasped(env.physics, env.robot):
             stage_success = True
+            print(f"DEBUG [pick]: ✓ 抓取成功! stage_success=True")
+        else:
+            print(f"DEBUG [pick]: ✗ 抓取失败! is_grasped=False")
+            print(f"  末端执行器最终位置: {env.robot.get_end_effector_pos(env.physics)}")
+            print(f"  目标抓取点位置: {key_pos}")
+            print(f"  位置误差: {np.linalg.norm(env.robot.get_end_effector_pos(env.physics) - key_pos)}")
         return observations, waypoints, stage_success, task_success
     
     @staticmethod
@@ -650,7 +766,77 @@ class SkillLib:
         observations.pop(-1)
         assert len(observations) == len(waypoints), f"observations and waypoints should have the same length, {len(observations)} and {len(waypoints)}"
         return observations, waypoints, success
-    
+
+    @staticmethod
+    def rotate(env, rotation_angle=np.pi/2, gripper_state=None, target_q_velocity=np.pi/40, max_n_substep=30, tolerance=0.01):
+        """
+        Rotate the grasped object by rotating the wrist joint.
+
+        Args:
+            env: LM4manipEnv object
+            rotation_angle: rotation angle in radians (default: pi/2 = 90 degrees)
+                           positive for counter-clockwise, negative for clockwise
+            gripper_state: gripper state (None for auto-detect)
+            target_q_velocity: angular velocity for rotation
+            max_n_substep: max substeps per timestep
+            tolerance: tolerance for qpos error
+
+        Returns:
+            observations: list of observations
+            waypoints: list of waypoints
+            stage_success: whether the rotation succeeded
+            task_success: whether the task is complete
+        """
+        qpos = np.array(env.robot.get_qpos(env.physics)).reshape(-1)
+        observations = [env.get_observation()]
+        waypoints = []
+        if gripper_state is None:
+            gripper_closed = env.robot.get_ee_open_state(env.physics)
+            if gripper_closed: gripper_state = np.zeros(2)
+            else: gripper_state = np.ones(2) * 0.04
+
+        # Calculate number of timesteps based on rotation angle
+        timesteps = int(abs(rotation_angle) / target_q_velocity)
+        task_success = False
+        stage_success = False
+
+        for i in range(timesteps):
+            action = np.array(qpos).copy()
+            # Rotate the last joint (wrist) by the specified angle
+            action[-1] += target_q_velocity * (i + 1) * np.sign(rotation_angle)
+            action = np.concatenate([action, gripper_state])
+
+            for _ in range(max_n_substep):
+                timestep = env.step(action)
+                if timestep.last():
+                    task_success = True
+                    break
+                current_qpos = np.array(env.task.robot.get_qpos(env.physics)).reshape(-1)
+                if np.max(current_qpos - np.array(action[:7])) < tolerance \
+                    and np.min(current_qpos - np.array(action[:7])) > -tolerance:
+                    break
+
+            if task_success:
+                break
+
+            waypoint = np.concatenate([env.robot.get_end_effector_pos(env.physics),
+                                       quaternion_to_euler(env.robot.get_end_effector_quat(env.physics)),
+                                       gripper_state])
+            obs = env.get_observation()
+            observations.append(obs)
+            waypoints.append(waypoint)
+
+        observations.pop(-1)
+        assert len(observations) == len(waypoints), f"observations and waypoints should have the same length, {len(observations)} and {len(waypoints)}"
+
+        # Check if rotation was successful by comparing final angle
+        final_qpos = np.array(env.robot.get_qpos(env.physics)).reshape(-1)
+        angle_diff = abs(final_qpos[-1] - (qpos[-1] + rotation_angle))
+        if angle_diff < tolerance * 10:  # Allow some tolerance
+            stage_success = True
+
+        return observations, waypoints, stage_success, task_success
+
     @staticmethod
     def open_laptop(env, target_entity_name):
         laptop = env.task.entities[target_entity_name]

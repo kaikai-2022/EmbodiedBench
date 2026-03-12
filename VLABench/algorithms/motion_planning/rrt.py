@@ -39,9 +39,12 @@ def rrt_motion_planning(start_pos,
         obstacle_pcd = np.asarray(obstacle_pcd.points)
     obstacle_pcd = obstacle_pcd[obstacle_pcd[:, 2] >= z_threshold]
     obstacle_pcd = remove_pcd_near_point(obstacle_pcd, start_pos)
+    # 如果过滤后障碍物为空，设置为None避免SearchSpace出错
+    if obstacle_pcd is not None and len(obstacle_pcd) == 0:
+        obstacle_pcd = None
     if obstacle_pcd is not None and obstacle_pcd.shape[1] != 6:
         obstacle_pcd = np.concatenate([obstacle_pcd - margin * np.ones((obstacle_pcd.shape[0], 3)),
-                                       obstacle_pcd + margin * np.ones((obstacle_pcd.shape[0], 3))], 
+                                       obstacle_pcd + margin * np.ones((obstacle_pcd.shape[0], 3))],
                                       axis=1)
     search_space = SearchSpace(search_dimensions, obstacle_pcd)
     rrt = RRT(search_space, q, start_pos, end_pos, max_samples, r, prc)

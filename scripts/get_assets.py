@@ -413,12 +413,57 @@ class AssetPipeline:
             xml_path.rename(target_xml)
             xml_path = target_xml
 
+        # 修复 XML 中的资源路径（贴图和网格）
+        self.fix_xml_asset_paths(target_xml, uid)
+
         # 渲染预览图
         self.render_model_preview(model_dir, uid)
 
         self.stats['converted'] += 1
         logger.info(f"✓ 完成: {uid}")
         return True
+
+    def fix_xml_asset_paths(self, xml_path: Path, uid: str):
+        """
+        修复 XML 中的资源路径
+
+        obj2mjcf 会在子目录中生成碰撞网格和贴图，但 XML 被移动到父目录后，
+        需要更新资源路径以指向子目录
+
+        Args:
+            xml_path: XML 文件路径
+            uid: 模型 UID（也是子目录名）
+        """
+        try:
+            import re
+
+            with open(xml_path, 'r', encoding='utf-8') as f:
+                xml_content = f.read()
+
+            # 修复贴图路径：default.png -> uid/default.png
+            # 匹配 <texture ... file="default.png"/>
+            xml_content = re.sub(
+                r'(<texture[^>]+file=")default\.png(")',
+                rf'\g<1>{uid}/default.png\g<2>',
+                xml_content
+            )
+
+            # 修复碰撞网格路径：uid_collision_N.obj -> uid/uid_collision_N.obj
+            # 匹配 <mesh file="uid_collision_N.obj"/>
+            xml_content = re.sub(
+                rf'(<mesh\s+file=")({uid}_collision_\d+\.obj)(")',
+                rf'\g<1>{uid}/\g<2>\g<3>',
+                xml_content
+            )
+
+            # 写回文件
+            with open(xml_path, 'w', encoding='utf-8') as f:
+                f.write(xml_content)
+
+            logger.debug(f"✓ 修复资源路径: {xml_path.name}")
+
+        except Exception as e:
+            logger.warning(f"修复资源路径失败 {xml_path.name}: {e}")
 
     def save_source_info(self, uid: str, metadata: dict, model_dir: Path):
         """保存模型来源信息到 sources.txt"""

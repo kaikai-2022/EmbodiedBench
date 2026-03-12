@@ -62,13 +62,57 @@ def check_asset_exists(object_name: str) -> Dict:
     matches = list(asset_dir.glob(f"**/*{object_name}*.xml"))
 
     if matches:
-        xml_path = str(matches[0].relative_to(asset_dir.parent))
-        logger.info(f"  ✓ 在文件系统中找到 {object_name}: {xml_path}")
+        # 尝试找到一个可用的模型（纹理文件完整）
+        for xml_file in matches:
+            assets_root = Path(vlabench_root) / 'assets'
+            xml_path = str(xml_file.relative_to(assets_root))
+
+            # 检查纹理文件是否存在
+            try:
+                with open(xml_file, 'r', encoding='utf-8') as f:
+                    xml_content = f.read()
+
+                # 提取所有 texture file 引用
+                import re
+                texture_files = re.findall(r'<texture[^>]*file="([^"]+)"', xml_content)
+
+                # 检查每个纹理文件是否存在
+                all_textures_exist = True
+                missing_textures = []
+
+                for texture_file in texture_files:
+                    # 纹理文件路径相对于 XML 文件所在目录
+                    texture_path = xml_file.parent / texture_file
+                    if not texture_path.exists():
+                        all_textures_exist = False
+                        missing_textures.append(texture_file)
+
+                if all_textures_exist:
+                    # 找到一个完整的模型
+                    logger.info(f"  ✓ 在文件系统中找到 {object_name}: {xml_path}")
+
+                    return {
+                        "found": True,
+                        "xml_path": xml_path,
+                        "class": "CommonGraspedEntity"
+                    }
+                else:
+                    # 纹理缺失，尝试下一个模型
+                    logger.warning(f"  ⚠ {xml_file.name} 纹理缺失: {missing_textures}，尝试其他模型...")
+
+            except Exception as e:
+                logger.warning(f"  ⚠ 检查 {xml_file.name} 时出错: {e}")
+                continue
+
+        # 所有匹配的模型都有问题
+        logger.error(f"  ✗ 找到 {len(matches)} 个 {object_name} 模型，但都存在纹理缺失问题")
+        logger.error(f"  建议: 使用 get_assets.py 下载新的模型")
 
         return {
-            "found": True,
-            "xml_path": xml_path,
-            "class": "GenericObject"
+            "found": False,
+            "xml_path": None,
+            "class": None,
+            "error": f"所有 {object_name} 模型都存在纹理缺失问题"
         }
 
     logger.info(f"  ✗ 未找到 {object_name}")

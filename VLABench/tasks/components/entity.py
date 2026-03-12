@@ -44,6 +44,19 @@ class Entity(composer.Entity):
             for k, v in self.randomness.items():
                 if isinstance(v, list):
                     self.randomness[k] = np.array(v)
+
+            # 如果 randomness 中有固定的 scale 值（非列表/范围），在 _build 阶段就应用
+            # 这样可以在 physics 编译前修改 MJCF
+            if self.randomness.get("scale", None) is not None:
+                scale_value = self.randomness["scale"]
+                # 如果是固定值（float/int），在构建时就应用
+                if isinstance(scale_value, (float, int)):
+                    if not hasattr(self, "scale_ratio_to_recover"):
+                        self.scale_ratio_to_recover = 1
+                    self.apply_scale(scale_value)
+                    self.scale_ratio_to_recover = 1 / scale_value
+                # 如果是范围（list/tuple），则在 initialize_episode 时随机应用
+
         if len(self.init_quat) == 3:
             self.init_quat = np.array(euler_to_quaternion(self.init_quat[0], self.init_quat[1], self.init_quat[2]))
     
@@ -64,8 +77,12 @@ class Entity(composer.Entity):
                 new_xquat = quaternion_multiply(new_xquat, 
                                                 euler_to_quaternion(*(self.randomness["quat"] * random_state.uniform([-np.pi, -np.pi, -np.pi], [np.pi, np.pi, np.pi]))))
             if self.randomness.get("scale", None) is not None:
-                # modify the scale of the mesh, size and relative pos of geom
-                self.set_scale(physics, self.randomness.get("scale"))
+                scale_value = self.randomness["scale"]
+                # 只有当 scale 是范围（list/tuple）时才在这里应用
+                # 固定值已经在 _build 阶段应用过了
+                if isinstance(scale_value, (list, tuple, np.ndarray)):
+                    # modify the scale of the mesh, size and relative pos of geom
+                    self.set_scale(physics, scale_value)
             if self.randomness.get("texture", None) is not None and self.randomness.get("texture") != False:
                 # modify the texture of the mesh
                 self.set_texture(physics, self.randomness.get("texture"))

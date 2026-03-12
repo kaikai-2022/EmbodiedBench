@@ -180,6 +180,27 @@ def check_object_orientation(env, component_name: str) -> Tuple[bool, str, Dict]
         cos_angle = np.dot(local_z_in_world, world_z)
         angle = np.arccos(np.clip(cos_angle, -1, 1)) * 180 / np.pi
 
+        # 某些物体类型（如显微镜）由于模型建模方式，需要特殊的旋转才能正确显示
+        # 对于这些物体，我们检查局部 Y 轴是否指向上方（表示已正确旋转）
+        special_rotation_objects = ['microscope']
+        if any(obj_type in component_name.lower() for obj_type in special_rotation_objects):
+            # 检查局部 Y 轴（而非 Z 轴）是否指向上方
+            local_y_in_world = xmat[:, 1]
+            cos_angle_y = np.dot(local_y_in_world, world_z)
+            angle_y = np.arccos(np.clip(cos_angle_y, -1, 1)) * 180 / np.pi
+
+            # 如果局部 Y 轴接近垂直（说明已正确旋转 90 度）
+            if angle_y < 45 or angle_y > 135:
+                return True, "", {
+                    "component": component_name,
+                    "local_z": local_z_in_world.tolist(),
+                    "local_y": local_y_in_world.tolist(),
+                    "angle_with_vertical": angle,
+                    "angle_y_with_vertical": angle_y,
+                    "status": "OK",
+                    "note": "特殊旋转物体（检查局部Y轴朝向）"
+                }
+
         # 判断是否正向放置（z 轴基本向上，允许小幅度倾斜）
         if angle < 45:  # 小于 45 度认为正向
             return True, "", {
@@ -588,7 +609,7 @@ def render_vlm_example(env_config_path, output_image_path, output_mask_path, cam
     try:
         # 创建环境
         env = load_env(
-            task="simple_pickplace",
+            task="move_petri_dish",
             episode_config=env_config,
             time_limit=float('inf'),
             reset_wait_step=0,

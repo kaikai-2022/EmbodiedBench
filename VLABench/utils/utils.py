@@ -122,6 +122,10 @@ def find_keypoint_and_prepare_grasp(env, entity, prior_euler, std=0, max_retry=1
     return the valid grasp keypoint, prepare point and the quaternion of the gripper
     """
     keypoints = entity.get_grasped_keypoints(env.physics)
+    print(f"\nDEBUG [find_keypoint_and_prepare_grasp]: 实体有 {len(keypoints)} 个抓取点")
+    for i, kp in enumerate(keypoints):
+        print(f"  抓取点 {i}: {kp}")
+
     valid = False
     env_pcd = env.get_observation()["masked_point_cloud"]
     retry = 0
@@ -139,19 +143,27 @@ def find_keypoint_and_prepare_grasp(env, entity, prior_euler, std=0, max_retry=1
         prepare_point = keypoint + move_vector * distance
         grasp_prepare_gripper_pcd = copy.deepcopy(gripper_pcd).translate(move_vector * distance)
         grasp_prepare_gripper_pcd.paint_uniform_color([0, 1, 0])
-    
+
         collision1 = gripper_collision_check(gripper_pcd, env_pcd)
-        collision2 = gripper_collision_check(grasp_prepare_gripper_pcd, env_pcd)    
+        collision2 = gripper_collision_check(grasp_prepare_gripper_pcd, env_pcd)
+
+        if retry % 10 == 0:
+            print(f"DEBUG [find_keypoint]: 尝试 {retry}/{max_retry}, 抓取点={keypoint}, collision1={collision1}, collision2={collision2}")
+
         if not collision1 and not collision2:
             valid = True
         retry += 1
         if retry > max_retry:
+            print(f"DEBUG [find_keypoint]: 达到最大尝试次数 {max_retry}，无法找到有效抓取点")
             print("cant find a valid grasp point, take default one")
             return keypoint, keypoint+np.array([0, -0.1, 0]), euler_to_quaternion(*prior_euler[0])
         if retry % 10 == 0:
             # increase the search space by increasing the std
             std += np.pi/100
-            
+
+    print(f"DEBUG [find_keypoint]: 成功找到有效抓取点! 尝试了 {retry} 次")
+    print(f"  最终抓取点: {keypoint}")
+    print(f"  准备点: {prepare_point}")
     return keypoint, prepare_point, key_quat    
 
 def gripper_collision_check(gripper_pcd, env_pcd, threshold=0.1):

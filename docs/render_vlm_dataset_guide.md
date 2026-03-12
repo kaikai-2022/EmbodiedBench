@@ -516,7 +516,6 @@ TASKS=(
     "lift_object"
     "place_in_container"
     "pick_tube"
-    "flip_petri_dish"
     "insert_tube_centrifuge"
 )
 

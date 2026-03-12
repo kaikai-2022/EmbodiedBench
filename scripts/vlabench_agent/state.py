@@ -44,7 +44,12 @@ class VLABenchAgentState(TypedDict):
     rendered_images: Optional[List[str]]  # 渲染图像路径列表
     validation_report: Optional[Dict]     # 场景验证报告
 
+    # 优化相关 (Optimization Node 输出) - Phase 2
+    user_feedback: Optional[str]          # 用户反馈（用于优化）
+    optimization_applied: Optional[bool]  # 是否已应用优化
+    optimization_summary: Optional[str]   # 优化摘要
+
     # 流程控制
-    current_stage: str  # 'analyzing' | 'asset_check' | 'asset_download' | 'task_creation' | 'rendering' | 'done' | 'error'
+    current_stage: str  # 'analyzing' | 'asset_check' | 'asset_download' | 'task_creation' | 'rendering' | 'optimization' | 're_rendering' | 'done' | 'error'
     errors: List[str]   # 错误记录
     warnings: List[str] # 警告记录

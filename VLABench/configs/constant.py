@@ -299,7 +299,11 @@ name2class_xml = {
     "cord": [components.Cord, get_object_list(os.path.join(xml_root, "obj/meshes/tools/electronic_cord/cord_head"))],
     "electronic_outlet": [components.Entity, get_object_list(os.path.join(xml_root, "obj/meshes/tools/outlets"))],
     "mirrors": [components.Mirrors, get_object_list(os.path.join(xml_root, "obj/meshes/tools/mirror"))],
-}   
+
+    # lab equipment
+    "petri_dish": [components.CommonGraspedEntity, "obj/meshes/lab_equipment/petri_dish/petri_dish.xml"],
+    "petri_dish_0": [components.CommonGraspedEntity, "obj/meshes/lab_equipment/petri_dish/petri_dish_0/petri_dish.xml"],
+}
 
 additional_dict = {}
 for key, value in name2class_xml.items():

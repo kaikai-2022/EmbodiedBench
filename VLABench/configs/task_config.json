@@ -1035,32 +1035,25 @@
             }
         }
     },
-        
 
-    "simple_pickplace": {
-        "engine": {
-            "option": {
-                "impratio": 2
-            }
-        },
+
+    "move_petri_dish": {
         "task": {
             "asset": {
-                "seen_object": ["salt"],
-                "seen_container": ["pan_seen"]
+                "seen_object": ["petri_dish_0"]
             },
             "components": [
                 {
-                    "name": "counter",
-                    "xml_path": "obj/meshes/counters/counter_0/counter.xml",
-                    "class": "Counter",
-                    "position": [0.53, 0, 0],
+                    "name": "table",
+                    "xml_path": "obj/meshes/table/table.xml",
+                    "class": "Table",
                     "randomness": {
                         "texture": false
                     }
                 }
             ],
             "scene": {
-                "name": "kitchen_2"
+                "name": "lab_0"
             }
         }
     }

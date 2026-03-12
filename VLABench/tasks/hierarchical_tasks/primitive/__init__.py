@@ -12,4 +12,4 @@ from VLABench.tasks.hierarchical_tasks.primitive.select_painting_series import *
 from VLABench.tasks.hierarchical_tasks.primitive.select_poker_series import *
 from VLABench.tasks.hierarchical_tasks.primitive.select_toy_series import *
 
-from VLABench.tasks.hierarchical_tasks.primitive.simple_pickplace import *
+from VLABench.tasks.hierarchical_tasks.primitive.move_petri_dish_series import *

@@ -17,6 +17,7 @@ from .nodes import (
     task_creator_node,
     render_executor_node
 )
+from .nodes.optimization_node import optimization_node
 
 logger = logging.getLogger(__name__)
 
@@ -62,6 +63,48 @@ def should_continue_to_task_creator(state: Dict) -> str:
     return "task_creator"
 
 
+def should_optimize_or_finish(state: Dict) -> str:
+    """
+    条件判断: render_executor 之后是否需要优化
+
+    Args:
+        state: VLABenchAgentState
+
+    Returns:
+        下一个节点名称: "optimization" 或 "end"
+    """
+    # 如果用户提供了反馈，需要优化
+    if state.get("user_feedback"):
+        return "optimization"
+
+    # 如果validation失败，需要优化
+    validation = state.get("validation_report", {})
+    if validation.get("overall_status") == "FAILED":
+        return "optimization"
+
+    # 如果有warnings，也可以考虑优化
+    if validation.get("warnings"):
+        return "optimization"
+
+    # 否则直接结束
+    return "end"
+
+
+def should_re_render(state: Dict) -> str:
+    """
+    条件判断: optimization 之后是否需要重新渲染
+
+    Args:
+        state: VLABenchAgentState
+
+    Returns:
+        下一个节点名称: "render_executor" 或 "end"
+    """
+    if state.get("optimization_applied"):
+        return "render_executor"
+    return "end"
+
+
 def build_vlabench_agent():
     """
     构建 VLABench 自动化流水线 Agent
@@ -79,6 +122,7 @@ def build_vlabench_agent():
     workflow.add_node("asset_manager", asset_manager_node)
     workflow.add_node("task_creator", task_creator_node)
     workflow.add_node("render_executor", render_executor_node)
+    workflow.add_node("optimization", optimization_node)  # 新增优化节点
     workflow.add_node("error_handler", error_handler_node)
 
     # 添加边
@@ -101,8 +145,25 @@ def build_vlabench_agent():
     # task_creator -> render_executor
     workflow.add_edge("task_creator", "render_executor")
 
-    # render_executor -> END
-    workflow.add_edge("render_executor", END)
+    # render_executor -> optimization (如果需要) 或 END
+    workflow.add_conditional_edges(
+        "render_executor",
+        should_optimize_or_finish,
+        {
+            "optimization": "optimization",
+            "end": END
+        }
+    )
+
+    # optimization -> render_executor (重新渲染) 或 END
+    workflow.add_conditional_edges(
+        "optimization",
+        should_re_render,
+        {
+            "render_executor": "render_executor",
+            "end": END
+        }
+    )
 
     # error_handler -> END
     workflow.add_edge("error_handler", END)
@@ -116,12 +177,13 @@ def build_vlabench_agent():
     return graph
 
 
-def create_initial_state(user_instruction: str) -> Dict:
+def create_initial_state(user_instruction: str, user_feedback: str = None) -> Dict:
     """
     创建初始状态
 
     Args:
         user_instruction: 用户自然语言指令
+        user_feedback: 用户反馈（可选，用于优化）
 
     Returns:
         初始状态字典
@@ -135,6 +197,9 @@ def create_initial_state(user_instruction: str) -> Dict:
         "task_save_path": None,
         "rendered_images": None,
         "validation_report": None,
+        "user_feedback": user_feedback,
+        "optimization_applied": False,
+        "optimization_summary": None,
         "current_stage": "analyzing",
         "errors": [],
         "warnings": []

@@ -135,7 +135,7 @@ python scripts/render_vlm_dataset.py --task insert_tube_centrifuge --dimension "
 ### 1. 环境加载
 ```python
 env = load_env(
-    task="simple_pickplace",
+    task="move_petri_dish",
     episode_config=env_config,
     time_limit=float('inf'),
     reset_wait_step=0,

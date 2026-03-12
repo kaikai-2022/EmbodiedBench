@@ -156,11 +156,20 @@ def task_creator_node(state: Dict) -> Dict:
 
 重要规则:
 1. 物体索引从 1 开始 (0 是桌子)
-2. 操作名称: pick, place, pour, lift
+2. 支持的操作名称: pick, place, pour, lift, rotate, flip, push, pull
 3. pick 操作: {{"name": "pick", "params": {{"target_entity_name": 索引}}}}
 4. place 操作: {{"name": "place", "params": {{"target_container_name": 索引}}}}
 5. pour 操作: {{"name": "pour", "params": {{"target_container_name": 索引}}}}
 6. lift 操作: {{"name": "lift", "params": {{"target_height": 高度}}}}
+7. rotate 操作: {{"name": "rotate", "params": {{"rotation_angle": 角度}}}}  # 角度单位为弧度, 默认1.57(90度)
+8. flip 操作: {{"name": "flip", "params": {{}}}}  # 翻转180度
+9. push 操作: {{"name": "push", "params": {{"push_distance": 距离}}}}
+10. pull 操作: {{"name": "pull", "params": {{"pull_distance": 距离}}}}
+
+特殊说明:
+- rotate 操作用于旋转抓取的物体,需要先 pick 物体
+- 常用角度: 1.57 (90度), 3.14 (180度), 0.785 (45度)
+- 对于 "旋转烧杯" 类任务,序列应为: pick -> rotate
 
 只返回 JSON 数组,不要其他文字。"""
 
@@ -217,8 +226,12 @@ def task_creator_node(state: Dict) -> Dict:
                 "target_height": 0.9
             }
         }
+    elif operation_type == 'rotate':
+        # rotate操作的评测条件: 检查物体是否被抓取并旋转
+        # 注意: VLABench可能没有专门的rotate条件,这里留空或使用通用条件
+        conditions = {}
 
-    logger.info(f"[Task Creator] ✓ 生成评测条件: {list(conditions.keys())}")
+    logger.info(f"[Task Creator] ✓ 生成评测条件: {list(conditions.keys()) if conditions else '无特定条件'}")
 
     # 4. 生成 env_config
     env_config = generate_env_config(
