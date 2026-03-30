@@ -68,37 +68,52 @@ def print_result(result: dict):
     print("\n" + "=" * 70)
 
     if result.get('current_stage') == 'done':
-        print("✅ 任务完成!")
+        print("任务完成!")
         print("=" * 70)
-        print(f"\n📁 保存路径: {result.get('task_save_path')}")
-        print(f"\n🖼️  渲染图像:")
-        for img in result.get('rendered_images', []):
-            print(f"  - {img}")
 
         # 打印任务信息
         task_analysis = result.get('task_analysis', {})
         if task_analysis:
-            print(f"\n📋 任务信息:")
+            print(f"\n任务信息:")
             print(f"  - 任务名称: {task_analysis.get('task_name')}")
             print(f"  - 物体列表: {', '.join(task_analysis.get('objects', []))}")
             print(f"  - 操作类型: {task_analysis.get('operation_type')}")
             print(f"  - 英文指令: {task_analysis.get('instruction_en')}")
 
+        # 打印生成的代码路径
+        task_module_path = result.get('task_module_path')
+        if task_module_path:
+            print(f"\n生成的任务类: {task_module_path}")
+
+        # 打印仿真结果
+        if result.get('simulation_success'):
+            print(f"\n仿真结果: 成功")
+            if result.get('simulation_video_path'):
+                print(f"  - 视频: {result['simulation_video_path']}")
+            if result.get('simulation_hdf5_path'):
+                print(f"  - HDF5: {result['simulation_hdf5_path']}")
+
+        # 打印技能序列
+        skill_seq = result.get('executed_skill_sequence', [])
+        if skill_seq:
+            print(f"\n执行的技能序列:")
+            for i, skill in enumerate(skill_seq):
+                print(f"  {i+1}. {skill.get('name')} {skill.get('params', {})}")
+
+        # 打印 VLM 评测数据路径
+        print(f"\nVLM 评测数据: {result.get('task_save_path')}")
+        rendered = result.get('rendered_images', [])
+        if rendered:
+            print(f"渲染图像:")
+            for img in rendered:
+                print(f"  - {img}")
+
         # 打印警告
         warnings = result.get('warnings', [])
         if warnings:
-            print(f"\n⚠️  警告 ({len(warnings)}):")
+            print(f"\n警告 ({len(warnings)}):")
             for warn in warnings:
                 print(f"  - {warn}")
-
-        # 打印验证报告摘要
-        validation = result.get('validation_report', {})
-        if validation:
-            status = validation.get('overall_status', 'UNKNOWN')
-            if status == 'PASS':
-                print(f"\n✓ 场景验证: 通过")
-            else:
-                print(f"\n⚠ 场景验证: {status}")
 
     else:
         print("❌ 任务失败")

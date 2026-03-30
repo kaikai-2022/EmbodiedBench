@@ -36,20 +36,33 @@ class VLABenchAgentState(TypedDict):
     #   }
     # }
 
-    # 任务配置 (Task Creator Node 输出)
+    # 代码生成 (code_generator_node 输出)
+    generated_code: Optional[str]               # 生成的 Python 任务类源码
+    task_module_path: Optional[str]             # 写入磁盘的文件路径
+
+    # 技能规划 (skill_planner_node 输出)
+    skill_plan: Optional[Dict]                  # 结构化技能序列和条件 JSON
+
+    # 注册 (registration_node 输出)
+    registration_success: Optional[bool]        # 动态注册是否成功
+
+    # 仿真 (simulation_node 输出)
+    simulation_success: Optional[bool]          # 轨迹生成是否成功
+    simulation_video_path: Optional[str]        # 录制的演示视频路径
+    simulation_hdf5_path: Optional[str]         # 保存的 HDF5 训练数据路径
+    episode_config: Optional[Dict]              # env.save() 的输出（环境配置快照）
+    executed_skill_sequence: Optional[List[Dict]]  # 实际执行的技能序列（operation_sequence 格式）
+
+    # VLM 评测数据 (vlm_data_node 输出)
     env_config: Optional[Dict]       # 完整的 env_config.json 内容
-    task_save_path: Optional[str]    # 任务保存路径
-
-    # 渲染结果 (Render Executor Node 输出)
+    task_save_path: Optional[str]    # VLM 评测任务保存路径
     rendered_images: Optional[List[str]]  # 渲染图像路径列表
-    validation_report: Optional[Dict]     # 场景验证报告
 
-    # 优化相关 (Optimization Node 输出) - Phase 2
-    user_feedback: Optional[str]          # 用户反馈（用于优化）
-    optimization_applied: Optional[bool]  # 是否已应用优化
-    optimization_summary: Optional[str]   # 优化摘要
+    # 重试控制
+    code_generation_attempts: int               # 代码生成尝试次数（默认 0）
+    error_feedback: Optional[str]               # 失败时的错误上下文，反馈给 code_generator 重试
 
     # 流程控制
-    current_stage: str  # 'analyzing' | 'asset_check' | 'asset_download' | 'task_creation' | 'rendering' | 'optimization' | 're_rendering' | 'done' | 'error'
+    current_stage: str  # 'analyzing' | 'asset_check' | 'code_generation' | 'registration' | 'simulation' | 'vlm_data' | 'done' | 'error'
     errors: List[str]   # 错误记录
     warnings: List[str] # 警告记录

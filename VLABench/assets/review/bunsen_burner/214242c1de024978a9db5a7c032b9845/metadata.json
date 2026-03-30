@@ -1,0 +1,132 @@
+{
+  "uri": "https://api.sketchfab.com/v3/models/214242c1de024978a9db5a7c032b9845",
+  "uid": "214242c1de024978a9db5a7c032b9845",
+  "name": "Bunsen Burner",
+  "staffpickedAt": null,
+  "viewCount": 7,
+  "likeCount": 1,
+  "animationCount": 0,
+  "viewerUrl": "https://sketchfab.com/3d-models/214242c1de024978a9db5a7c032b9845",
+  "embedUrl": "https://sketchfab.com/models/214242c1de024978a9db5a7c032b9845/embed",
+  "commentCount": 0,
+  "isDownloadable": true,
+  "publishedAt": "2022-05-13T21:50:38.266659",
+  "tags": [],
+  "categories": [],
+  "thumbnails": {
+    "images": [
+      {
+        "uid": "dc0399a0b3bb4bbe910f4415d12a6e10",
+        "size": 185009,
+        "width": 1920,
+        "url": "https://media.sketchfab.com/models/214242c1de024978a9db5a7c032b9845/thumbnails/188bc31ac54f4c1f9aa5cb4a62e31284/d3bd81836ec741f492ba6be4f3573ace.jpeg",
+        "height": 1080
+      },
+      {
+        "uid": "0490fcf262674458804f65b8fbbb37e0",
+        "size": 22890,
+        "width": 1024,
+        "url": "https://media.sketchfab.com/models/214242c1de024978a9db5a7c032b9845/thumbnails/188bc31ac54f4c1f9aa5cb4a62e31284/9a957e3967194150ac4e5e2ce6e3cf14.jpeg",
+        "height": 576
+      },
+      {
+        "uid": "b0552341f3e847ef8fbfa518492fea0a",
+        "size": 13227,
+        "width": 720,
+        "url": "https://media.sketchfab.com/models/214242c1de024978a9db5a7c032b9845/thumbnails/188bc31ac54f4c1f9aa5cb4a62e31284/094a7055815e416880305270bf448866.jpeg",
+        "height": 405
+      },
+      {
+        "uid": "b640edae0b1944bf9c4b8d3fb767c89f",
+        "size": 3262,
+        "width": 256,
+        "url": "https://media.sketchfab.com/models/214242c1de024978a9db5a7c032b9845/thumbnails/188bc31ac54f4c1f9aa5cb4a62e31284/3acb9db191574c368dc2331c0d96dfbb.jpeg",
+        "height": 144
+      },
+      {
+        "uid": "979b96d6738f425c81b4989d2f8b6061",
+        "size": 1007,
+        "width": 64,
+        "url": "https://media.sketchfab.com/models/214242c1de024978a9db5a7c032b9845/thumbnails/188bc31ac54f4c1f9aa5cb4a62e31284/77b1b7bf0c4a4152ad133a80e6ffc896.jpeg",
+        "height": 36
+      }
+    ]
+  },
+  "user": {
+    "uid": "abbb1a0e24fd491292bfd47a5d0b4848",
+    "username": "Leafalu",
+    "displayName": "Lucy Greenhill",
+    "profileUrl": "https://sketchfab.com/Leafalu",
+    "account": "basic",
+    "avatar": {
+      "uri": "https://api.sketchfab.com/v3/avatars/3ef1bd11d3eb4b57a0b353e8f2e5fc3e",
+      "images": [
+        {
+          "size": 680,
+          "width": 32,
+          "url": "https://media.sketchfab.com/avatars/3ef1bd11d3eb4b57a0b353e8f2e5fc3e/116042a0854e40538adab302b593683d.jpeg",
+          "height": 32
+        },
+        {
+          "size": 1253,
+          "width": 48,
+          "url": "https://media.sketchfab.com/avatars/3ef1bd11d3eb4b57a0b353e8f2e5fc3e/efea16be51d04eb7a00cb9ea0b43b87f.jpeg",
+          "height": 48
+        },
+        {
+          "size": 2797,
+          "width": 90,
+          "url": "https://media.sketchfab.com/avatars/3ef1bd11d3eb4b57a0b353e8f2e5fc3e/ac9b469ccec74caf923a81fb2f0be3ed.jpeg",
+          "height": 90
+        },
+        {
+          "size": 3215,
+          "width": 100,
+          "url": "https://media.sketchfab.com/avatars/3ef1bd11d3eb4b57a0b353e8f2e5fc3e/a075e1d43d2f446c949b5967b470c757.jpeg",
+          "height": 100
+        }
+      ]
+    },
+    "uri": "https://api.sketchfab.com/v3/users/abbb1a0e24fd491292bfd47a5d0b4848"
+  },
+  "description": "for uni game project",
+  "faceCount": 1048,
+  "createdAt": "2022-05-13T21:48:32.661663",
+  "vertexCount": 531,
+  "isAgeRestricted": false,
+  "archives": {
+    "glb": {
+      "textureCount": 0,
+      "size": 34260,
+      "type": "glb",
+      "textureMaxResolution": 0,
+      "faceCount": 1048,
+      "vertexCount": 610
+    },
+    "gltf": {
+      "textureCount": 0,
+      "size": 16729,
+      "type": "gltf",
+      "textureMaxResolution": 0,
+      "faceCount": 1048,
+      "vertexCount": 610
+    },
+    "source": {
+      "textureCount": null,
+      "size": 82914,
+      "type": "source",
+      "textureMaxResolution": null,
+      "faceCount": null,
+      "vertexCount": null
+    },
+    "usdz": {
+      "textureCount": null,
+      "size": 20383,
+      "type": "usdz",
+      "textureMaxResolution": null,
+      "faceCount": null,
+      "vertexCount": null
+    }
+  },
+  "license": "by"
+}

@@ -10,6 +10,47 @@ from typing import Dict, Optional
 
 logger = logging.getLogger(__name__)
 
+# 同义词映射：LLM 常用名 -> name2class_xml 中的注册名
+ASSET_SYNONYMS = {
+    "test_tube": "tube",
+    "test_tube_rack": "chemistry_tube_stand",
+    "tube_rack": "chemistry_tube_stand",
+    "tube_stand": "chemistry_tube_stand",
+    "tube_holder": "chemistry_tube_stand",
+    "bunsen_burner": "bunsen_burner",
+    "erlenmeyer_flask": "flask",
+    "conical_flask": "flask",
+    "microscope_slide": "coverslip",
+    "cutting_board": "cut_board",
+    "box": "giftbox",
+    "cardboard_box": "giftbox",
+    "container_box": "giftbox",
+}
+
+
+def _register_downloaded_asset(canonical_name: str, xml_path: str):
+    """
+    将下载/发现的非内置资产动态注册到 name2class_xml 中。
+
+    这样后续的 get_entity_config()、load_containers()、load_init_containers() 等
+    都能通过 name2class_xml[name] 找到该资产，无需为每种非内置资产编写特殊处理逻辑。
+
+    Args:
+        canonical_name: 注册名（如 "bunsen_burner"）
+        xml_path: 相对于 VLABENCH_ROOT/assets/ 的 XML 路径
+    """
+    try:
+        from VLABench.tasks.components import CommonGraspedEntity
+        from VLABench.configs.constant import name2class_xml
+
+        if canonical_name not in name2class_xml:
+            name2class_xml[canonical_name] = [CommonGraspedEntity, xml_path]
+            logger.info(f"  → 动态注册到 name2class_xml: {canonical_name} -> {xml_path}")
+        else:
+            logger.debug(f"  → {canonical_name} 已在 name2class_xml 中，跳过注册")
+    except ImportError as e:
+        logger.warning(f"  ⚠ 动态注册失败（导入错误）: {e}")
+
 
 def check_asset_exists(object_name: str) -> Dict:
     """
@@ -25,41 +66,82 @@ def check_asset_exists(object_name: str) -> Dict:
             "class": str or None
         }
     """
+    # 同义词映射：将 LLM 常用名映射到 name2class_xml 中的注册名
+    canonical_name = ASSET_SYNONYMS.get(object_name, object_name)
+    if canonical_name != object_name:
+        logger.info(f"  → 同义词映射: {object_name} -> {canonical_name}")
+
     try:
-        # 尝试导入 VLABench 配置
+        # 先导入 components 以避免循环导入
+        import VLABench.tasks.components  # noqa: F401
         from VLABench.configs.constant import name2class_xml
 
-        # 在 name2class_xml 中查找
-        if object_name in name2class_xml:
-            class_type, xml_path = name2class_xml[object_name]
+        # 在 name2class_xml 中查找（先用映射后的名称，再用原始名称）
+        lookup_name = canonical_name if canonical_name in name2class_xml else object_name
+        if lookup_name in name2class_xml:
+            class_type, xml_path = name2class_xml[lookup_name]
             xml_path_str = xml_path if isinstance(xml_path, str) else xml_path[0]
 
-            logger.info(f"  ✓ 在配置中找到 {object_name}: {xml_path_str}")
+            logger.info(f"  ✓ 在配置中找到 {object_name} (as {lookup_name}): {xml_path_str}")
 
             return {
                 "found": True,
                 "xml_path": xml_path_str,
-                "class": class_type.__name__
+                "class": class_type.__name__,
+                "builtin": True
             }
     except ImportError:
         logger.warning("  ⚠ VLABench.configs.constant 导入失败,跳过配置查找")
     except Exception as e:
         logger.warning(f"  ⚠ 配置查找失败: {e}")
 
-    # 在文件系统中搜索
+    # 在文件系统中搜索（使用 canonical_name 和 object_name 两个名称都尝试）
     vlabench_root = os.environ.get('VLABENCH_ROOT')
     if not vlabench_root:
         logger.warning("  ⚠ VLABENCH_ROOT 未设置")
         return {"found": False, "xml_path": None, "class": None}
 
     asset_dir = Path(vlabench_root) / 'assets' / 'obj' / 'meshes'
+    review_dir = Path(vlabench_root) / 'assets' / 'review'
 
-    if not asset_dir.exists():
-        logger.warning(f"  ⚠ 资产目录不存在: {asset_dir}")
+    search_dirs = []
+    if asset_dir.exists():
+        search_dirs.append(asset_dir)
+    if review_dir.exists():
+        search_dirs.append(review_dir)
+
+    if not search_dirs:
+        logger.warning(f"  ⚠ 资产目录不存在: {asset_dir} 和 {review_dir}")
         return {"found": False, "xml_path": None, "class": None}
 
-    # 搜索匹配的 XML 文件
-    matches = list(asset_dir.glob(f"**/*{object_name}*.xml"))
+    # 搜索匹配的 XML 文件（尝试 canonical_name 和 object_name）
+    search_names = [canonical_name] if canonical_name != object_name else [object_name]
+    if canonical_name != object_name:
+        search_names.append(object_name)
+
+    # 同时搜索小写形式（review 目录中的文件夹通常是小写）
+    for name in list(search_names):
+        lower_name = name.lower()
+        if lower_name not in search_names:
+            search_names.append(lower_name)
+
+    matches = []
+    for search_name in search_names:
+        for search_dir in search_dirs:
+            # 搜索文件名匹配
+            matches = list(search_dir.glob(f"**/*{search_name}*.xml"))
+            if not matches:
+                # 搜索目录名匹配（review 目录中 XML 文件名是哈希值，但目录名包含关键词）
+                for subdir in search_dir.iterdir():
+                    if subdir.is_dir() and search_name in subdir.name:
+                        matches = list(subdir.glob("**/*.xml"))
+                        if matches:
+                            break
+            if matches:
+                logger.info(f"  → 文件系统搜索 '{search_name}' 在 {search_dir} 找到 {len(matches)} 个匹配")
+                break
+        if matches:
+            break
 
     if matches:
         # 尝试找到一个可用的模型（纹理文件完整）
@@ -90,6 +172,9 @@ def check_asset_exists(object_name: str) -> Dict:
                 if all_textures_exist:
                     # 找到一个完整的模型
                     logger.info(f"  ✓ 在文件系统中找到 {object_name}: {xml_path}")
+
+                    # 动态注册到 name2class_xml，使后续的 get_entity_config() 能找到
+                    _register_downloaded_asset(canonical_name, xml_path)
 
                     return {
                         "found": True,
@@ -135,7 +220,9 @@ def download_asset(keyword: str, max_downloads: int = 3) -> Dict:
             "error": str (optional)
         }
     """
-    logger.info(f"  开始下载资产: {keyword}")
+    # 将下划线转换为空格，Objaverse 搜索使用自然语言
+    search_keyword = keyword.replace("_", " ")
+    logger.info(f"  开始下载资产: {keyword} (搜索关键词: {search_keyword})")
 
     vlabench_root = os.environ.get('VLABENCH_ROOT')
     if not vlabench_root:
@@ -163,7 +250,7 @@ def download_asset(keyword: str, max_downloads: int = 3) -> Dict:
         # 因为 VLABench 会在 VLABENCH_ROOT/assets/ 下查找资产
         result = subprocess.run([
             "python", str(script_path),
-            "--keyword", keyword,
+            "--keyword", search_keyword,
             "--max_downloads", str(max_downloads),
             "--output_dir", "./VLABench/assets/review",
             "--skip_existing"
@@ -171,7 +258,7 @@ def download_asset(keyword: str, max_downloads: int = 3) -> Dict:
 
         if result.returncode == 0:
             # 解析输出,提取下载的资产信息
-            output_dir = project_root / "VLABench" / "assets" / "review" / keyword
+            output_dir = project_root / "VLABench" / "assets" / "review" / keyword.lower()
 
             # 后处理：修复 XML 文件中的路径引用
             # obj2mjcf 生成的结构是: uuid/uuid.xml 和 uuid/uuid/*.obj
@@ -227,77 +314,11 @@ def download_asset(keyword: str, max_downloads: int = 3) -> Dict:
                         content
                     )
 
-                    # 重构 XML：移除 <body> 和 <freejoint/>，将 geom 直接放在 <worldbody> 下
-                    # obj2mjcf 生成的 XML 包含 <body><freejoint/></body> 结构，
-                    # 但 VLABench 期望直接在 <worldbody> 下使用 <geom>
-                    lines = content.split('\n')
-                    new_lines = []
-                    in_worldbody = False
-                    skip_until_worldbody_end = False
-
-                    for i, line in enumerate(lines):
-                        # 检测 <worldbody> 开始
-                        if '<worldbody>' in line:
-                            new_lines.append(line)
-                            in_worldbody = True
-                            continue
-                        # 检测 </worldbody> 结束
-                        if '</worldbody>' in line:
-                            new_lines.append(line)
-                            in_worldbody = False
-                            skip_until_worldbody_end = False
-                            continue
-                        # 跳过 <body name=...> 行
-                        if in_worldbody and '<body name=' in line:
-                            continue
-                        # 跳过 <freejoint/> 行
-                        if in_worldbody and '<freejoint/>' in line:
-                            continue
-                        # 跳过 </body> 行
-                        if in_worldbody and '</body>' in line:
-                            continue
-                        # 调整 geom 缩进（从 6 个空格改为 4 个）
-                        if in_worldbody and '<geom' in line:
-                            # 移除前导空格并添加 4 个空格
-                            new_lines.append('    ' + line.lstrip())
-                            continue
-                        # 其他行正常添加
-                        if not skip_until_worldbody_end:
-                            new_lines.append(line)
-
-                    content = '\n'.join(new_lines)
-
-                    # 添加质量属性到 visual geom 元素
-                    def add_mass_to_visual(match):
-                        geom_tag = match.group(0)
-                        if 'mass=' in geom_tag or 'density=' in geom_tag:
-                            return geom_tag
-                        if geom_tag.endswith('/>'):
-                            return geom_tag.replace('/>', ' mass="1"/>')
-                        else:
-                            return geom_tag.replace('>', ' mass="1">')
-
-                    content = re.sub(
-                        r'<geom[^>]*class="visual"[^>]*/?>',
-                        add_mass_to_visual,
-                        content
-                    )
-
-                    # 添加密度属性到 collision geom 元素
-                    def add_density_to_collision(match):
-                        geom_tag = match.group(0)
-                        if 'density=' in geom_tag or 'mass=' in geom_tag:
-                            return geom_tag
-                        if geom_tag.endswith('/>'):
-                            return geom_tag.replace('/>', ' density="100"/>')
-                        else:
-                            return geom_tag.replace('>', ' density="100">')
-
-                    content = re.sub(
-                        r'<geom[^>]*class="collision"[^>]*/?>',
-                        add_density_to_collision,
-                        content
-                    )
+                    # 注意：不再移除 <body>/<freejoint>，也不再手动添加 mass/density
+                    # get_assets.py 的 postprocess_model → fix_obj2mjcf_xml 已正确处理：
+                    #   - <body> 包裹结构
+                    #   - <inertial> 质量属性
+                    #   - dm_control MJCF parser 要求 <inertial> 在 <body> 内
 
                     with open(xml_path, 'w', encoding='utf-8') as f:
                         f.write(content)
@@ -306,7 +327,8 @@ def download_asset(keyword: str, max_downloads: int = 3) -> Dict:
                 except Exception as e:
                     logger.warning(f"  ⚠ 跳过 XML 修复: {e}")
 
-            assets = list(output_dir.glob("*/*.xml"))
+            assets = [x for x in output_dir.glob("*/*.xml")
+                      if x.stem != "temp_render" and not x.stem.startswith("temp_")]
 
             logger.info(f"  ✓ 下载成功: {len(assets)} 个资产")
 

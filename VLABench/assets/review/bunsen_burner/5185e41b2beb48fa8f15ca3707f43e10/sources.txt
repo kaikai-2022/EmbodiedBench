@@ -1,0 +1,15 @@
+Model UID: 5185e41b2beb48fa8f15ca3707f43e10
+Model Name: Bunsen Burner
+
+Source Information:
+============================================================
+Source: unknown
+Objaverse UID: 5185e41b2beb48fa8f15ca3707f43e10
+
+HuggingFace Objaverse:
+Dataset: https://huggingface.co/datasets/allenai/objaverse
+Object Path: glbs/51/5185e41b2beb48fa8f15ca3707f43e10.glb
+
+Additional Metadata:
+Tags: experiment, lab, burner, fire, science
+Description: 3D model of bunsen burner used in chemistry labs. Model has been optimized for games. Model has two mesh parts and has a single material with PBR maps....

@@ -9,7 +9,7 @@ import os
 from pathlib import Path
 from typing import Dict
 
-from ..tools.asset_tools import check_asset_exists, download_asset
+from ..tools.asset_tools import check_asset_exists, download_asset, ASSET_SYNONYMS, _register_downloaded_asset
 
 logger = logging.getLogger(__name__)
 
@@ -46,6 +46,9 @@ def asset_manager_node(state: Dict) -> Dict:
     for obj in required_objects:
         logger.info(f"[Asset Manager] 检查物体: {obj}")
         status = check_asset_exists(obj)
+        # 记录 canonical name（同义词映射后的名称）
+        canonical = ASSET_SYNONYMS.get(obj, obj)
+        status["canonical_name"] = canonical
         asset_status[obj] = status
 
         if not status['found']:
@@ -58,7 +61,7 @@ def asset_manager_node(state: Dict) -> Dict:
         logger.info(f"[Asset Manager] 开始下载...")
 
         for obj in missing_objects:
-            download_result = download_asset(obj, max_downloads=5)
+            download_result = download_asset(obj, max_downloads=3)
 
             if download_result['success'] and download_result['assets']:
                 # 更新资产状态 - 使用相对路径
@@ -84,6 +87,10 @@ def asset_manager_node(state: Dict) -> Dict:
                     "class": obj_class,
                     "newly_downloaded": True
                 }
+                # 动态注册到 name2class_xml，让后续 get_entity_config() 能找到
+                canonical = ASSET_SYNONYMS.get(obj, obj)
+                _register_downloaded_asset(canonical, rel_path)
+
                 logger.info(f"[Asset Manager] ✓ {obj} 下载成功")
             else:
                 # 下载失败,记录错误

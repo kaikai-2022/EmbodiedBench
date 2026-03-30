@@ -1,0 +1,162 @@
+{
+  "uri": "https://api.sketchfab.com/v3/models/e90e3cf7446f4c0896b67dfcea9eca0e",
+  "uid": "e90e3cf7446f4c0896b67dfcea9eca0e",
+  "name": "Microscope",
+  "staffpickedAt": null,
+  "viewCount": 1196,
+  "likeCount": 35,
+  "animationCount": 0,
+  "viewerUrl": "https://sketchfab.com/3d-models/e90e3cf7446f4c0896b67dfcea9eca0e",
+  "embedUrl": "https://sketchfab.com/models/e90e3cf7446f4c0896b67dfcea9eca0e/embed",
+  "commentCount": 2,
+  "isDownloadable": true,
+  "publishedAt": "2020-01-21T19:06:07.234204",
+  "tags": [
+    {
+      "name": "microscope",
+      "slug": "microscope",
+      "uri": "https://api.sketchfab.com/v3/tags/microscope"
+    },
+    {
+      "name": "science",
+      "slug": "science",
+      "uri": "https://api.sketchfab.com/v3/tags/science"
+    },
+    {
+      "name": "xyz",
+      "slug": "xyz",
+      "uri": "https://api.sketchfab.com/v3/tags/xyz"
+    },
+    {
+      "name": "xyz-school",
+      "slug": "xyz-school",
+      "uri": "https://api.sketchfab.com/v3/tags/xyz-school"
+    },
+    {
+      "name": "xyzhomework",
+      "slug": "xyzhomework",
+      "uri": "https://api.sketchfab.com/v3/tags/xyzhomework"
+    }
+  ],
+  "categories": [
+    {
+      "name": "science-technology"
+    }
+  ],
+  "thumbnails": {
+    "images": [
+      {
+        "uid": "f56867f0aad643828e31eb3d6ee0fe3f",
+        "size": 97854,
+        "width": 1920,
+        "url": "https://media.sketchfab.com/models/e90e3cf7446f4c0896b67dfcea9eca0e/thumbnails/4f2fcb44678c43ca928e9eb5581f7d43/edac150a3d9b43f091447e9ba721590a.jpeg",
+        "height": 1080
+      },
+      {
+        "uid": "d7f31e8afbda4d989dbd6d0c566142c0",
+        "size": 34724,
+        "width": 1024,
+        "url": "https://media.sketchfab.com/models/e90e3cf7446f4c0896b67dfcea9eca0e/thumbnails/4f2fcb44678c43ca928e9eb5581f7d43/e0e7d66e238f4bc9a53d09158cfef179.jpeg",
+        "height": 576
+      },
+      {
+        "uid": "53368bd29eeb4c758765ae9e85864ebc",
+        "size": 20085,
+        "width": 720,
+        "url": "https://media.sketchfab.com/models/e90e3cf7446f4c0896b67dfcea9eca0e/thumbnails/4f2fcb44678c43ca928e9eb5581f7d43/28f7330cdb834d94824e4bcb2e6697b6.jpeg",
+        "height": 405
+      },
+      {
+        "uid": "d5494529bc46424bbc6c0eed6449efc4",
+        "size": 3983,
+        "width": 256,
+        "url": "https://media.sketchfab.com/models/e90e3cf7446f4c0896b67dfcea9eca0e/thumbnails/4f2fcb44678c43ca928e9eb5581f7d43/6ac76749bb354deda3d262274bcb3a0d.jpeg",
+        "height": 144
+      },
+      {
+        "uid": "705e0b0e9c404b879c07e12202963779",
+        "size": 760,
+        "width": 64,
+        "url": "https://media.sketchfab.com/models/e90e3cf7446f4c0896b67dfcea9eca0e/thumbnails/4f2fcb44678c43ca928e9eb5581f7d43/2ee9d7e999f44d4bb95a1b6747d5154f.jpeg",
+        "height": 36
+      }
+    ]
+  },
+  "user": {
+    "uid": "9e75a451148745e79b987fd328c2f9b2",
+    "username": "NicKravchenko",
+    "displayName": "Nikita Kravchenko",
+    "profileUrl": "https://sketchfab.com/NicKravchenko",
+    "account": "basic",
+    "avatar": {
+      "uri": "https://api.sketchfab.com/v3/avatars/a8568da103154bcc9224af0de1b439d7",
+      "images": [
+        {
+          "size": 708,
+          "width": 32,
+          "url": "https://media.sketchfab.com/avatars/a8568da103154bcc9224af0de1b439d7/e1cbd500d2764c4e84372c9eeba41c57.jpeg",
+          "height": 32
+        },
+        {
+          "size": 1101,
+          "width": 48,
+          "url": "https://media.sketchfab.com/avatars/a8568da103154bcc9224af0de1b439d7/b1b8ea5fd9a64d3680f3e9e8c36032e1.jpeg",
+          "height": 48
+        },
+        {
+          "size": 2346,
+          "width": 90,
+          "url": "https://media.sketchfab.com/avatars/a8568da103154bcc9224af0de1b439d7/0f399ef5b8554d0f9c0a7c77befdd792.jpeg",
+          "height": 90
+        },
+        {
+          "size": 2690,
+          "width": 100,
+          "url": "https://media.sketchfab.com/avatars/a8568da103154bcc9224af0de1b439d7/ca1289693da34069b6111ff70d139a23.jpeg",
+          "height": 100
+        }
+      ]
+    },
+    "uri": "https://api.sketchfab.com/v3/users/9e75a451148745e79b987fd328c2f9b2"
+  },
+  "description": "Home work fo XYZ school, low poly, game ready microscope model",
+  "faceCount": 2554,
+  "createdAt": "2020-01-21T18:58:11.647031",
+  "vertexCount": 1516,
+  "isAgeRestricted": false,
+  "archives": {
+    "glb": {
+      "textureCount": 5,
+      "size": 2796768,
+      "type": "glb",
+      "textureMaxResolution": 2048,
+      "faceCount": 2554,
+      "vertexCount": 2534
+    },
+    "gltf": {
+      "textureCount": 5,
+      "size": 2697411,
+      "type": "gltf",
+      "textureMaxResolution": 2048,
+      "faceCount": 2554,
+      "vertexCount": 2534
+    },
+    "source": {
+      "textureCount": null,
+      "size": 2731177,
+      "type": "source",
+      "textureMaxResolution": null,
+      "faceCount": null,
+      "vertexCount": null
+    },
+    "usdz": {
+      "textureCount": null,
+      "size": 2053074,
+      "type": "usdz",
+      "textureMaxResolution": null,
+      "faceCount": null,
+      "vertexCount": null
+    }
+  },
+  "license": "by"
+}

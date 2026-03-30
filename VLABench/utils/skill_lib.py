@@ -3,6 +3,7 @@ Skill Library for data generation.
 """
 import numpy as np
 import random
+import time as _time
 from VLABench.utils.utils import find_keypoint_and_prepare_grasp, distance, quaternion_to_euler, quaternion_from_axis_angle, quaternion_multiply
 from VLABench.algorithms.motion_planning.rrt import rrt_motion_planning
 from VLABench.algorithms.utils import interpolate_path, qauternion_slerp
@@ -20,7 +21,7 @@ class SkillLib:
                         quats,
                         gripper_state,
                         max_n_substep=1,
-                        tolerance=0.01):
+                        tolerance=0.02):
         """
         Universal step function for data generation.
         Input:
@@ -36,10 +37,8 @@ class SkillLib:
             stage_success: bool, whether the stage is successful
             task_success: bool, whether the task is successful
         """
-        print(f"\nDEBUG [step_trajectory]: 开始执行轨迹")
-        print(f"  总路径点数: {len(points)}")
-        print(f"  容差阈值: {tolerance}")
-        print(f"  每步最大子步数: {max_n_substep}")
+        _t_start = _time.time()
+        print(f"\n[STEP] step_trajectory 开始: {len(points)} 个路径点, max_substep={max_n_substep}")
 
         observations = []
         waypoints = []
@@ -59,7 +58,7 @@ class SkillLib:
 
                 # 检查任务是否完成
                 if timestep.last():
-                    print(f"DEBUG [step_trajectory]: 在路径点 {i}/{len(points)} 处任务完成 (timestep.last())")
+                    print(f"[STEP] 路径点 {i}/{len(points)} 处 timestep.last()=True")
                     task_success = True
                     break
 
@@ -69,40 +68,34 @@ class SkillLib:
                 qpos_min_error = np.min(current_qpos - np.array(action[:7]))
 
                 if qpos_max_error < tolerance and qpos_min_error > -tolerance:
-                    if i % 10 == 0 or i == len(points) - 1:  # 只打印部分点避免输出过多
-                        current_ee_pos = env.robot.get_end_effector_pos(env.physics)
-                        ee_error = distance(point, current_ee_pos)
-                        print(f"DEBUG [step_trajectory]: 路径点 {i}/{len(points)} - 关节收敛")
-                        print(f"  目标末端位置: {point}")
-                        print(f"  当前末端位置: {current_ee_pos}")
-                        print(f"  末端位置误差: {ee_error:.4f}m")
-                        print(f"  qpos 误差范围: [{qpos_min_error:.6f}, {qpos_max_error:.6f}]")
                     break
 
             last_executed_waypoint = i
 
             if task_success:
-                print(f"DEBUG [step_trajectory]: 提前退出 - 任务已完成")
                 break
 
             obs = env.get_observation()
             observations.append(obs)
             waypoints.append(waypoint)
 
-        # 最终检查
-        final_ee_pos = env.robot.get_end_effector_pos(env.physics)
-        final_distance = distance(points[-1], final_ee_pos)
+            # 每50步或最后一步打印进度
+            if i % 50 == 0 or i == len(points) - 1:
+                print(f"[STEP] 进度 {i+1}/{len(points)}, 耗时 {_time.time()-_t_start:.1f}s")
 
-        print(f"\nDEBUG [step_trajectory]: 轨迹执行完成")
-        print(f"  执行了 {last_executed_waypoint + 1}/{len(points)} 个路径点")
-        print(f"  最终末端位置: {final_ee_pos}")
-        print(f"  目标末端位置 (最后路径点): {points[-1]}")
-        print(f"  最终距离误差: {final_distance:.4f}m")
-        print(f"  stage_success 判定: {final_distance} < {tolerance} = {final_distance < tolerance}")
+        # 最终检查
+        if len(points) > 0:
+            final_ee_pos = env.robot.get_end_effector_pos(env.physics)
+            final_distance = distance(points[-1], final_ee_pos)
+            if final_distance < tolerance:
+                stage_success = True
+            print(f"[STEP] step_trajectory 完成: {last_executed_waypoint+1}/{len(points)} 点, "
+                  f"final_dist={final_distance:.4f}, stage={stage_success}, task={task_success}, "
+                  f"耗时 {_time.time()-_t_start:.1f}s")
+        else:
+            print(f"[STEP] step_trajectory 完成: 空路径, 耗时 {_time.time()-_t_start:.1f}s")
 
         assert len(observations) == len(waypoints), f"observations and waypoints should have the same length, {len(observations)} and {len(waypoints)}"
-        if final_distance < tolerance:
-            stage_success = True
         return observations, waypoints, stage_success, task_success
             
     @staticmethod
@@ -901,6 +894,74 @@ class SkillLib:
                                              gripper_state]))
         observations.pop(-1)
         assert len(observations) == len(waypoints), f"observations and waypoints should have the same length, {len(observations)} and {len(waypoints)}"
+        return observations, waypoints, True, task_success
+
+    @staticmethod
+    def shake(env, n_shakes=3, shake_angle=0.5, steps_per_swing=5, gripper_state=None):
+        """
+        摇晃操作：在当前位置保持不动，通过快速交替偏转末端姿态实现摇摆。
+
+        参数：
+            n_shakes: 摇摆次数（一次 = 正→负 完整往返）
+            shake_angle: 摇摆幅度（弧度），默认0.5（约30度）
+            steps_per_swing: 每段摇摆的插值步数，默认5
+            gripper_state: 夹爪状态，默认保持当前状态
+        """
+        start_pos = np.array(env.robot.get_end_effector_pos(env.physics))
+        start_quat = np.array(env.robot.get_end_effector_quat(env.physics))
+
+        if gripper_state is None:
+            gripper_closed = env.robot.get_ee_open_state(env.physics)
+            if gripper_closed:
+                gripper_state = np.zeros(2)
+            else:
+                gripper_state = np.ones(2) * 0.04
+
+        observations = [env.get_observation()]
+        waypoints = []
+        task_success = False
+
+        # 生成摇摆的目标四元数序列
+        quat_positive = quaternion_multiply(
+            quaternion_from_axis_angle(np.array([0, 1, 0]), shake_angle),
+            start_quat
+        )
+        quat_negative = quaternion_multiply(
+            quaternion_from_axis_angle(np.array([0, 1, 0]), -shake_angle),
+            start_quat
+        )
+
+        # 摇摆序列：+angle, -angle, ..., 回正
+        shake_targets = []
+        for i in range(n_shakes):
+            shake_targets.append(quat_positive)
+            shake_targets.append(quat_negative)
+        shake_targets.append(start_quat)
+
+        current_quat = start_quat
+        for target_quat in shake_targets:
+            # 手动生成插值点（interpolate_path 对 distance=0 只返回1个点）
+            interp_positions = []
+            interp_quats = []
+            for t in np.linspace(0, 1, steps_per_swing, endpoint=True):
+                interp_positions.append(start_pos.copy())
+                interp_quats.append(qauternion_slerp(current_quat, target_quat, t))
+
+            obs, new_waypoints, stage_success, ts = SkillLib.step_trajectory(
+                env, interp_positions, interp_quats, gripper_state
+            )
+            observations.extend(obs)
+            waypoints.extend(new_waypoints)
+
+            if ts:
+                task_success = True
+                break
+
+            current_quat = target_quat
+
+        observations.pop(-1)
+        assert len(observations) == len(waypoints), \
+            f"observations and waypoints should have the same length, {len(observations)} and {len(waypoints)}"
         return observations, waypoints, True, task_success
 
     @staticmethod

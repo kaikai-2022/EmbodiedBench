@@ -1,0 +1,19 @@
+{
+  "status": "PASS",
+  "xml_path": "/ssd/mkqin/workspace/VLABench/VLABench/assets/review/bunsen_burner/5185e41b2beb48fa8f15ca3707f43e10/5185e41b2beb48fa8f15ca3707f43e10.xml",
+  "checks": {
+    "xml_load": "PASS",
+    "physics_compile": "PASS",
+    "body_found": "PASS: 5185e41b2beb48fa8f15ca3707f43e10/",
+    "stability": "PASS: final_z=0.300",
+    "xy_drift": "PASS: drift=0.000m",
+    "final_position": [
+      0.0,
+      0.0,
+      0.3
+    ],
+    "video": "PASS: 90 frames, 3.0s"
+  },
+  "preview_path": null,
+  "video_path": "/ssd/mkqin/workspace/VLABench/VLABench/assets/review/bunsen_burner/5185e41b2beb48fa8f15ca3707f43e10/validation.mp4"
+}

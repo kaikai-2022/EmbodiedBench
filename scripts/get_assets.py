@@ -23,9 +23,7 @@ from typing import Optional, Tuple
 # 如果环境中已经设置了 HF_ENDPOINT，优先使用环境变量
 # 否则，检查是否在中国大陆，如果是则使用镜像
 if 'HF_ENDPOINT' not in os.environ:
-    # 可以根据需要设置默认镜像
-    # os.environ['HF_ENDPOINT'] = 'https://hf-mirror.com'
-    pass  # 使用官方源
+    os.environ['HF_ENDPOINT'] = 'https://hf-mirror.com'
 else:
     logger_temp = logging.getLogger(__name__)
     logger_temp.info(f"检测到 HF_ENDPOINT 环境变量: {os.environ['HF_ENDPOINT']}")
@@ -41,6 +39,32 @@ try:
     from PIL import Image
 except ImportError:
     Image = None  # type: ignore
+
+# ==================== 上下文搜索配置 ====================
+# 预定义的搜索上下文，用于优先筛选特定领域的模型
+CONTEXT_PROFILES = {
+    "lab": {
+        "boost_categories": ["science-technology"],
+        "penalize_categories": ["cultural-heritage-history", "art-abstract"],
+        "boost_keywords": [
+            "lab", "laboratory", "science", "scientific", "chemistry",
+            "chemical", "experiment", "research", "glass", "glassware",
+            "equipment", "medical", "biology", "physics", "beaker",
+            "flask", "pipette", "microscope", "centrifuge", "tube",
+            "syringe", "petri", "burette", "funnel", "mortar",
+        ],
+    },
+    "home": {
+        "boost_categories": ["furniture-home", "food-drink"],
+        "penalize_categories": ["cultural-heritage-history", "weapons-military"],
+        "boost_keywords": [
+            "home", "furniture", "kitchen", "household", "domestic",
+            "room", "indoor", "living", "table", "chair", "cup",
+            "plate", "bowl", "spoon", "fork", "knife",
+        ],
+    },
+}
+# ===========================================================
 
 # 配置日志
 logging.basicConfig(
@@ -162,14 +186,25 @@ class AssetPipeline:
         min_vertices: int = 400,
         output_dir: str = './assets/review',
         skip_existing: bool = True,
-        merge_meshes: bool = True
+        merge_meshes: bool = True,
+        context: Optional[str] = None
     ):
-        self.keyword = keyword.lower().replace(" ", "_")
+        self.keyword = keyword.lower().replace(" ", "_")  # 用于目录名
+        self.search_terms = keyword.lower().split()       # 用于搜索匹配（保留多词）
         self.max_downloads = max_downloads
         self.min_vertices = min_vertices
         self.base_dir = Path(output_dir) / self.keyword
         self.skip_existing = skip_existing
         self.merge_meshes = merge_meshes
+
+        # 加载上下文配置
+        self.context_profile = None
+        if context:
+            if context in CONTEXT_PROFILES:
+                self.context_profile = CONTEXT_PROFILES[context]
+                logger.info(f"使用搜索上下文: {context}")
+            else:
+                logger.warning(f"未知上下文 '{context}'，可选: {list(CONTEXT_PROFILES.keys())}")
 
         # 统计信息
         self.stats = {
@@ -252,36 +287,59 @@ class AssetPipeline:
             tags = [t.get("name", "").lower() for t in ann.get("tags", [])]
             description = (ann.get("description") or "").lower()
 
-            if (self.keyword in name or
-                any(self.keyword in t for t in tags) or
-                self.keyword in description):
+            if all(
+                (term in name or
+                 any(term in t for t in tags) or
+                 term in description)
+                for term in self.search_terms
+            ):
                 candidates.append((uid, ann))
 
-        logger.info(f"找到 {len(candidates)} 个匹配 '{self.keyword}' 的模型")
+        logger.info(f"找到 {len(candidates)} 个匹配 '{' '.join(self.search_terms)}' 的模型")
 
         # 排序：优先级规则
-        # 1. 名称中包含关键词的优先（而不是描述或标签中）
-        # 2. 名称完全匹配或开头匹配的优先
-        # 3. 有名称的优先
-        # 4. 标签数量多的优先
+        # 1. 上下文类别加分/减分（如 science-technology 加分）
+        # 2. 上下文关键词加分（tags/description 中的领域词）
+        # 3. 名称中包含关键词的优先
+        # 4. 名称完全匹配或开头匹配的优先
+        # 5. 有名称的优先
+        # 6. 社区质量评分（likeCount，同等条件下优先高赞模型）
+        context_profile = self.context_profile
+
         def rank_model(item):
             uid, ann = item
             name = (ann.get("name") or "").lower()
             tags = [t.get("name", "").lower() for t in ann.get("tags", [])]
+            categories = [c.get("name", "").lower() for c in ann.get("categories", [])]
+            description = (ann.get("description") or "").lower()
 
-            # 名称中包含关键词（最高优先级）
-            name_match = 1 if self.keyword in name else 0
+            # --- 上下文评分 ---
+            category_score = 0
+            context_keyword_score = 0
 
-            # 名称以关键词开头（高优先级）
-            name_starts = 1 if name.startswith(self.keyword) else 0
+            if context_profile:
+                # 类别加分/减分
+                for cat in categories:
+                    if cat in context_profile["boost_categories"]:
+                        category_score += 2
+                    if cat in context_profile["penalize_categories"]:
+                        category_score -= 2
 
-            # 有名称
+                # 上下文关键词加分（在 name + tags + description 中搜索）
+                all_text = name + " " + " ".join(tags) + " " + description
+                hits = sum(1 for kw in context_profile["boost_keywords"] if kw in all_text)
+                context_keyword_score = min(hits, 3)  # 上限 3 分
+
+            # --- 原有评分 ---
+            search_phrase = " ".join(self.search_terms)
+            name_match = 3 if search_phrase in name else 0
+            name_starts = 1 if name.startswith(search_phrase) else 0
             has_name = 1 if ann.get("name") else 0
 
-            # 标签数量
-            tag_count = len(tags)
+            # --- 质量评分（likeCount）---
+            like_count = ann.get("likeCount", 0) or 0
 
-            return (name_match, name_starts, has_name, tag_count)
+            return (category_score, context_keyword_score, name_match, name_starts, has_name, like_count)
 
         candidates.sort(key=rank_model, reverse=True)
 
@@ -416,12 +474,184 @@ class AssetPipeline:
         # 修复 XML 中的资源路径（贴图和网格）
         self.fix_xml_asset_paths(target_xml, uid)
 
+        # [DEBUG] 打印 fix_xml_asset_paths 之后、postprocess 之前的 XML 内容片段
+        logger.info(f"  [DEBUG get_assets] XML after fix_xml_asset_paths, before postprocess:")
+        with open(target_xml, 'r') as f:
+            content = f.read()
+        # 检查是否有 <body> 标签
+        if '<body' in content:
+            logger.info(f"  [DEBUG get_assets] ✓ <body> found in XML before postprocess")
+        else:
+            logger.info(f"  [DEBUG get_assets] ✗ <body> NOT found in XML before postprocess")
+        # 打印 worldbody 段
+        import re
+        wb_match = re.search(r'<worldbody>.*?</worldbody>', content, re.DOTALL)
+        if wb_match:
+            logger.info(f"  [DEBUG get_assets] worldbody section:\n{wb_match.group()[:500]}")
+
+        # 后处理：几何中心归零 + 尺寸归一化 + 物理属性修复
+        self.postprocess_model(model_dir, uid, target_xml)
+
+        # [DEBUG] 打印 postprocess 之后的 XML 内容片段
+        logger.info(f"  [DEBUG get_assets] XML after postprocess:")
+        with open(target_xml, 'r') as f:
+            content = f.read()
+        if '<body' in content:
+            logger.info(f"  [DEBUG get_assets] ✓ <body> found in XML after postprocess")
+        else:
+            logger.info(f"  [DEBUG get_assets] ✗ <body> NOT found in XML after postprocess")
+        wb_match = re.search(r'<worldbody>.*?</worldbody>', content, re.DOTALL)
+        if wb_match:
+            logger.info(f"  [DEBUG get_assets] worldbody section after postprocess:\n{wb_match.group()[:500]}")
+
         # 渲染预览图
         self.render_model_preview(model_dir, uid)
+
+        # [DEBUG] 检查渲染后 XML 是否被破坏
+        logger.info(f"  [DEBUG get_assets] XML after render_model_preview:")
+        with open(target_xml, 'r') as f:
+            content = f.read()
+        if '<body' in content:
+            logger.info(f"  [DEBUG get_assets] ✓ <body> still intact after render")
+        else:
+            logger.info(f"  [DEBUG get_assets] ✗ <body> LOST after render!")
+
+        # MuJoCo 加载验证
+        self.validate_model(model_dir, uid, target_xml)
+
+        # 朝向修正（基于 LLM 视觉判断）
+        self.fix_model_orientation(model_dir, uid, target_xml)
+
+        # 尺寸修正（基于 LLM 常识判断合理物理尺寸）
+        self.fix_model_size(model_dir, uid, target_xml)
 
         self.stats['converted'] += 1
         logger.info(f"✓ 完成: {uid}")
         return True
+
+    def postprocess_model(self, model_dir: Path, uid: str, target_xml: Path):
+        """后处理：几何中心归零、尺寸归一化、物理属性修复"""
+        try:
+            # 添加项目根目录到 sys.path 以便导入 fix_obj2mjcf_xml
+            project_root = Path(__file__).resolve().parent.parent
+            if str(project_root) not in sys.path:
+                sys.path.insert(0, str(project_root))
+
+            from fix_obj2mjcf_xml import postprocess_model as _postprocess
+
+            report = _postprocess(
+                model_dir=str(model_dir),
+                uid=uid,
+                mass=0.02,
+                target_max_dim=0.15,
+                remove_freejoint=True,
+                add_grasppoints=True,
+            )
+
+            # 保存后处理报告
+            report_path = model_dir / "postprocess_report.json"
+            report_path.write_text(
+                json.dumps(report, ensure_ascii=False, indent=2)
+            )
+            logger.info(f"  后处理报告: {report_path.name}")
+
+        except Exception as e:
+            logger.warning(f"后处理失败 {uid}: {e}")
+            import traceback
+            logger.warning(f"后处理完整traceback:\n{traceback.format_exc()}")
+
+    def validate_model(self, model_dir: Path, uid: str, target_xml: Path):
+        """MuJoCo 加载验证"""
+        try:
+            scripts_dir = Path(__file__).resolve().parent
+            if str(scripts_dir) not in sys.path:
+                sys.path.insert(0, str(scripts_dir))
+
+            from validate_asset import validate_asset
+
+            report = validate_asset(str(target_xml), render_preview=False,
+                                    render_video=True)
+
+            # 保存验证报告
+            report_path = model_dir / "validation_report.json"
+            report_path.write_text(
+                json.dumps(report, ensure_ascii=False, indent=2)
+            )
+
+            status = report.get('status', 'UNKNOWN')
+            if status == 'FAIL':
+                logger.warning(f"  模型验证失败: {uid}")
+            elif status == 'WARN':
+                logger.warning(f"  模型验证警告: {uid}")
+            else:
+                logger.info(f"  模型验证通过: {uid}")
+
+        except ImportError:
+            logger.debug("validate_asset 模块不可用，跳过验证")
+        except Exception as e:
+            logger.warning(f"验证失败 {uid}: {e}")
+            import traceback
+            logger.debug(traceback.format_exc())
+
+    def fix_model_orientation(self, model_dir: Path, uid: str, target_xml: Path):
+        """朝向修正：基于 LLM 视觉判断"""
+        try:
+            from orientation_fix import fix_orientation
+
+            object_name = self.keyword
+            report = fix_orientation(
+                model_dir=str(model_dir),
+                uid=uid,
+                object_name=object_name,
+                target_xml=str(target_xml),
+            )
+
+            # 保存朝向修正报告
+            report_path = model_dir / "orientation_report.json"
+            report_path.write_text(
+                json.dumps(report, ensure_ascii=False, indent=2)
+            )
+
+            if report.get("action") == "rotated":
+                logger.info(f"  朝向已修正: {uid} (旋转 {report['rotation']})")
+            elif report.get("action") == "no_change":
+                logger.info(f"  朝向正确: {uid}")
+            else:
+                logger.info(f"  朝向检查: {report.get('action', 'unknown')}")
+
+        except Exception as e:
+            logger.warning(f"朝向修正失败 {uid}: {e}")
+            import traceback
+            logger.warning(traceback.format_exc())
+
+    def fix_model_size(self, model_dir: Path, uid: str, target_xml: Path):
+        """尺寸修正：基于 LLM 常识判断合理物理尺寸"""
+        try:
+            from size_fix import fix_size
+
+            object_name = self.keyword
+            report = fix_size(
+                model_dir=str(model_dir),
+                uid=uid,
+                object_name=object_name,
+                target_xml=str(target_xml),
+            )
+
+            # 保存尺寸修正报告
+            report_path = model_dir / "size_report.json"
+            report_path.write_text(
+                json.dumps(report, ensure_ascii=False, indent=2)
+            )
+
+            if report.get("action") == "rescaled":
+                logger.info(f"  尺寸已修正: {uid} ({report['old_height_m']:.3f}m -> {report['new_height_m']:.3f}m)")
+            else:
+                logger.info(f"  尺寸检查: {report.get('action', 'unknown')}")
+
+        except Exception as e:
+            logger.warning(f"尺寸修正失败 {uid}: {e}")
+            import traceback
+            logger.warning(traceback.format_exc())
 
     def fix_xml_asset_paths(self, xml_path: Path, uid: str):
         """
@@ -692,9 +922,13 @@ class AssetPipeline:
                 Image.fromarray(img).save(save_path)
                 renderer.close()
 
-                os.chdir(original_dir)
                 return True
             finally:
+                # 确保恢复工作目录和清理临时文件
+                try:
+                    os.chdir(original_dir)
+                except Exception:
+                    pass
                 if os.path.exists(temp_xml):
                     os.remove(temp_xml)
 
@@ -817,6 +1051,14 @@ def parse_args():
         help='不合并网格，保留场景结构'
     )
 
+    parser.add_argument(
+        '--context',
+        type=str,
+        default=None,
+        choices=list(CONTEXT_PROFILES.keys()),
+        help=f'搜索上下文，优先筛选特定领域模型。可选: {list(CONTEXT_PROFILES.keys())}'
+    )
+
     return parser.parse_args()
 
 
@@ -835,7 +1077,8 @@ def main():
         min_vertices=args.min_vertices,
         output_dir=args.output_dir,
         skip_existing=args.skip_existing,
-        merge_meshes=merge_meshes
+        merge_meshes=merge_meshes,
+        context=args.context
     )
 
     pipeline.run()

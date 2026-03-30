@@ -7,6 +7,7 @@ import open3d as o3d
 import mediapy
 import argparse
 import traceback
+import time
 from dm_control import viewer
 from tqdm import tqdm
 from datetime import datetime
@@ -45,27 +46,71 @@ def get_all_hdf5_files(directory):
     return hdf5_files
 
 def generate_trajectory(args, index, logger):
+    t0 = time.time()
+    print(f"\n{'='*60}")
+    print(f"[TIMING] generate_trajectory 开始 (index={index})")
+    print(f"{'='*60}")
+
+    print(f"[TIMING] 加载环境...")
+    t1 = time.time()
     env = load_env(args.task_name, robot=args.robot, eval=args.eval_unseen)
+    print(f"[TIMING] load_env 完成, 耗时 {time.time()-t1:.1f}s")
+
+    t1 = time.time()
     env.reset()
+    print(f"[TIMING] env.reset() 完成, 耗时 {time.time()-t1:.1f}s")
+
     episode_config = env.save()
-    
+
     # load key prior information and task specific variables
-    target_entity = env.task.config_manager.target_entity   
+    target_entity = env.task.config_manager.target_entity
     instruction = env.task.get_instruction()
     meta_info = dict(
         target_entity=[target_entity],
         entities=list(env.task.entities.keys()),
         instruction=[instruction],
     )
-    
+    print(f"[DEBUG] target_entity={target_entity}, entities={list(env.task.entities.keys())}")
+
     # register the expert sequence
+    t1 = time.time()
     skill_seq = env.get_expert_skill_sequence()
+    print(f"[TIMING] get_expert_skill_sequence 完成, 耗时 {time.time()-t1:.1f}s")
+    print(f"[DEBUG] 技能序列共 {len(skill_seq)} 个技能")
 
     # start auto trajectory generation
     observations, waypoints= [], []
+    task_success = False
     if skill_seq is not None: # normal case
-        for skill in skill_seq:
-            obs, waypoint, stage_success, task_success = skill(env)
+        for skill_idx, skill in enumerate(skill_seq):
+            skill_name = skill.func.__name__
+            skill_params = {k: v for k, v in skill.keywords.items() if k != 'env'}
+            print(f"\n[TIMING] ===== 技能 {skill_idx+1}/{len(skill_seq)}: {skill_name} =====")
+            print(f"[DEBUG] 参数: {skill_params}")
+            t_skill = time.time()
+            obs, waypoint, stage_success, skill_task_success = skill(env)
+            elapsed = time.time() - t_skill
+            print(f"[TIMING] 技能 {skill_name} 完成, 耗时 {elapsed:.1f}s")
+            print(f"[DEBUG] stage_success={stage_success}, skill_task_success={skill_task_success}")
+            print(f"[DEBUG] 生成 {len(obs)} 个观测, {len(waypoint)} 个路径点")
+
+            # 打印试管当前位置
+            try:
+                target = env.task.entities[env.task.target_entity]
+                tube_pos = env.physics.bind(target.mjcf_model.worldbody).xpos
+                print(f"[DEBUG] 试管当前位置: {tube_pos}")
+                # 打印试管架位置
+                for key, entity in env.task.entities.items():
+                    if "tube_stand" in key:
+                        stand_pos = entity.get_xpos(env.physics)
+                        print(f"[DEBUG] 试管架位置: {stand_pos}")
+                        break
+                # 打印 _tube_has_left_stand
+                if hasattr(env.task, '_tube_has_left_stand'):
+                    print(f"[DEBUG] _tube_has_left_stand={env.task._tube_has_left_stand}")
+            except Exception as e:
+                print(f"[DEBUG] 获取位置信息失败: {e}")
+
             if args.debug:
                 for o in obs: observations.append(dict(rgb=o["rgb"]))
             else:
@@ -74,22 +119,51 @@ def generate_trajectory(args, index, logger):
             if args.early_stop and not stage_success:
                 logger.warning(f"{skill} failed, early quit...")
                 break
-            if task_success:
+            if skill_task_success:
+                task_success = True
+                print(f"[DEBUG] 技能返回 task_success=True, 提前退出")
                 break
+
+        # 使用条件（conditions）来判断任务是否成功
+        print(f"\n[TIMING] 检查任务条件...")
+        t1 = time.time()
+        if hasattr(env.task, 'conditions') and env.task.conditions is not None:
+            try:
+                for ci, cond in enumerate(env.task.conditions.conditions):
+                    cond_result = cond.is_met(env.physics)
+                    print(f"[DEBUG]   Condition {ci} ({type(cond).__name__}): {cond_result}")
+                result = env.task.conditions.is_met(env.physics)
+                print(f"[DEBUG] Overall Conditions is_met: {result}")
+                if result:
+                    task_success = True
+            except Exception as e:
+                print(f"[DEBUG] Error evaluating conditions: {e}")
+                import traceback as tb
+                print(tb.format_exc())
+        else:
+            print("[DEBUG] No conditions found")
+        print(f"[TIMING] 条件检查完成, 耗时 {time.time()-t1:.1f}s")
     else: # TODO: some special tasks should be handled based on the feedback
         raise NotImplementedError("No expert skill sequence found")
-    
+
     task_dir = os.path.join(args.save_dir, args.task_name)
+    print(f"\n[TIMING] 所有技能执行完成, 总观测数={len(observations)}, task_success={task_success}")
+    print(f"[TIMING] 技能执行总耗时: {time.time()-t0:.1f}s")
+
     if args.record_video:
-        frames = [] 
+        print(f"[TIMING] 开始生成视频 ({len(observations)} 帧)...")
+        t1 = time.time()
+        frames = []
         for o in observations:
             frames.append(np.vstack([np.hstack(o["rgb"][:2]), np.hstack(o["rgb"][2:4])]))
         if not os.path.exists(task_dir):
             os.makedirs(task_dir)
-        mediapy.write_video(os.path.join(task_dir, f"demo_{index}_success_{task_success}.mp4"), 
-                            frames, fps=10) 
+        video_path = os.path.join(task_dir, f"demo_{index}_success_{task_success}.mp4")
+        mediapy.write_video(video_path, frames, fps=10)
+        print(f"[TIMING] 视频生成完成, 耗时 {time.time()-t1:.1f}s, 路径: {video_path}")
     if not task_success:
         logger.warning("Task failed, skip saving data")
+        print(f"[TIMING] generate_trajectory 结束 (失败), 总耗时: {time.time()-t0:.1f}s")
         return
     else:
         logger.info("Task success, saving data")

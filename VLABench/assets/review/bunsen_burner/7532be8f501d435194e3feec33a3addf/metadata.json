@@ -1,0 +1,136 @@
+{
+  "uri": "https://api.sketchfab.com/v3/models/7532be8f501d435194e3feec33a3addf",
+  "uid": "7532be8f501d435194e3feec33a3addf",
+  "name": "Bunsen Burner",
+  "staffpickedAt": null,
+  "viewCount": 745,
+  "likeCount": 4,
+  "animationCount": 0,
+  "viewerUrl": "https://sketchfab.com/3d-models/7532be8f501d435194e3feec33a3addf",
+  "embedUrl": "https://sketchfab.com/models/7532be8f501d435194e3feec33a3addf/embed",
+  "commentCount": 0,
+  "isDownloadable": true,
+  "publishedAt": "2018-03-29T22:41:41.041960",
+  "tags": [],
+  "categories": [
+    {
+      "name": "science-technology"
+    }
+  ],
+  "thumbnails": {
+    "images": [
+      {
+        "uid": "d7cfcf1923ae44f0bb34b1e150f4d49f",
+        "size": 257907,
+        "width": 1920,
+        "url": "https://media.sketchfab.com/models/7532be8f501d435194e3feec33a3addf/thumbnails/85f34a894c8f4f63b47a4850a42ea71e/331f7bd44080419fb360e37ec2cbbaae.jpeg",
+        "height": 1080
+      },
+      {
+        "uid": "e95aca16daaf4c068c7ef03b826c9259",
+        "size": 67450,
+        "width": 1024,
+        "url": "https://media.sketchfab.com/models/7532be8f501d435194e3feec33a3addf/thumbnails/85f34a894c8f4f63b47a4850a42ea71e/9b081b7656aa42fe9ddc125e06810a1c.jpeg",
+        "height": 576
+      },
+      {
+        "uid": "bd8c7615aad54b478353fa8318f066ce",
+        "size": 30482,
+        "width": 720,
+        "url": "https://media.sketchfab.com/models/7532be8f501d435194e3feec33a3addf/thumbnails/85f34a894c8f4f63b47a4850a42ea71e/1e0a1568ffa44a9591dc5aeab4c17d92.jpeg",
+        "height": 405
+      },
+      {
+        "uid": "a0dcacebe3494e8ab6c463cfcfb7a930",
+        "size": 3875,
+        "width": 256,
+        "url": "https://media.sketchfab.com/models/7532be8f501d435194e3feec33a3addf/thumbnails/85f34a894c8f4f63b47a4850a42ea71e/244d88f952454a52913895eaa8b0a7a3.jpeg",
+        "height": 144
+      },
+      {
+        "uid": "1c7e7846ecd3491f80ec25d5f0afc0ea",
+        "size": 676,
+        "width": 64,
+        "url": "https://media.sketchfab.com/models/7532be8f501d435194e3feec33a3addf/thumbnails/85f34a894c8f4f63b47a4850a42ea71e/bf4a3c3663284208be089b6ff71c5ffa.jpeg",
+        "height": 36
+      }
+    ]
+  },
+  "user": {
+    "uid": "93ce6dd1f3c147698f79a69269c1b579",
+    "username": "Gmotion",
+    "displayName": "Lwando London Gomomo",
+    "profileUrl": "https://sketchfab.com/Gmotion",
+    "account": "basic",
+    "avatar": {
+      "uri": "https://api.sketchfab.com/v3/avatars/7328b3e873d24520aa7598e60acc1aeb",
+      "images": [
+        {
+          "size": 706,
+          "width": 32,
+          "url": "https://media.sketchfab.com/avatars/7328b3e873d24520aa7598e60acc1aeb/f5a976dc20df45369f39086ca2b9cd0a.jpeg",
+          "height": 32
+        },
+        {
+          "size": 1015,
+          "width": 48,
+          "url": "https://media.sketchfab.com/avatars/7328b3e873d24520aa7598e60acc1aeb/f934e028166041e5b6b556fbb973c2f3.jpeg",
+          "height": 48
+        },
+        {
+          "size": 2321,
+          "width": 90,
+          "url": "https://media.sketchfab.com/avatars/7328b3e873d24520aa7598e60acc1aeb/c7747fc51d2b4755894d9b1b921ae79d.jpeg",
+          "height": 90
+        },
+        {
+          "size": 2692,
+          "width": 100,
+          "url": "https://media.sketchfab.com/avatars/7328b3e873d24520aa7598e60acc1aeb/f056f3663ceb4358912fa7d08172a713.jpeg",
+          "height": 100
+        }
+      ]
+    },
+    "uri": "https://api.sketchfab.com/v3/users/93ce6dd1f3c147698f79a69269c1b579"
+  },
+  "description": "Chemistry laboratory Bunsen burner",
+  "faceCount": 3842,
+  "createdAt": "2018-03-29T22:11:51.304461",
+  "vertexCount": 1821,
+  "isAgeRestricted": false,
+  "archives": {
+    "glb": {
+      "textureCount": 3,
+      "size": 1435244,
+      "type": "glb",
+      "textureMaxResolution": 512,
+      "faceCount": 3842,
+      "vertexCount": 3537
+    },
+    "gltf": {
+      "textureCount": 3,
+      "size": 1208552,
+      "type": "gltf",
+      "textureMaxResolution": 512,
+      "faceCount": 3842,
+      "vertexCount": 3537
+    },
+    "source": {
+      "textureCount": null,
+      "size": 1158691,
+      "type": "source",
+      "textureMaxResolution": null,
+      "faceCount": null,
+      "vertexCount": null
+    },
+    "usdz": {
+      "textureCount": null,
+      "size": 685303,
+      "type": "usdz",
+      "textureMaxResolution": null,
+      "faceCount": null,
+      "vertexCount": null
+    }
+  },
+  "license": "by"
+}

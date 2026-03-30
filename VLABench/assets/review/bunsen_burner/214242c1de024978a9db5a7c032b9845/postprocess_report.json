@@ -1,0 +1,28 @@
+{
+  "uid": "214242c1de024978a9db5a7c032b9845",
+  "centered": true,
+  "scaled": false,
+  "scale_factor": null,
+  "orientation_warning": null,
+  "original_dims": {
+    "center": [
+      -0.051803194999999996,
+      0.069999995,
+      -0.029999995
+    ],
+    "ranges": [
+      0.22298877,
+      0.15697299,
+      0.15812651
+    ],
+    "max_dim": 0.22298877
+  },
+  "final_dims": {
+    "ranges": [
+      0.22298878,
+      0.15697299,
+      0.1581265
+    ],
+    "max_dim": 0.22298878
+  }
+}

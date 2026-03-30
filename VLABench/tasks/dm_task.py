@@ -52,8 +52,8 @@ class LM4ManipBaseTask(composer.Task):
         """
         self.task_name = task_name
         self.config_manager = register.load_config_manager(task_name)(task_name)
-        self.asset_path = os.path.join(os.getenv("VLABENCH_ROOT"), "assets") 
-        self.use_llm = use_llm       
+        self.asset_path = os.path.join(os.getenv("VLABENCH_ROOT"), "assets")
+        self.use_llm = use_llm
         self._arena = composer.Arena(xml_path=os.path.join(self.asset_path, xml_file))
         self._robot = robot
         self.attach_entity(robot)
@@ -171,7 +171,7 @@ class LM4ManipBaseTask(composer.Task):
             - entity configuration
         """
         if eval: config = self.config_manager.get_unseen_task_config()
-        else: config = self.config_manager.get_seen_task_config() 
+        else: config = self.config_manager.get_seen_task_config()
         if isinstance(config, dict):
             self.config = config
         elif isinstance(config, str):
@@ -179,7 +179,7 @@ class LM4ManipBaseTask(composer.Task):
                 self.config = yaml.safe_load(f)
         # override the config with deterministic config
         deterministic_config = kwargs.get("deterministic_config", None)
-        if deterministic_config is not None: 
+        if deterministic_config is not None:
             for key in ["scene", "components", "instructions", "conditions"]:
                 if key in deterministic_config["task"].keys():
                     self.config["task"][key] = deterministic_config["task"][key]
@@ -190,7 +190,7 @@ class LM4ManipBaseTask(composer.Task):
         self.set_engine_config(self.config["engine"])
         # load scene and entities
         if self.config["task"].get("scene", None) is not None:
-            self.load_scene_from_config(config["task"]["scene"]) 
+            self.load_scene_from_config(config["task"]["scene"])
         for entity_config in self.config["task"]["components"]:
             self.load_entity_from_config(entity_config)
         # build instrutions
@@ -212,7 +212,11 @@ class LM4ManipBaseTask(composer.Task):
                 if k in ["robot"]:
                     specific_condition[k] = self.robot
                     continue
-                if k in ["positions", "target_pos_range"]: continue
+                if k in ["positions", "target_pos_range", "orientations",
+                         "duration", "xy_tolerance",  # heated condition 的数值参数，不做 entity 解析
+                         "target_height", "tolerance_distance", "tolerance_angle",  # 其他数值参数
+                         "dimension", "offset", "threshold", "check_axes",
+                         ]: continue
                 if isinstance(entities, str):
                     specific_condition[k] = self.entities.get(entities, None)
                 elif isinstance(entities, list):
@@ -296,7 +300,7 @@ class LM4ManipBaseTask(composer.Task):
             return None
     
     def should_terminate_episode(self, physics):
-        if hasattr(self, "conditions"):
+        if hasattr(self, "conditions") and self.conditions is not None:
             terminal = self.conditions.is_met(physics)
         else:
             terminal = False

@@ -29,3 +29,17 @@ obj2mjcf>=0.0.22          # 新增：OBJ到MJCF格式转换工具
 trimesh>=4.0.0            # 新增：3D模型处理（GLB到OBJ转换，无需Blender）
 tqdm>=4.65.0              # 新增：进度条显示
 pillow>=9.0.0             # 新增：图像处理（预览图生成）
+
+# VLABench Agent 依赖
+
+# LangGraph 和 LangChain 核心
+langgraph>=0.2.0
+langchain>=0.3.0
+langchain-core>=0.3.0
+
+# Claude API (Anthropic)
+langchain-anthropic>=0.2.0
+anthropic>=0.40.0
+
+# 数据处理
+pydantic>=2.0.0

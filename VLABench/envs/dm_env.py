@@ -21,7 +21,6 @@ class LM4ManipDMEnv(composer.Environment):
         timestep = super().reset()
         self.cancel_gravity_and_improve_fluid()
         for i in range(self.reset_wait_step):
-            # print(f"reset {i}")
             self.step()
         self.reset_gravity_and_fluid(self.physics)
         for _ in range(self.reset_wait_step):

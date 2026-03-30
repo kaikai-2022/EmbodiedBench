@@ -1,0 +1,15 @@
+Model UID: e90e3cf7446f4c0896b67dfcea9eca0e
+Model Name: Microscope
+
+Source Information:
+============================================================
+Source: unknown
+Objaverse UID: e90e3cf7446f4c0896b67dfcea9eca0e
+
+HuggingFace Objaverse:
+Dataset: https://huggingface.co/datasets/allenai/objaverse
+Object Path: glbs/e9/e90e3cf7446f4c0896b67dfcea9eca0e.glb
+
+Additional Metadata:
+Tags: microscope, science, xyz, xyz-school, xyzhomework
+Description: Home work fo XYZ school, low poly, game ready microscope model...

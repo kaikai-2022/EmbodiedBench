@@ -1,0 +1,15 @@
+Model UID: 7532be8f501d435194e3feec33a3addf
+Model Name: Bunsen Burner
+
+Source Information:
+============================================================
+Source: unknown
+Objaverse UID: 7532be8f501d435194e3feec33a3addf
+
+HuggingFace Objaverse:
+Dataset: https://huggingface.co/datasets/allenai/objaverse
+Object Path: glbs/75/7532be8f501d435194e3feec33a3addf.glb
+
+Additional Metadata:
+Tags: 
+Description: Chemistry laboratory Bunsen burner...

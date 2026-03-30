@@ -1,0 +1,28 @@
+{
+  "uid": "5185e41b2beb48fa8f15ca3707f43e10",
+  "centered": true,
+  "scaled": false,
+  "scale_factor": null,
+  "orientation_warning": "模型最长轴为 X (0.209m)，Z轴为 0.100m，可能需要旋转",
+  "original_dims": {
+    "center": [
+      0.054634905000000004,
+      0.07316345,
+      0.0
+    ],
+    "ranges": [
+      0.20926981,
+      0.14647380000000002,
+      0.1
+    ],
+    "max_dim": 0.20926981
+  },
+  "final_dims": {
+    "ranges": [
+      0.20926982,
+      0.1464738,
+      0.1
+    ],
+    "max_dim": 0.20926982
+  }
+}

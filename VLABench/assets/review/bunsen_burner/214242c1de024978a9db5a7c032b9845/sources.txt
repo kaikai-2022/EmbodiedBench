@@ -1,0 +1,15 @@
+Model UID: 214242c1de024978a9db5a7c032b9845
+Model Name: Bunsen Burner
+
+Source Information:
+============================================================
+Source: unknown
+Objaverse UID: 214242c1de024978a9db5a7c032b9845
+
+HuggingFace Objaverse:
+Dataset: https://huggingface.co/datasets/allenai/objaverse
+Object Path: glbs/21/214242c1de024978a9db5a7c032b9845.glb
+
+Additional Metadata:
+Tags: 
+Description: for uni game project...

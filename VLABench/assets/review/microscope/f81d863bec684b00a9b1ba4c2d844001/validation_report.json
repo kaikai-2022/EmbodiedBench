@@ -1,0 +1,19 @@
+{
+  "status": "PASS",
+  "xml_path": "/ssd/mkqin/workspace/VLABench/VLABench/assets/review/microscope/f81d863bec684b00a9b1ba4c2d844001/f81d863bec684b00a9b1ba4c2d844001.xml",
+  "checks": {
+    "xml_load": "PASS",
+    "physics_compile": "PASS",
+    "body_found": "PASS: f81d863bec684b00a9b1ba4c2d844001/",
+    "stability": "PASS: final_z=0.300",
+    "xy_drift": "PASS: drift=0.000m",
+    "final_position": [
+      0.0,
+      0.0,
+      0.3
+    ],
+    "video": "PASS: 90 frames, 3.0s"
+  },
+  "preview_path": null,
+  "video_path": "/ssd/mkqin/workspace/VLABench/VLABench/assets/review/microscope/f81d863bec684b00a9b1ba4c2d844001/validation.mp4"
+}

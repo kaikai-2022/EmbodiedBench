@@ -1,0 +1,197 @@
+{
+  "uri": "https://api.sketchfab.com/v3/models/5185e41b2beb48fa8f15ca3707f43e10",
+  "uid": "5185e41b2beb48fa8f15ca3707f43e10",
+  "name": "Bunsen Burner",
+  "staffpickedAt": null,
+  "viewCount": 748,
+  "likeCount": 12,
+  "animationCount": 0,
+  "viewerUrl": "https://sketchfab.com/3d-models/5185e41b2beb48fa8f15ca3707f43e10",
+  "embedUrl": "https://sketchfab.com/models/5185e41b2beb48fa8f15ca3707f43e10/embed",
+  "commentCount": 0,
+  "isDownloadable": true,
+  "publishedAt": "2021-03-23T11:14:19.211496",
+  "tags": [
+    {
+      "name": "experiment",
+      "slug": "experiment",
+      "uri": "https://api.sketchfab.com/v3/tags/experiment"
+    },
+    {
+      "name": "lab",
+      "slug": "lab",
+      "uri": "https://api.sketchfab.com/v3/tags/lab"
+    },
+    {
+      "name": "burner",
+      "slug": "burner",
+      "uri": "https://api.sketchfab.com/v3/tags/burner"
+    },
+    {
+      "name": "fire",
+      "slug": "fire",
+      "uri": "https://api.sketchfab.com/v3/tags/fire"
+    },
+    {
+      "name": "science",
+      "slug": "science",
+      "uri": "https://api.sketchfab.com/v3/tags/science"
+    },
+    {
+      "name": "chemistry",
+      "slug": "chemistry",
+      "uri": "https://api.sketchfab.com/v3/tags/chemistry"
+    },
+    {
+      "name": "flames",
+      "slug": "flames",
+      "uri": "https://api.sketchfab.com/v3/tags/flames"
+    },
+    {
+      "name": "bunsen",
+      "slug": "bunsen",
+      "uri": "https://api.sketchfab.com/v3/tags/bunsen"
+    },
+    {
+      "name": "game",
+      "slug": "game",
+      "uri": "https://api.sketchfab.com/v3/tags/game"
+    },
+    {
+      "name": "pbr",
+      "slug": "pbr",
+      "uri": "https://api.sketchfab.com/v3/tags/pbr"
+    },
+    {
+      "name": "low",
+      "slug": "low",
+      "uri": "https://api.sketchfab.com/v3/tags/low"
+    },
+    {
+      "name": "poly",
+      "slug": "poly",
+      "uri": "https://api.sketchfab.com/v3/tags/poly"
+    }
+  ],
+  "categories": [
+    {
+      "name": "science-technology"
+    }
+  ],
+  "thumbnails": {
+    "images": [
+      {
+        "uid": "f47956909d9449f3bfaf98f594cd32e8",
+        "size": 242551,
+        "width": 1920,
+        "url": "https://media.sketchfab.com/models/5185e41b2beb48fa8f15ca3707f43e10/thumbnails/5e02af061bd243dcb0579477ead88689/a35e6e972f2e4acfae0814906fbc33d2.jpeg",
+        "height": 1080
+      },
+      {
+        "uid": "31ba099478aa4e3eb45bf7bdb13c505e",
+        "size": 34062,
+        "width": 1024,
+        "url": "https://media.sketchfab.com/models/5185e41b2beb48fa8f15ca3707f43e10/thumbnails/5e02af061bd243dcb0579477ead88689/d994ef25f11f4fd7b1ac00ea5fc16ff7.jpeg",
+        "height": 576
+      },
+      {
+        "uid": "a037ed35b0c34a02a1628e6be78d7ccc",
+        "size": 15225,
+        "width": 720,
+        "url": "https://media.sketchfab.com/models/5185e41b2beb48fa8f15ca3707f43e10/thumbnails/5e02af061bd243dcb0579477ead88689/133b3dd8d6504823a0b00f9768a9d403.jpeg",
+        "height": 405
+      },
+      {
+        "uid": "5ceb0f8ffb9a41f9a8d0a3208034cbb6",
+        "size": 2566,
+        "width": 256,
+        "url": "https://media.sketchfab.com/models/5185e41b2beb48fa8f15ca3707f43e10/thumbnails/5e02af061bd243dcb0579477ead88689/c373fd07248f49f98913c50df8f786c2.jpeg",
+        "height": 144
+      },
+      {
+        "uid": "90f3d3a9f2f340ffb43bc87f77ee072e",
+        "size": 598,
+        "width": 64,
+        "url": "https://media.sketchfab.com/models/5185e41b2beb48fa8f15ca3707f43e10/thumbnails/5e02af061bd243dcb0579477ead88689/2d21fd0d492d409eae24bdaac2c55f66.jpeg",
+        "height": 36
+      }
+    ]
+  },
+  "user": {
+    "uid": "c45aab42c63d48169441db6390cac985",
+    "username": "dreamsoftin",
+    "displayName": "Dreamsoft Innovations Private Limited",
+    "profileUrl": "https://sketchfab.com/dreamsoftin",
+    "account": "basic",
+    "avatar": {
+      "uri": "https://api.sketchfab.com/v3/avatars/6e0b6f89300f4514a2dedc6eefd40d48",
+      "images": [
+        {
+          "size": 869,
+          "width": 32,
+          "url": "https://media.sketchfab.com/avatars/6e0b6f89300f4514a2dedc6eefd40d48/b12d2a9cdc1043248cb03b8f7e7f1718.png",
+          "height": 32
+        },
+        {
+          "size": 1455,
+          "width": 48,
+          "url": "https://media.sketchfab.com/avatars/6e0b6f89300f4514a2dedc6eefd40d48/114cc397ab9e467bb38a646ea98a91c0.png",
+          "height": 48
+        },
+        {
+          "size": 2840,
+          "width": 90,
+          "url": "https://media.sketchfab.com/avatars/6e0b6f89300f4514a2dedc6eefd40d48/05384dd0745d4ead9930ace9f59085dc.png",
+          "height": 90
+        },
+        {
+          "size": 3627,
+          "width": 100,
+          "url": "https://media.sketchfab.com/avatars/6e0b6f89300f4514a2dedc6eefd40d48/0bbd7b6dbb404fd5832dee15573539af.png",
+          "height": 100
+        }
+      ]
+    },
+    "uri": "https://api.sketchfab.com/v3/users/c45aab42c63d48169441db6390cac985"
+  },
+  "description": "3D model of bunsen burner used in chemistry labs. Model has been optimized for games. Model has two mesh parts and has a single material with PBR maps.",
+  "faceCount": 2758,
+  "createdAt": "2021-03-23T10:56:59.247069",
+  "vertexCount": 1385,
+  "isAgeRestricted": false,
+  "archives": {
+    "glb": {
+      "textureCount": 3,
+      "size": 6899940,
+      "type": "glb",
+      "textureMaxResolution": 2048,
+      "faceCount": 2756,
+      "vertexCount": 2215
+    },
+    "gltf": {
+      "textureCount": 3,
+      "size": 6835279,
+      "type": "gltf",
+      "textureMaxResolution": 2048,
+      "faceCount": 2756,
+      "vertexCount": 2215
+    },
+    "source": {
+      "textureCount": null,
+      "size": 7130412,
+      "type": "source",
+      "textureMaxResolution": null,
+      "faceCount": null,
+      "vertexCount": null
+    },
+    "usdz": {
+      "textureCount": null,
+      "size": 1691127,
+      "type": "usdz",
+      "textureMaxResolution": null,
+      "faceCount": null,
+      "vertexCount": null
+    }
+  },
+  "license": "by"
+}

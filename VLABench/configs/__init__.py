@@ -22,4 +22,10 @@ name2config = {
     "make_juice_series":["make_juice"],
     "seesaw_series":["simple_seesaw_use", "complex_seesaw_use"],
     "set_study_table_series":["set_study_table"],
+
+    "heat_chemistry_tube_series":["heat_chemistry_tube"],
+    "insert_tube_series":["insert_tube"],
+    "shake_tube_series":["shake_tube"],
+    "lift_petri_dish_series":["lift_petri_dish"],
+    "pour_liquid_from_test_tube_into_beaker_series":["pour_liquid_from_test_tube_into_beaker"],
 }

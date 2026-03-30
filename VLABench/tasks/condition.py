@@ -364,6 +364,145 @@ class OrCondition(Condition):
     def __init__(self, condition_sets):
         assert isinstance(condition_sets, list) and isinstance(condition_sets[0], ConditionSet), "condition_sets should be a list of condition sets"
         self.condition_sets = condition_sets
-    
+
     def is_met(self, physics=None):
         return any([condition_set.is_met(physics) for condition_set in self.condition_sets])
+
+@register.add_condition("heated")
+class HeatedCondition(Condition):
+    """
+    通用加热条件：判断目标物体是否被加热源充分加热。
+
+    设计思路：
+    - 空间判定：目标物体必须在加热源正上方（Z 高于加热源 且 XY 在加热源范围内）
+    - 时间判定：采用"累积计时"而非"连续计时"，即目标物体移开后不清零已累积的时间，
+      只是停止计时。这样做是为了对机械臂控制抖动更鲁棒——轻微晃动不会导致进度丢失。
+    - 通用性：heat_source 参数不绑定特定加热工具，本生灯、酒精灯、电炉等均可。
+
+    判定流程（每个 control step 调用一次 is_met）：
+    1. 计算当前 step 距上次调用的时间差 dt（通过 physics.data.time）
+    2. 检查目标物体是否在加热源正上方：
+       a. Z 轴：目标物体 Z > 加热源 Z
+       b. XY 轴：优先使用 heat_source.contain() 判断；若不支持则 fallback 到 XY 欧氏距离 < xy_tolerance
+    3. 若在上方，accumulated_time += dt
+    4. accumulated_time >= duration 时条件达成
+
+    参数：
+        target_entity: 被加热的物体（如试管）
+        heat_source:   加热工具（如本生灯），任何 Entity 均可
+        duration:      需要累积的加热秒数，默认 5.0 秒
+        xy_tolerance:  XY 距离阈值（仅在 heat_source 无 contain 方法时使用），默认 0.08m
+    """
+    def __init__(self, target_entity, heat_source, duration=5.0, xy_tolerance=0.08):
+        self.target_entity = target_entity
+        self.heat_source = heat_source
+        self.duration = duration
+        self.xy_tolerance = xy_tolerance
+        self.accumulated_time = 0.0
+        self.last_time = None
+
+    def _is_above_heat_source(self, physics):
+        """
+        判断目标物体是否在加热源正上方。
+        两步检查：(1) Z 高于加热源顶部  (2) XY 在加热源范围内
+
+        注意：对于 subentity（如试管架上的试管），worldbody.xpos 在被抓起后可能不更新。
+        因此优先使用 geom 位置的平均值作为实际位置。
+        """
+        # 获取目标物体的实际位置（优先用 geom 均值，对 subentity 更可靠）
+        target_geoms = self.target_entity.mjcf_model.find_all('geom')
+        if target_geoms:
+            target_xpos = np.mean([physics.bind(g).xpos for g in target_geoms], axis=0)
+        else:
+            target_xpos = physics.bind(self.target_entity.mjcf_model.worldbody).xpos
+
+        # 获取加热源顶部 z（用所有 geom 的最高点）
+        source_xpos = physics.bind(self.heat_source.mjcf_model.worldbody).xpos
+        source_geoms = self.heat_source.mjcf_model.find_all('geom')
+        if source_geoms:
+            source_top_z = max(physics.bind(g).xpos[2] for g in source_geoms)
+        else:
+            source_top_z = source_xpos[2]
+
+        # 步骤1：Z 轴检查 — 目标必须高于加热源顶部
+        if target_xpos[2] <= source_top_z:
+            return False
+
+        # 步骤2：XY 范围检查
+        if hasattr(self.heat_source, 'contain') and callable(self.heat_source.contain):
+            point_to_check = target_xpos.copy()
+            point_to_check[2] = source_xpos[2] + 0.01
+            return self.heat_source.contain(point_to_check, physics)
+        else:
+            # fallback：简单的 XY 欧氏距离判定
+            xy_dist = np.sqrt((target_xpos[0] - source_xpos[0])**2 +
+                              (target_xpos[1] - source_xpos[1])**2)
+            return xy_dist < self.xy_tolerance
+
+    def is_met(self, physics):
+        # 通过仿真时间计算 dt（每次 is_met 调用间隔）
+        current_time = physics.data.time
+        dt = (current_time - self.last_time) if self.last_time is not None else 0.0
+        self.last_time = current_time
+
+        # 空间判定 + 时间累积
+        if self._is_above_heat_source(physics):
+            self.accumulated_time += dt
+
+        return self.accumulated_time >= self.duration
+
+    def met_progress(self, physics=None):
+        """返回加热进度 (0.0 ~ 1.0)，方便评估和 debug"""
+        progress = min(self.accumulated_time / self.duration, 1.0) if self.duration > 0 else 1.0
+        return progress, []
+
+@register.add_condition("on_orientation")
+class OnOrientationCondition(Condition):
+    """
+    Check if the entity's orientation matches the target orientation within tolerance.
+    params:
+        entities: list of entity names
+        orientations: list of target orientations in Euler angles (roll, pitch, yaw) in radians
+        tolerance_angle: maximum allowed angle difference in radians (default: pi/6)
+        check_axes: list of axes to check (default: [0, 1, 2] meaning roll, pitch, yaw)
+    """
+    def __init__(self, entities, orientations, tolerance_angle=np.pi/6, check_axes=None):
+        self.entities = entities
+        self.orientations = np.array(orientations)
+        self.tolerance_angle = tolerance_angle
+        self.check_axes = check_axes if check_axes is not None else [0, 1, 2]  # Default: check all axes
+
+    def is_met(self, physics=None):
+        for i, entity in enumerate(self.entities):
+            entity_quat = physics.bind(entity.mjcf_model.worldbody).xquat
+            # Convert quaternion to Euler angles
+            from VLABench.utils.utils import quaternion_to_euler
+            current_euler = quaternion_to_euler(entity_quat)
+
+            # Get possible target orientations (support multiple targets)
+            if len(self.orientations.shape) == 1:
+                # Single target orientation
+                target_orientations = [self.orientations]
+            else:
+                # Multiple target orientations (any one can match)
+                target_orientations = self.orientations
+
+            # Check if current orientation matches any target
+            orientation_matched = False
+            for target_euler in target_orientations:
+                # Calculate angular difference for each axis
+                angle_diff = np.abs(current_euler - target_euler)
+                # Handle angle wrapping (e.g., 359° vs 1° should be close)
+                angle_diff = np.minimum(angle_diff, 2*np.pi - angle_diff)
+
+                # Only check specified axes
+                angle_diff_to_check = angle_diff[self.check_axes]
+
+                # Check if all specified angles are within tolerance
+                if np.all(angle_diff_to_check < self.tolerance_angle):
+                    orientation_matched = True
+                    break
+
+            if not orientation_matched:
+                return False
+        return True
