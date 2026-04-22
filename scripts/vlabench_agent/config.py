@@ -35,10 +35,12 @@ class AgentConfig:
     # ==================== API 配置 ====================
 
     # API Key (已配置)
-    ANTHROPIC_API_KEY: str = "sk-NdKNGm3YPJK9GSWA808f2c87Cb9e422c86858610972cE265"
+    # ANTHROPIC_API_KEY: str = "sk-NdKNGm3YPJK9GSWA808f2c87Cb9e422c86858610972cE265"
+    ANTHROPIC_API_KEY: str = "sk-FIauuBJizMdwBttvTao2d4oY6NeVakZVT2vhBfB8SmcX289R"
 
     # 自定义 API 端点 (去掉 /v1 后缀,库会自动添加)
-    BASE_URL: str = "http://apifs.shubiaobiao.cn"
+    # BASE_URL: str = "http://apifs.shubiaobiao.cn"
+    BASE_URL: str = "https://us.novaiapi.com"
 
     # ==================== 其他配置 ====================
 

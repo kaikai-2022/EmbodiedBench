@@ -32,7 +32,12 @@ def load_env(task,
         random_init: bool, if true, the env will take random layout/texture in each reset. Set this value 'False' when eval or replay.
     """
     # load config
+    # 动态注册任务兼容：如果 task 已注册但 name2config/TASK_CONFIG 中找不到，
+    # 则用 task_series = task（即 task_name_series 作为 series name）
     task_series = find_key_by_value(name2config, task)
+    if task_series == task and task in register._tasks:
+        # task 已在 register 中注册（registration_node 已处理），尝试从动态更新的 TASK_CONFIG 读取
+        task_series = f"{task}_series"
     specific_config = TASK_CONFIG.get(task_series, {})
     default_config = TASK_CONFIG["default"]
     default_config.update(specific_config)
@@ -44,7 +49,7 @@ def load_env(task,
     robot_config_overide = default_config.get("robot", {})
     robot_config.update(robot_config_overide)
     robot = register.load_robot(robot)(**robot_config)
-    if default_config['task'] and default_config['task'].get("random_init", None) is not None:
+    if default_config.get('task') and default_config['task'].get("random_init", None) is not None:
         random_init = default_config['task']['random_init']
     if episode_config is not None:
         # forbid random initialization if given episode config

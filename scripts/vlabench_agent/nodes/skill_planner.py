@@ -1,14 +1,23 @@
 """
-Skill Planner Node - 用 LLM 规划技能序列
+Skill Planner Node - 多步长程编排引擎
 
-专注于任务语义理解和技能序列规划，输出结构化 JSON。
-不生成代码，代码由 code_generator 节点通过模板填充完成。
+按 Skill Planner 设计规范文档实现：
+  - 废除 operation_type → 改为从 action 字段推断
+  - 废除 DSL 占位符 ($TARGET_ENTITY) → 直接输出 uid
+  - 废除 conditions 字典 → 执行完即成功
+  - 新增 pre/post_state_assertion (CoT 追踪)
+  - SKILL_LIB_DOC 底层原子技能白皮书
+
+设计原则:
+  - 状态驱动的全局单次规划 (Stateful One-Shot)
+  - 消灭硬编码规则，完全信任 LLM 决策
+  - 显式传参，无宏替换
 """
 
 import json
 import logging
 import re
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
 try:
     from langchain_anthropic import ChatAnthropic
@@ -16,239 +25,60 @@ except ImportError:
     ChatAnthropic = None
 
 from ..config import AgentConfig
+from .node_logger import log_node_output_file
 
 logger = logging.getLogger(__name__)
 
-# 已知的任务类型及其标准技能序列模式
-TASK_TYPE_PATTERNS = {
-    "pick": {
-        "description": "抓取物体（仅抓取，不移动到其他位置）",
-        "typical_skills": ["pick"],
-        "typical_conditions": {"is_grasped": {"entities": ["target_entity"], "robot": "robot"}},
-    },
-    "lift": {
-        "description": "抓起并举起物体",
-        "typical_skills": ["pick", "lift"],
-        "typical_conditions": {"lift": {"entities": ["target_entity"], "target_height": 0.9}},
-    },
-    "place": {
-        "description": "抓取物体并放入容器",
-        "typical_skills": ["pick", "place"],
-        "typical_conditions": {"contain": {"container": "target_container", "entities": ["target_entity"]}},
-    },
-    "pour": {
-        "description": "抓取物体、举起、移动到目标上方、倾倒",
-        "typical_skills": ["pick", "lift", "moveto", "pour"],
-        "typical_conditions": {
-            "pour": {"target_entity": "target_entity"},
-            "above": {"target_entity": "target_entity", "platform": "target_container"},
-        },
-    },
-    "push": {
-        "description": "推动物体或按压按钮",
-        "typical_skills": ["press"],
-        "typical_conditions": {"press_button": {"target_button": "target_entity"}},
-    },
-    "rotate": {
-        "description": "抓取物体并旋转",
-        "typical_skills": ["pick", "lift", "rotate", "moveto", "open_gripper"],
-        "typical_conditions": {
-            "on_orientation": {"entities": ["target_entity"], "orientations": [[0, 0, 1.5708]], "tolerance_angle": 0.5236},
-            "on_position": {"entities": ["target_entity"], "positions": [[0, 0, 0.8]], "tolerance_distance": 0.08},
-        },
-    },
-    "move": {
-        "description": "抓取物体并移动到指定位置后放下",
-        "typical_skills": ["pick", "lift", "moveto", "open_gripper"],
-        "typical_conditions": {},
-    },
-    "heat": {
-        "description": "抓取物体、举起、移动到加热源上方加热",
-        "typical_skills": ["pick", "lift", "moveto", "wait"],
-        "typical_conditions": {
-            "heated": {"target_entity": "target_entity", "heat_source": "target_container", "duration": 5.0},
-        },
-    },
-}
+# ========== 底层原子技能白皮书 (SKILL_LIB_DOC) ==========
+SKILL_LIB_DOC = """
+## 可用原子技能 (Atomic Skills)
 
+- pick(target_uid, prior_eulers=[[-pi, 0, 0]]): 从上方抓取物体。prior_eulers 决定抓取朝向。
+- place(target_uid): 放置到指定物体上方。
+- pour(): 倾倒动作（假设手里已抓着容器）。仅旋转腕部关节，末端位置会偏移。
+- pour_to_entity(target_uid, tilt_angle=pi/2, wait_time=10): 倾倒到指定容器上方。使用 IK 保持末端位置不变，通过逐步倾斜实现稳定倾倒。**pour 操作优先使用此技能**。
+- insert_to_entity(target_uid, insert_depth=0.05): 将抓取的物体插入目标实体的孔位（如试管插入试管架）。自动松开夹爪，无需再添加 open_gripper。
+- lift(lift_height=0.15, gripper_state=np.zeros(2)): 举起当前抓取的物体。
+- moveto(target_pos, gripper_state=np.zeros(2)): 移动末端执行器到目标位置。
+- moveto_entity(target_uid, offset=[0,0,0.2], gripper_state=np.zeros(2)): 移动到指定实体上方，自动从实体运行时位置计算目标。
+- open_gripper(): 松开夹爪。
+- close_gripper(): 闭合夹爪。
+- wait(wait_time=50): 等待指定步数。
+- rotate(rotation_angle=pi/2): 旋转当前抓取的物体。
+- press(target_pos): 按压目标位置。
+- push(target_pos, push_distance=0.1): 推动物体。
+- reset(): 重置环境。
+"""
+
+# ========== 原子技能白名单 ==========
 VALID_SKILLS = {
-    "pick", "place", "lift", "moveto", "pour", "push", "pull",
-    "press", "flip", "wait", "rotate", "open_gripper", "close_gripper",
-    "open_door", "close_door", "open_drawer", "open_laptop", "move_offset",
-    "reset",
+    "pick", "place", "lift", "moveto", "moveto_entity", "pour", "pour_to_entity", "push", "press",
+    "flip", "wait", "rotate", "open_gripper", "close_gripper",
+    "open_door", "close_door", "open_drawer", "open_laptop",
+    "move_offset", "reset", "insert_to_entity",
 }
 
-VALID_CONDITIONS = {
-    "contain", "not_contain", "is_grasped", "press_button", "on", "above",
-    "pour", "on_position", "contact", "joint_in_range", "lift", "order",
-    "on_orientation", "asyn_sequence", "or", "heated",
+# ========== 动作 → 技能模式映射 (LLM 参考，非硬编码) ==========
+ACTION_TO_SKILL_HINT = {
+    "pour": ["pick", "lift", "moveto_entity", "pour"],
+    "remove": ["moveto", "pick", "open_gripper"],
+    "place": ["moveto", "place"],
+    "lift": ["moveto", "pick", "lift"],
+    "shake": ["moveto", "pick", "wait"],
+    "dispense": ["moveto", "pick", "pour"],
+    "heat": ["moveto", "pick", "lift", "moveto", "wait"],
+    "move": ["moveto", "pick", "lift", "moveto", "open_gripper"],
+    "open": ["moveto", "pick", "open_gripper"],
 }
 
 
-def build_skill_planner_prompt(task_analysis: Dict, asset_status: Dict, error_feedback: str = None) -> str:
-    """构建 Skill Planner 的 LLM prompt"""
-
-    task_name = task_analysis.get("task_name", "custom_task")
-    operation_type = task_analysis.get("operation_type", "pick")
-    instruction_en = task_analysis.get("instruction_en", "")
-    objects = task_analysis.get("objects", [])
-
-    # 组装资产信息
-    asset_info_lines = []
-    for obj_name, info in asset_status.items():
-        if isinstance(info, dict):
-            xml_path = info.get("xml_path", "unknown")
-            entity_class = info.get("class", "CommonGraspedEntity")
-            newly_downloaded = info.get("newly_downloaded", False)
-            asset_info_lines.append(
-                f"  - {obj_name}: xml_path={xml_path}, class={entity_class}, "
-                f"newly_downloaded={newly_downloaded}"
-            )
-
-    asset_info = "\n".join(asset_info_lines) if asset_info_lines else "  （无资产信息）"
-
-    # 任务类型模式描述
-    patterns_desc = []
-    for ttype, pattern in TASK_TYPE_PATTERNS.items():
-        skills_str = " → ".join(pattern["typical_skills"])
-        conds_str = ", ".join(pattern["typical_conditions"].keys())
-        patterns_desc.append(f"  - {ttype}: {pattern['description']}\n    技能: [{skills_str}], 条件: {{{conds_str}}}")
-    patterns_text = "\n".join(patterns_desc)
-
-    prompt = f"""你是一个机器人任务规划专家。根据给定的任务描述，规划出合理的技能序列和成功条件。
-
-## 任务信息
-- 任务名称: {task_name}
-- 操作类型（仅供参考，以英文指令的语义为准）: {operation_type}
-- 英文指令: {instruction_en}
-- 涉及物体: {objects}
-
-注意：操作类型可能不准确。请根据英文指令的实际语义判断任务类型。
-例如 "Move the X" 应该是 move 类型（抓取+移动+放下），而不是 pick 类型。
-
-## 资产信息
-{asset_info}
-
-## 可用的任务类型模式
-{patterns_text}
-
-## 可用技能（参数说明）
-- pick(target_entity_name, prior_eulers=[[-pi, 0, 0]]): 从上方抓取物体
-- place(target_container_name): 放置到容器
-- lift(lift_height=0.15, gripper_state=np.zeros(2)): 举起物体
-- moveto(target_pos, gripper_state=np.zeros(2)): 移动末端执行器到位置
-- pour(): 倾倒
-- press(target_pos): 按压
-- push(target_pos, push_distance=0.1): 推动
-- rotate(rotation_angle=pi/2, gripper_state=np.zeros(2)): 旋转
-- open_gripper(): 松开夹爪
-- flip(gripper_state): 翻转
-- wait(wait_time=50): 等待
-
-## 可用条件类型
-- is_grasped: 物体被夹爪抓住 → {{"entities": ["物体名"], "robot": "robot"}}
-- lift: 物体举到指定高度 → {{"entities": ["物体名"], "target_height": 0.9}}
-- contain: 物体在容器内 → {{"container": "容器名", "entities": ["物体名"]}}
-- pour: 物体被倾倒 → {{"target_entity": "物体名"}}
-- above: 物体在平台上方 → {{"target_entity": "物体名", "platform": "平台名"}}
-- on_position: 物体到达位置 → {{"entities": ["物体名"], "positions": [[x,y,z]], "tolerance_distance": 0.05}}
-- press_button: 按钮被按下 → {{"target_button": "按钮名"}}
-- on_orientation: 物体方向正确 → {{"entities": ["物体名"], "orientations": [[r,p,y]], "tolerance_angle": 0.5236}}
-- heated: 物体被加热源加热（在上方停留足够时间） → {{"target_entity": "物体名", "heat_source": "加热源名", "duration": 5.0}}
-
-## Franka 机械臂工作空间范围
-- X: -0.3 ~ 0.3 (左右)
-- Y: -0.2 ~ 0.3 (前后)
-- Z: 0.75 ~ 1.5 (上下)
-- 桌面高度约 0.78m，物体通常在 z=0.80~0.85
-- 机器人基座位置: [0, -0.4, 0.78]
-
-## 规则
-1. "移动"类任务（move）应包含 pick → lift → moveto → open_gripper，条件用 on_position
-2. "抓取"类任务（pick）只需 pick，条件用 is_grasped
-3. "举起"类任务（lift）用 pick → lift，条件用 lift
-4. "放置"类任务（place）用 pick → place，条件用 contain
-5. 所有 pick 操作默认 prior_eulers=[[-3.14159, 0, 0]]（从上方竖直抓取）
-6. lift 和 moveto 之后必须加 gripper_state=np.zeros(2) 保持夹爪闭合
-7. target_entity_name 填 "self.target_entity"
-8. target_container_name 填 "self.target_container"
-9. moveto 的 target_pos 如果是容器上方，用表达式 "np.array(self.entities[self.target_container].get_xpos(physics)) + np.array([0, 0, 0.2])"
-10. moveto 的 target_pos 如果是随机桌面位置，用 "target_pos"（由外部变量提供）
-11. **重要**: move 类任务中，moveto 的 target_pos 和 on_position 条件的 positions 必须使用同一个目标位置变量 "target_pos"
-12. **重要**: on_position 条件的 tolerance_distance 应设为 0.1（物体放下后有偏移），dimension 默认检查 XY 平面（2维）
-13. **重要**: heat 类任务（加热）用 pick → lift → moveto → wait，条件用 heated。heat_source 填加热工具（如本生灯），target_entity 填被加热物体。moveto 目标是加热源上方。
-
-请输出 JSON（不要任何其他文字）：
-{{
-  "task_type": "pick|lift|place|pour|push|rotate|move|heat",
-  "skill_sequence": [
-    {{"skill": "技能名", "params": {{"参数名": "参数值"}}}}
-  ],
-  "conditions": {{
-    "条件类型": {{条件参数}}
-  }},
-  "instruction_template": "英文指令模板，用 {{target_entity}} 和 {{target_container}} 占位",
-  "needs_container": true/false,
-  "moveto_target_expr": "moveto 的 target_pos 表达式（如果有）或 null"
-}}"""
-
-    if error_feedback:
-        prompt += f"""
-
-## 上次规划失败的反馈
-{error_feedback}
-请根据反馈调整你的规划。"""
-
-    return prompt
-
-
-def validate_skill_plan(plan: Dict) -> tuple:
-    """
-    校验 skill plan 的结构合法性
-
-    Returns:
-        (is_valid, error_msg)
-    """
-    # 检查必要字段
-    required_fields = ["task_type", "skill_sequence", "conditions", "instruction_template", "needs_container"]
-    for field in required_fields:
-        if field not in plan:
-            return False, f"缺少必要字段: {field}"
-
-    # 检查 task_type
-    valid_types = set(TASK_TYPE_PATTERNS.keys())
-    if plan["task_type"] not in valid_types:
-        return False, f"未知 task_type: {plan['task_type']}，可选: {valid_types}"
-
-    # 检查 skill_sequence
-    if not isinstance(plan["skill_sequence"], list) or len(plan["skill_sequence"]) == 0:
-        return False, "skill_sequence 必须是非空列表"
-
-    for i, entry in enumerate(plan["skill_sequence"]):
-        if not isinstance(entry, dict) or "skill" not in entry:
-            return False, f"skill_sequence[{i}] 格式错误，需要 {{skill: ..., params: ...}}"
-        if entry["skill"] not in VALID_SKILLS:
-            return False, f"未知技能: {entry['skill']}，可选: {VALID_SKILLS}"
-
-    # 检查 conditions
-    if not isinstance(plan["conditions"], dict):
-        return False, "conditions 必须是 dict"
-    for cond_type in plan["conditions"]:
-        if cond_type not in VALID_CONDITIONS:
-            return False, f"未知条件类型: {cond_type}，可选: {VALID_CONDITIONS}"
-
-    return True, ""
-
-
-def extract_json_from_response(text: str) -> Optional[Dict]:
+def _extract_json(text: str) -> Optional[Dict]:
     """从 LLM 响应中提取 JSON"""
-    # 尝试直接解析
+    text = text.strip()
     try:
-        return json.loads(text.strip())
+        return json.loads(text)
     except json.JSONDecodeError:
         pass
-
-    # 尝试从 markdown 代码块中提取
     patterns = [
         r'```json\s*\n(.*?)\n\s*```',
         r'```\s*\n(.*?)\n\s*```',
@@ -258,37 +88,214 @@ def extract_json_from_response(text: str) -> Optional[Dict]:
         match = re.search(pattern, text, re.DOTALL)
         if match:
             try:
-                json_str = match.group(1) if match.lastindex else match.group(0)
-                return json.loads(json_str)
-            except (json.JSONDecodeError, IndexError):
+                return json.loads(match.group(1).strip())
+            except json.JSONDecodeError:
                 continue
-
     return None
+
+
+def _validate_skill_plan(plan: Dict, valid_uids: set, max_steps: int) -> tuple:
+    """
+    校验 skill_plan 的完整性
+
+    Returns:
+        (is_valid, error_msg)
+    """
+    if "global_skill_plan" not in plan:
+        return False, "缺少 global_skill_plan 字段"
+
+    if not isinstance(plan["global_skill_plan"], list):
+        return False, "global_skill_plan 必须是 list"
+
+    if len(plan["global_skill_plan"]) == 0:
+        return False, "global_skill_plan 不能为空"
+
+    # 检查 step_id 覆盖
+    step_ids = {s["step_id"] for s in plan["global_skill_plan"]}
+    expected = set(range(max_steps))
+    if step_ids != expected:
+        return False, f"step_id 不连续或不全: 期望 {expected}, 实际 {step_ids}"
+
+    for i, step in enumerate(plan["global_skill_plan"]):
+        if not isinstance(step, dict):
+            return False, f"global_skill_plan[{i}] 必须是 dict"
+
+        required = ["step_id", "semantic_instruction", "pre_state_assertion",
+                    "atomic_sequence", "post_state_assertion"]
+        for field in required:
+            if field not in step:
+                return False, f"global_skill_plan[{i}] 缺少 {field}"
+
+        if not isinstance(step["atomic_sequence"], list):
+            return False, f"global_skill_plan[{i}] atomic_sequence 必须是 list"
+
+        for j, skill_entry in enumerate(step["atomic_sequence"]):
+            if not isinstance(skill_entry, dict):
+                return False, f"global_skill_plan[{i}].atomic_sequence[{j}] 必须是 dict"
+            if "skill" not in skill_entry:
+                return False, f"global_skill_plan[{i}].atomic_sequence[{j}] 缺少 skill"
+            if skill_entry["skill"] not in VALID_SKILLS:
+                return False, f"未知技能: {skill_entry['skill']}，可选: {VALID_SKILLS}"
+
+            # 校验 params 中的 uid 是否存在
+            params = skill_entry.get("params", {})
+            for k, v in params.items():
+                if isinstance(v, str) and v in valid_uids:
+                    continue  # uid 命中
+                if isinstance(v, list):
+                    for item in v:
+                        if isinstance(item, str) and item in valid_uids:
+                            continue
+
+    return True, ""
+
+
+def _build_asset_info(asset_status: Dict) -> str:
+    """Build asset inventory text for the prompt."""
+    if not asset_status:
+        return "  (no asset info)"
+
+    lines = []
+    for uid, info in asset_status.items():
+        class_name = info.get("class_name", "Unknown")
+        properties = info.get("properties", {})
+        props_str = ", ".join(f"{k}={v}" for k, v in properties.items()) if properties else "none"
+        lines.append(f"  - {uid}: class={class_name}, properties={{{props_str}}}")
+    return "\n".join(lines)
+
+
+def _build_steps_info(steps: List[Dict]) -> str:
+    """Build execution script text for the prompt."""
+    lines = []
+    for step in steps:
+        action = step.get("action", "?")
+        primary = step.get("primary_uid", "?")
+        secondary = step.get("secondary_uid", "null")
+        instruction = step.get("grounded_instruction", "")
+        lines.append(f"  Step {step.get('step_id', '?')}: [{action}] {primary} -> {secondary}")
+        lines.append(f"    instruction: {instruction}")
+    return "\n".join(lines)
+
+
+def build_skill_planner_prompt(
+    normalized_context: Dict,
+    asset_status: Dict,
+    error_feedback: str = None
+) -> str:
+    """Build the Skill Planner Mega-Prompt per design doc."""
+    steps = normalized_context.get("steps", [])
+    asset_info = _build_asset_info(asset_status)
+    steps_info = _build_steps_info(steps)
+
+    prompt = f"""You are a robot task planning expert. Given an execution script and physical assets, autonomously decide the atomic action sequence.
+
+## Core Constraints
+
+1. **State Tracking (CoT)**: Before planning each step's atomic_sequence, you MUST first write pre_state_assertion to reason about the robot state after the previous step.
+   - If the gripper is ALREADY HOLDING the target object, do NOT generate another pick.
+   - If the gripper is NOT empty before picking a new object, you MUST first generate open_gripper.
+
+2. **Explicit UIDs**: All uid parameters in atomic_sequence params MUST use the real UIDs from the asset inventory (e.g. beaker_0, tube_0).
+   Do NOT use any placeholder like $TARGET_ENTITY.
+
+3. **Direct Output**: In atomic_sequence params, write uid strings or numeric values directly without extra quotes.
+
+4. **Success = Execution Complete**: No conditions dict needed. The task succeeds when all atomic_sequence actions are executed.
+
+5. **Use moveto_entity for targeting objects**: When you need to move to a specific object (e.g. to pour into a beaker), use moveto_entity(target_uid=<container_uid>) instead of moveto with hardcoded coordinates. NEVER use moveto with hardcoded target_pos for pour operations.
+
+6. **pour_to_entity replaces moveto+pour**: pour_to_entity already handles moving to the container and tilting. After pour_to_entity, just use open_gripper to release the container. Do NOT use place after pour_to_entity.
+
+## Execution Script
+{steps_info}
+
+## Physical Asset Inventory
+{asset_info}
+
+{SKILL_LIB_DOC}
+
+## CoT State Tracking Rules
+
+For each step, you MUST fill in:
+- pre_state_assertion: Describe robot gripper state and object positions BEFORE this step.
+- atomic_sequence: Autonomously decide skills based on action type. Reference hints:
+  - pour -> pick -> lift -> pour_to_entity -> insert_to_entity (insert_to_entity already includes open_gripper, do NOT add another open_gripper after it)
+  - remove -> moveto -> pick -> open_gripper
+  - lift -> moveto -> pick -> lift
+  - place -> moveto -> place
+- post_state_assertion: Describe robot gripper state and object position changes AFTER this step.
+
+## Special Rule for Test Tubes
+- After any pour/pour_to_entity operation, you MUST use insert_to_entity to insert the held test tube back into the tube stand.
+- insert_to_entity already includes open_gripper internally, so do NOT add another open_gripper after it.
+- **CRITICAL**: insert_to_entity target_uid MUST be "chemistry_tube_stand" (the tube stand entity), NOT "tube_0" or "tube_1".
+
+## Coordinate Reference
+- Franka workspace: X: -0.3~0.3, Y: -0.2~0.3, Z: 0.75~1.5
+- Table height ~0.78m
+- moveto target position uses np.array() format
+
+## Output (strict JSON, no other text):
+{{
+  "global_skill_plan": [
+    {{
+      "step_id": 0,
+      "semantic_instruction": "<grounded_instruction original text>",
+      "pre_state_assertion": "Describe robot/environment state before execution",
+      "atomic_sequence": [
+        {{"skill": "skill_name", "params": {{"param_name": param_value}}}},
+        ...
+      ],
+      "post_state_assertion": "Describe robot/environment state after execution"
+    }}
+  ]
+}}"""
+
+    if error_feedback:
+        prompt += f"""
+
+## Previous Planning Error Feedback
+{error_feedback}
+Please adjust your plan based on this feedback."""
+
+    return prompt
+
 
 
 def skill_planner_node(state: Dict) -> Dict:
     """
-    技能规划节点 - 用 LLM 生成结构化的技能序列和成功条件
+    Skill Planner 节点 - 多步长程编排引擎
 
-    输入: task_analysis, asset_status
-    输出: skill_plan (结构化 JSON)
+    输入: state["normalized_context"]["steps"] + state["asset_status"]
+    输出: state["skill_plan"]["global_skill_plan"]
     """
     if ChatAnthropic is None:
         logger.error("[Skill Planner] langchain_anthropic 未安装")
         return {
-            "current_stage": "error",
             "errors": state.get("errors", []) + ["langchain_anthropic 未安装"],
+            "current_stage": "code_generator",
         }
 
-    logger.info("=" * 60)
-    logger.info("[Skill Planner] 开始规划技能序列...")
-
-    task_analysis = state.get("task_analysis", {})
+    normalized_context = state.get("normalized_context", {})
     asset_status = state.get("asset_status", {})
     error_feedback = state.get("error_feedback")
 
-    prompt = build_skill_planner_prompt(task_analysis, asset_status, error_feedback)
+    steps = normalized_context.get("steps", [])
+    if not steps:
+        logger.warning("[Skill Planner] steps 为空，跳过")
+        return {
+            "skill_plan": {"global_skill_plan": []},
+            "current_stage": "code_generator",
+        }
+
+    logger.info("=" * 60)
+    logger.info(f"[Skill Planner] 开始规划 {len(steps)} 个步骤...")
+
     llm = ChatAnthropic(**AgentConfig.get_llm_config())
+    prompt = build_skill_planner_prompt(normalized_context, asset_status, error_feedback)
+
+    valid_uids = set(asset_status.keys())
+    max_steps = len(steps)
 
     max_retries = 2
     last_error = None
@@ -296,46 +303,45 @@ def skill_planner_node(state: Dict) -> Dict:
     for attempt in range(max_retries + 1):
         try:
             if attempt > 0:
-                logger.info(f"[Skill Planner] 第 {attempt + 1} 次尝试...")
-                # 将上次的错误反馈追加到 prompt
-                retry_prompt = prompt + f"\n\n## 上次解析失败: {last_error}\n请确保输出合法 JSON。"
+                retry_prompt = prompt + f"\n\n## 上次校验失败: {last_error}\n请严格遵循 JSON 格式和 CoT 约束。"
                 response = llm.invoke(retry_prompt)
             else:
                 response = llm.invoke(prompt)
 
-            plan = extract_json_from_response(response.content)
+            plan = _extract_json(response.content)
             if plan is None:
-                last_error = f"无法从 LLM 响应中解析 JSON: {response.content[:200]}"
+                last_error = f"无法解析 JSON: {response.content[:200]}"
                 logger.warning(f"[Skill Planner] {last_error}")
                 continue
 
-            is_valid, error_msg = validate_skill_plan(plan)
+            is_valid, error_msg = _validate_skill_plan(plan, valid_uids, max_steps)
             if not is_valid:
-                last_error = f"规划校验失败: {error_msg}"
-                logger.warning(f"[Skill Planner] {last_error}")
+                last_error = error_msg
+                logger.warning(f"[Skill Planner] 校验失败: {error_msg}")
                 continue
 
-            # 成功
+            # 日志输出
             logger.info(f"[Skill Planner] ✓ 规划完成:")
-            logger.info(f"  任务类型: {plan['task_type']}")
-            skills = [s['skill'] for s in plan['skill_sequence']]
-            logger.info(f"  技能序列: {' → '.join(skills)}")
-            logger.info(f"  条件: {list(plan['conditions'].keys())}")
+            for step in plan["global_skill_plan"]:
+                skills = [s["skill"] for s in step["atomic_sequence"]]
+                logger.info(f"  Step {step['step_id']}: {' → '.join(skills)}")
             logger.info("=" * 60 + "\n")
 
-            return {
+            output = {
                 "skill_plan": plan,
-                "current_stage": "code_generation",
+                "messages": state.get("messages", []) + [response],
+                "current_stage": "code_generator",
             }
+            log_node_output_file("skill_planner", state, output)
+            return output
 
         except Exception as e:
             last_error = str(e)
             logger.error(f"[Skill Planner] LLM 调用失败: {e}")
 
-    # 所有重试都失败
     logger.error(f"[Skill Planner] ✗ 规划失败: {last_error}")
     return {
         "skill_plan": None,
         "error_feedback": f"技能规划失败: {last_error}",
-        "current_stage": "code_generation",  # 降级到 legacy code_generator
+        "current_stage": "code_generator",
     }

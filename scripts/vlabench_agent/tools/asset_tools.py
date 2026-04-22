@@ -6,26 +6,9 @@ import os
 import subprocess
 import logging
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Dict
 
 logger = logging.getLogger(__name__)
-
-# 同义词映射：LLM 常用名 -> name2class_xml 中的注册名
-ASSET_SYNONYMS = {
-    "test_tube": "tube",
-    "test_tube_rack": "chemistry_tube_stand",
-    "tube_rack": "chemistry_tube_stand",
-    "tube_stand": "chemistry_tube_stand",
-    "tube_holder": "chemistry_tube_stand",
-    "bunsen_burner": "bunsen_burner",
-    "erlenmeyer_flask": "flask",
-    "conical_flask": "flask",
-    "microscope_slide": "coverslip",
-    "cutting_board": "cut_board",
-    "box": "giftbox",
-    "cardboard_box": "giftbox",
-    "container_box": "giftbox",
-}
 
 
 def _register_downloaded_asset(canonical_name: str, xml_path: str):
@@ -36,7 +19,7 @@ def _register_downloaded_asset(canonical_name: str, xml_path: str):
     都能通过 name2class_xml[name] 找到该资产，无需为每种非内置资产编写特殊处理逻辑。
 
     Args:
-        canonical_name: 注册名（如 "bunsen_burner"）
+        canonical_name: 注册名（来自 Normalizer 的 spec）
         xml_path: 相对于 VLABENCH_ROOT/assets/ 的 XML 路径
     """
     try:
@@ -54,10 +37,12 @@ def _register_downloaded_asset(canonical_name: str, xml_path: str):
 
 def check_asset_exists(object_name: str) -> Dict:
     """
-    检查指定物体的 MJCF 资产是否存在
+    检查指定物体的 MJCF 资产是否存在。
+
+    只根据 name2class_xml 查，不做同义词映射（同义词映射在 Normalizer 层完成）。
 
     Args:
-        object_name: 物体名称 (如 "microscope")
+        object_name: 物体名称（来自 Normalizer 的 spec）
 
     Returns:
         {
@@ -66,24 +51,14 @@ def check_asset_exists(object_name: str) -> Dict:
             "class": str or None
         }
     """
-    # 同义词映射：将 LLM 常用名映射到 name2class_xml 中的注册名
-    canonical_name = ASSET_SYNONYMS.get(object_name, object_name)
-    if canonical_name != object_name:
-        logger.info(f"  → 同义词映射: {object_name} -> {canonical_name}")
-
     try:
-        # 先导入 components 以避免循环导入
         import VLABench.tasks.components  # noqa: F401
         from VLABench.configs.constant import name2class_xml
 
-        # 在 name2class_xml 中查找（先用映射后的名称，再用原始名称）
-        lookup_name = canonical_name if canonical_name in name2class_xml else object_name
-        if lookup_name in name2class_xml:
-            class_type, xml_path = name2class_xml[lookup_name]
+        if object_name in name2class_xml:
+            class_type, xml_path = name2class_xml[object_name]
             xml_path_str = xml_path if isinstance(xml_path, str) else xml_path[0]
-
-            logger.info(f"  ✓ 在配置中找到 {object_name} (as {lookup_name}): {xml_path_str}")
-
+            logger.info(f"  ✓ 在 name2class_xml 中找到 {object_name}: {xml_path_str}")
             return {
                 "found": True,
                 "xml_path": xml_path_str,
@@ -91,116 +66,11 @@ def check_asset_exists(object_name: str) -> Dict:
                 "builtin": True
             }
     except ImportError:
-        logger.warning("  ⚠ VLABench.configs.constant 导入失败,跳过配置查找")
+        logger.warning("  ⚠ VLABench.configs.constant 导入失败，跳过配置查找")
     except Exception as e:
-        logger.warning(f"  ⚠ 配置查找失败: {e}")
+        logger.warning(f"  ⚠ name2class_xml 查找失败: {e}")
 
-    # 在文件系统中搜索（使用 canonical_name 和 object_name 两个名称都尝试）
-    vlabench_root = os.environ.get('VLABENCH_ROOT')
-    if not vlabench_root:
-        logger.warning("  ⚠ VLABENCH_ROOT 未设置")
-        return {"found": False, "xml_path": None, "class": None}
-
-    asset_dir = Path(vlabench_root) / 'assets' / 'obj' / 'meshes'
-    review_dir = Path(vlabench_root) / 'assets' / 'review'
-
-    search_dirs = []
-    if asset_dir.exists():
-        search_dirs.append(asset_dir)
-    if review_dir.exists():
-        search_dirs.append(review_dir)
-
-    if not search_dirs:
-        logger.warning(f"  ⚠ 资产目录不存在: {asset_dir} 和 {review_dir}")
-        return {"found": False, "xml_path": None, "class": None}
-
-    # 搜索匹配的 XML 文件（尝试 canonical_name 和 object_name）
-    search_names = [canonical_name] if canonical_name != object_name else [object_name]
-    if canonical_name != object_name:
-        search_names.append(object_name)
-
-    # 同时搜索小写形式（review 目录中的文件夹通常是小写）
-    for name in list(search_names):
-        lower_name = name.lower()
-        if lower_name not in search_names:
-            search_names.append(lower_name)
-
-    matches = []
-    for search_name in search_names:
-        for search_dir in search_dirs:
-            # 搜索文件名匹配
-            matches = list(search_dir.glob(f"**/*{search_name}*.xml"))
-            if not matches:
-                # 搜索目录名匹配（review 目录中 XML 文件名是哈希值，但目录名包含关键词）
-                for subdir in search_dir.iterdir():
-                    if subdir.is_dir() and search_name in subdir.name:
-                        matches = list(subdir.glob("**/*.xml"))
-                        if matches:
-                            break
-            if matches:
-                logger.info(f"  → 文件系统搜索 '{search_name}' 在 {search_dir} 找到 {len(matches)} 个匹配")
-                break
-        if matches:
-            break
-
-    if matches:
-        # 尝试找到一个可用的模型（纹理文件完整）
-        for xml_file in matches:
-            assets_root = Path(vlabench_root) / 'assets'
-            xml_path = str(xml_file.relative_to(assets_root))
-
-            # 检查纹理文件是否存在
-            try:
-                with open(xml_file, 'r', encoding='utf-8') as f:
-                    xml_content = f.read()
-
-                # 提取所有 texture file 引用
-                import re
-                texture_files = re.findall(r'<texture[^>]*file="([^"]+)"', xml_content)
-
-                # 检查每个纹理文件是否存在
-                all_textures_exist = True
-                missing_textures = []
-
-                for texture_file in texture_files:
-                    # 纹理文件路径相对于 XML 文件所在目录
-                    texture_path = xml_file.parent / texture_file
-                    if not texture_path.exists():
-                        all_textures_exist = False
-                        missing_textures.append(texture_file)
-
-                if all_textures_exist:
-                    # 找到一个完整的模型
-                    logger.info(f"  ✓ 在文件系统中找到 {object_name}: {xml_path}")
-
-                    # 动态注册到 name2class_xml，使后续的 get_entity_config() 能找到
-                    _register_downloaded_asset(canonical_name, xml_path)
-
-                    return {
-                        "found": True,
-                        "xml_path": xml_path,
-                        "class": "CommonGraspedEntity"
-                    }
-                else:
-                    # 纹理缺失，尝试下一个模型
-                    logger.warning(f"  ⚠ {xml_file.name} 纹理缺失: {missing_textures}，尝试其他模型...")
-
-            except Exception as e:
-                logger.warning(f"  ⚠ 检查 {xml_file.name} 时出错: {e}")
-                continue
-
-        # 所有匹配的模型都有问题
-        logger.error(f"  ✗ 找到 {len(matches)} 个 {object_name} 模型，但都存在纹理缺失问题")
-        logger.error(f"  建议: 使用 get_assets.py 下载新的模型")
-
-        return {
-            "found": False,
-            "xml_path": None,
-            "class": None,
-            "error": f"所有 {object_name} 模型都存在纹理缺失问题"
-        }
-
-    logger.info(f"  ✗ 未找到 {object_name}")
+    logger.info(f"  ✗ 未在 name2class_xml 中找到 {object_name}")
     return {"found": False, "xml_path": None, "class": None}
 
 

@@ -7,6 +7,7 @@ import random
 from VLABench.tasks.components.entity import CommonGraspedEntity
 from VLABench.tasks.components.container import FlatContainer
 from VLABench.utils.register import register
+from VLABench.tasks.components.specific_entities.ml_liquid_containers import SolutionMixin
 
 @register.add_entity("BilliardBall")
 class BilliardBall(CommonGraspedEntity):
@@ -26,47 +27,12 @@ class BilliardBall(CommonGraspedEntity):
         return data_to_save
 
 @register.add_entity("ChemistryTube")
-class ChemistryTube(CommonGraspedEntity):
+class ChemistryTube(SolutionMixin, CommonGraspedEntity):
     """
-    Different chemistry solutions in the tube, some of them have diverse colors to distinguish their types and even concentrations
+    Different chemistry solutions in the tube, some of them have diverse colors to distinguish their types and even concentrations.
+    Inherits solution rendering from SolutionMixin.
     """
-    solution2rgba = {
-        "CuCl2":[0.141000, 1.000000, 0.174043, 0.400000],
-        "CuSO4":[0, 0.45, 1, 0.400000],
-        "FeCl3":[0.6475, 0.5686, 0.023, 0.400000],
-        "KMnO4":[0.5, 0, 0.5, 0.4],
-        "I2":[0.3, 0.13, 0.0, 0.4],
-        "K2CrO4":[0.57, 0.12, 0.013, 0.40000],
-        "NaCl": [1, 1, 1, 0.3],
-        "AgNO3": [1, 1, 1, 0.3],
-        "BaCl2": [1, 1, 1, 0.3],
-        "H2SO4": [1, 1, 1, 0.3],
-        "NaOH": [1, 1, 1, 0.3],
-        "Ba(NO3)2": [1, 1, 1, 0.3],
-        "Pb(NO3)2": [1, 1, 1, 0.3],
-        "Na2CO3": [1, 1, 1, 0.3],
-        "CaCl2": [1, 1, 1, 0.3],
-        "HCl": [1, 1, 1, 0.3],
-        "CaSO4": [1, 1, 1, 0.7]
-    }
-    def __init__(self, solution, **kwargs):
-        super().__init__(**kwargs)
-        self.solution = solution    
-        
-    def change_texture(self, physics, texture_name):
-        physics.bind(self.mjcf_model.worldbody.find("geom", "solution")).rgba = self.solution2rgba[self.solution]
-    
-    def get_solution(self):
-        return self.solution
-    
-    def initialize_episode(self, physics, random_state):
-        self.change_texture(physics, self.solution)
-        return super().initialize_episode(physics, random_state)
-    
-    def save(self, physics):
-        data_to_save = super().save(physics)
-        data_to_save["solution"] = self.solution
-        return data_to_save
+    pass
 
 @register.add_entity("NameTag")
 class NameTag(CommonGraspedEntity):

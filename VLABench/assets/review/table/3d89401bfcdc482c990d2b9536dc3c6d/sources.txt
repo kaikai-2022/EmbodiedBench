@@ -1,0 +1,15 @@
+Model UID: 3d89401bfcdc482c990d2b9536dc3c6d
+Model Name: Table and Chairs
+
+Source Information:
+============================================================
+Source: unknown
+Objaverse UID: 3d89401bfcdc482c990d2b9536dc3c6d
+
+HuggingFace Objaverse:
+Dataset: https://huggingface.co/datasets/allenai/objaverse
+Object Path: glbs/3d/3d89401bfcdc482c990d2b9536dc3c6d.glb
+
+Additional Metadata:
+Tags: victorian, chairs, furniture, table, chair
+Description: Just a table and a chair - game res-ish; could be optimized further but was mostly a test to help  me learn SP...

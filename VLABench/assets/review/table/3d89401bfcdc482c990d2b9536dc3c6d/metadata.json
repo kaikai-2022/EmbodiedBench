@@ -1,0 +1,162 @@
+{
+  "uri": "https://api.sketchfab.com/v3/models/3d89401bfcdc482c990d2b9536dc3c6d",
+  "uid": "3d89401bfcdc482c990d2b9536dc3c6d",
+  "name": "Table and Chairs",
+  "staffpickedAt": null,
+  "viewCount": 9466,
+  "likeCount": 300,
+  "animationCount": 0,
+  "viewerUrl": "https://sketchfab.com/3d-models/3d89401bfcdc482c990d2b9536dc3c6d",
+  "embedUrl": "https://sketchfab.com/models/3d89401bfcdc482c990d2b9536dc3c6d/embed",
+  "commentCount": 2,
+  "isDownloadable": true,
+  "publishedAt": "2020-08-08T19:25:55.485296",
+  "tags": [
+    {
+      "name": "victorian",
+      "slug": "victorian",
+      "uri": "https://api.sketchfab.com/v3/tags/victorian"
+    },
+    {
+      "name": "chairs",
+      "slug": "chairs",
+      "uri": "https://api.sketchfab.com/v3/tags/chairs"
+    },
+    {
+      "name": "furniture",
+      "slug": "furniture",
+      "uri": "https://api.sketchfab.com/v3/tags/furniture"
+    },
+    {
+      "name": "table",
+      "slug": "table",
+      "uri": "https://api.sketchfab.com/v3/tags/table"
+    },
+    {
+      "name": "chair",
+      "slug": "chair",
+      "uri": "https://api.sketchfab.com/v3/tags/chair"
+    }
+  ],
+  "categories": [
+    {
+      "name": "furniture-home"
+    }
+  ],
+  "thumbnails": {
+    "images": [
+      {
+        "uid": "5df714edc5994ba0aabc0c8cde63ae4b",
+        "size": 81727,
+        "width": 1920,
+        "url": "https://media.sketchfab.com/models/3d89401bfcdc482c990d2b9536dc3c6d/thumbnails/9b011d784fdc45d5b1e075834d1a5378/dc854cc078f647aaa10141e9ac53a21f.jpeg",
+        "height": 1080
+      },
+      {
+        "uid": "c5a0e4324c044e67adbec45396fbf97e",
+        "size": 26488,
+        "width": 1024,
+        "url": "https://media.sketchfab.com/models/3d89401bfcdc482c990d2b9536dc3c6d/thumbnails/9b011d784fdc45d5b1e075834d1a5378/b07ec220c67340bba189d06c06378efe.jpeg",
+        "height": 576
+      },
+      {
+        "uid": "134d3af9e12d497a83fd604722707e24",
+        "size": 15305,
+        "width": 720,
+        "url": "https://media.sketchfab.com/models/3d89401bfcdc482c990d2b9536dc3c6d/thumbnails/9b011d784fdc45d5b1e075834d1a5378/ede81cb294214efabd2a4c23ec52d05c.jpeg",
+        "height": 405
+      },
+      {
+        "uid": "c2e56509ea0f40b2af55bc6ada0e4abd",
+        "size": 3127,
+        "width": 256,
+        "url": "https://media.sketchfab.com/models/3d89401bfcdc482c990d2b9536dc3c6d/thumbnails/9b011d784fdc45d5b1e075834d1a5378/5a0e4b40f5e24f08bfcb041dc01d4a12.jpeg",
+        "height": 144
+      },
+      {
+        "uid": "76a26175f3184e1196e0e054ebbb6d93",
+        "size": 601,
+        "width": 64,
+        "url": "https://media.sketchfab.com/models/3d89401bfcdc482c990d2b9536dc3c6d/thumbnails/9b011d784fdc45d5b1e075834d1a5378/bee75d1065f54526bebcf6d8d5212283.jpeg",
+        "height": 36
+      }
+    ]
+  },
+  "user": {
+    "uid": "5482267ec9f2400c8f84bbe456c5ffe0",
+    "username": "Graham.Jolliffe",
+    "displayName": "Graham",
+    "profileUrl": "https://sketchfab.com/Graham.Jolliffe",
+    "account": "basic",
+    "avatar": {
+      "uri": "https://api.sketchfab.com/v3/avatars/136b36bd8d9f4b29a9560de2c3221421",
+      "images": [
+        {
+          "size": 764,
+          "width": 32,
+          "url": "https://media.sketchfab.com/avatars/136b36bd8d9f4b29a9560de2c3221421/010317f798bf4e30adc6d168161dd024.jpeg",
+          "height": 32
+        },
+        {
+          "size": 1141,
+          "width": 48,
+          "url": "https://media.sketchfab.com/avatars/136b36bd8d9f4b29a9560de2c3221421/b2deb33d64314517a3d533abfca1d6da.jpeg",
+          "height": 48
+        },
+        {
+          "size": 2542,
+          "width": 90,
+          "url": "https://media.sketchfab.com/avatars/136b36bd8d9f4b29a9560de2c3221421/fef25ec8ecb642728afabd396d7d633b.jpeg",
+          "height": 90
+        },
+        {
+          "size": 2876,
+          "width": 100,
+          "url": "https://media.sketchfab.com/avatars/136b36bd8d9f4b29a9560de2c3221421/2a85ac91bd2341998507886bffabe34a.jpeg",
+          "height": 100
+        }
+      ]
+    },
+    "uri": "https://api.sketchfab.com/v3/users/5482267ec9f2400c8f84bbe456c5ffe0"
+  },
+  "description": "Just a table and a chair - game res-ish; could be optimized further but was mostly a test to help  me learn SP",
+  "faceCount": 7320,
+  "createdAt": "2020-08-08T19:11:40.941902",
+  "vertexCount": 4320,
+  "isAgeRestricted": false,
+  "archives": {
+    "glb": {
+      "textureCount": 6,
+      "size": 20131540,
+      "type": "glb",
+      "textureMaxResolution": 2048,
+      "faceCount": 7320,
+      "vertexCount": 6394
+    },
+    "gltf": {
+      "textureCount": 6,
+      "size": 19930587,
+      "type": "gltf",
+      "textureMaxResolution": 2048,
+      "faceCount": 7320,
+      "vertexCount": 6394
+    },
+    "source": {
+      "textureCount": null,
+      "size": 20339345,
+      "type": "source",
+      "textureMaxResolution": null,
+      "faceCount": null,
+      "vertexCount": null
+    },
+    "usdz": {
+      "textureCount": null,
+      "size": 6219403,
+      "type": "usdz",
+      "textureMaxResolution": null,
+      "faceCount": null,
+      "vertexCount": null
+    }
+  },
+  "license": "by"
+}

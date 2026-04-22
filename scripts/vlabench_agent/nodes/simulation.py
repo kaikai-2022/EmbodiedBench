@@ -14,6 +14,8 @@ import numpy as np
 from pathlib import Path
 from typing import Dict, List, Optional
 
+from .node_logger import log_node_output_file
+
 logger = logging.getLogger(__name__)
 
 # 设置 MuJoCo 渲染后端
@@ -32,6 +34,30 @@ class SkillTimeoutError(Exception):
 
 def _timeout_handler(signum, frame):
     raise SkillTimeoutError("技能执行超时")
+
+
+def _save_video(observations, task_dir, task_success):
+    """保存视频，无论仿真成功或失败都调用"""
+    if not observations:
+        return None
+    try:
+        import mediapy
+        frames = []
+        for o in observations:
+            if "rgb" in o and len(o["rgb"]) >= 4:
+                frames.append(np.vstack([
+                    np.hstack(o["rgb"][:2]),
+                    np.hstack(o["rgb"][2:4])
+                ]))
+        if frames:
+            task_dir.mkdir(parents=True, exist_ok=True)
+            video_path = str(task_dir / f"demo_0_success_{task_success}.mp4")
+            mediapy.write_video(video_path, frames, fps=10)
+            logger.info(f"[Simulation]   ✓ 视频保存: {video_path}")
+            return video_path
+    except Exception as e:
+        logger.warning(f"[Simulation]   ⚠ 视频保存失败: {e}")
+    return None
 
 
 def extract_skill_sequence(skill_seq, entity_names: List[str]) -> List[Dict]:
@@ -89,8 +115,13 @@ def simulation_node(state: Dict) -> Dict:
     logger.info("=" * 60)
     logger.info("[Simulation] 开始 MuJoCo 物理仿真...")
 
+    # 确保 VLABENCH_ROOT 环境变量已设置（assets 在 VLABench 子目录下）
+    if not os.environ.get("VLABENCH_ROOT"):
+        os.environ["VLABENCH_ROOT"] = "/ssd/mkqin/workspace/VLABench/VLABench"
+
     task_analysis = state.get("task_analysis", {})
-    task_name = task_analysis.get("task_name", "custom_task")
+    task_name = task_analysis.get("task_name", "custom_task").replace(" ", "_")
+    observations = []  # 提前初始化，确保异常路径也能保存视频
 
     try:
         # 1. 加载环境（需要先导入 robots 和 tasks 以触发 @register 装饰器注册）
@@ -99,6 +130,22 @@ def simulation_node(state: Dict) -> Dict:
         importlib.import_module("VLABench.tasks.hierarchical_tasks.primitive")  # 触发 @register.add_task
         importlib.import_module("VLABench.tasks.hierarchical_tasks.composite")
         from VLABench.envs import load_env
+
+        # 动态加载 series 文件（由 code_generator 生成，注册 task_name task）
+        vlabench_root = os.environ.get("VLABENCH_ROOT", "/ssd/mkqin/workspace/VLABench/VLABench")
+        series_path = os.path.join(
+            os.path.dirname(vlabench_root),
+            "VLABench", "tasks", "hierarchical_tasks", "primitive",
+            f"{task_name}_series.py"
+        )
+        if os.path.exists(series_path):
+            import importlib.util
+            spec = importlib.util.spec_from_file_location(f"{task_name}_series", series_path)
+            mod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(mod)
+            logger.info(f"[Simulation] ✓ 已加载 series 文件: {series_path}")
+        else:
+            logger.warning(f"[Simulation] ⚠ series 文件不存在: {series_path}")
 
         logger.info(f"[Simulation] 加载环境: {task_name}")
         env = load_env(task_name, robot="franka")
@@ -133,7 +180,7 @@ def simulation_node(state: Dict) -> Dict:
         executed_skill_sequence = extract_skill_sequence(skill_seq, component_names or entities)
 
         # 5. 执行技能序列（带超时保护）
-        observations, waypoints = [], []
+        waypoints = []
         task_success = False
 
         # 设置整体仿真超时
@@ -180,28 +227,10 @@ def simulation_node(state: Dict) -> Dict:
         # 7. 保存数据
         vlabench_root = os.environ.get("VLABENCH_ROOT")
         project_root = Path(vlabench_root).parent if vlabench_root else Path(".")
-        save_dir = project_root / "dataset" / "training_data"
-        task_dir = save_dir / task_name
-        task_dir.mkdir(parents=True, exist_ok=True)
+        task_dir = project_root / "dataset" / "training_data" / task_name
 
-        # 保存视频
-        video_path = None
-        if observations:
-            try:
-                import mediapy
-                frames = []
-                for o in observations:
-                    if "rgb" in o and len(o["rgb"]) >= 4:
-                        frames.append(np.vstack([
-                            np.hstack(o["rgb"][:2]),
-                            np.hstack(o["rgb"][2:4])
-                        ]))
-                if frames:
-                    video_path = str(task_dir / f"demo_0_success_{task_success}.mp4")
-                    mediapy.write_video(video_path, frames, fps=10)
-                    logger.info(f"[Simulation]   ✓ 视频保存: {video_path}")
-            except Exception as e:
-                logger.warning(f"[Simulation]   ⚠ 视频保存失败: {e}")
+        # 保存视频（无论成功或失败都保存）
+        video_path = _save_video(observations, task_dir, task_success)
 
         # 保存 HDF5 数据（仅在成功时）
         hdf5_path = None
@@ -234,7 +263,7 @@ def simulation_node(state: Dict) -> Dict:
             logger.info("[Simulation] ✓ 仿真成功完成")
             logger.info("=" * 60 + "\n")
 
-            return {
+            output = {
                 "simulation_success": True,
                 "simulation_video_path": video_path,
                 "simulation_hdf5_path": hdf5_path,
@@ -243,11 +272,13 @@ def simulation_node(state: Dict) -> Dict:
                 "error_feedback": None,
                 "current_stage": "vlm_data",
             }
+            log_node_output_file("simulation", state, output)
+            return output
         else:
             logger.warning("[Simulation] ✗ 仿真失败 - 任务未完成")
             logger.info("=" * 60 + "\n")
 
-            return {
+            output = {
                 "simulation_success": False,
                 "simulation_video_path": video_path,
                 "episode_config": episode_config,
@@ -260,14 +291,35 @@ def simulation_node(state: Dict) -> Dict:
                 ),
                 "current_stage": "simulation",
             }
+            log_node_output_file("simulation", state, output)
+            return output
 
     except Exception as e:
         error_tb = traceback.format_exc()
         logger.error(f"[Simulation] ✗ 仿真异常: {e}")
         logger.error(error_tb)
 
-        return {
+        # 即使崩溃也尝试保存已有观测的视频
+        video_path = None
+        try:
+            if observations:
+                vlabench_root = os.environ.get("VLABENCH_ROOT")
+                project_root = Path(vlabench_root).parent if vlabench_root else Path(".")
+                task_dir = project_root / "dataset" / "training_data" / task_name
+                video_path = _save_video(observations, task_dir, False)
+        except Exception:
+            pass
+
+        try:
+            env.close()
+        except Exception:
+            pass
+
+        output = {
             "simulation_success": False,
+            "simulation_video_path": video_path,
             "error_feedback": f"仿真异常:\n{error_tb}",
             "current_stage": "simulation",
         }
+        log_node_output_file("simulation", state, output)
+        return output

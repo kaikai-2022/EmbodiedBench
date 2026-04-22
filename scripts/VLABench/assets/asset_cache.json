@@ -1,0 +1,92 @@
+{
+  "beaker": {
+    "spec": "beaker",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "table": {
+    "spec": "table",
+    "source_type": "objaverse",
+    "is_physical": true
+  },
+  "volumetric pipet": {
+    "spec": "volumetric_pipette",
+    "source_type": "objaverse",
+    "is_physical": true
+  },
+  "unknown acid solution": {
+    "spec": "acid solution",
+    "source_type": "local",
+    "is_physical": false
+  },
+  "Erlenmeyer flask": {
+    "spec": "flask",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "phenolphthalein indicator": {
+    "spec": "phenolphthalein indicator",
+    "source_type": "local",
+    "is_physical": false
+  },
+  "HCl solution": {
+    "spec": "HCl solution",
+    "source_type": "local",
+    "is_physical": false
+  },
+  "NaOH": {
+    "spec": "NaOH",
+    "source_type": "local",
+    "is_physical": false
+  },
+  "tube stand": {
+    "spec": "chemistry_tube_stand",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "tube": {
+    "spec": "tube",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "CuSO4": {
+    "spec": "CuSO4",
+    "source_type": "local",
+    "is_physical": false
+  },
+  "CuCl2": {
+    "spec": "CuCl2",
+    "source_type": "local",
+    "is_physical": false
+  },
+  "KMnO4": {
+    "spec": "KMnO4",
+    "source_type": "local",
+    "is_physical": false
+  },
+  "microwave": {
+    "spec": "microwave",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "test tube": {
+    "spec": "tube",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "liquid": {
+    "spec": "liquid",
+    "source_type": "local",
+    "is_physical": false
+  },
+  "FeCl3": {
+    "spec": "FeCl3",
+    "source_type": "local",
+    "is_physical": false
+  },
+  "pipettes stand": {
+    "spec": "pipettes_stand",
+    "source_type": "objaverse",
+    "is_physical": true
+  }
+}

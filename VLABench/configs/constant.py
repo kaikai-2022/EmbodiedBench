@@ -302,7 +302,8 @@ name2class_xml = {
 
     # lab equipment
     "petri_dish": [components.CommonGraspedEntity, "obj/meshes/lab_equipment/petri_dish/petri_dish.xml"],
-    "beaker": [components.CommonGraspedEntity, "obj/meshes/lab_equipment/beaker/beaker_0/beaker/beaker.xml"],
+    "beaker": [components.ChemistryBeaker, "obj/meshes/lab_equipment/beaker/chemistry_beaker/chemistry_beaker.xml"],
+    "chemistry_beaker": [components.ChemistryBeaker, "obj/meshes/lab_equipment/beaker/chemistry_beaker/chemistry_beaker.xml"],
     "bunsen_burner": [components.CommonGraspedEntity, "review/bunsen_burner/7532be8f501d435194e3feec33a3addf/7532be8f501d435194e3feec33a3addf.xml"],
 }
 

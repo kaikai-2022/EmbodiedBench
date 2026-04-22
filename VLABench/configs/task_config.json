@@ -2133,14 +2133,26 @@
     "task": {
       "asset": {
         "seen_object": [
-          ["CuCl2"],
-          ["CuSO4"],
-          ["FeCl3"],
-          ["KMnO4"]
+          [
+            "CuCl2"
+          ],
+          [
+            "CuSO4"
+          ],
+          [
+            "FeCl3"
+          ],
+          [
+            "KMnO4"
+          ]
         ],
         "unseen_object": [
-          ["I2"],
-          ["K2CrO4"]
+          [
+            "I2"
+          ],
+          [
+            "K2CrO4"
+          ]
         ],
         "seen_container": [
           "beaker"
@@ -2153,6 +2165,155 @@
         ],
         "unseen_init_container": [
           "chemistry_tube_stand"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "lift_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "beaker",
+          "table"
+        ],
+        "unseen_object": [
+          "beaker",
+          "table"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "custom_task_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "object"
+        ],
+        "unseen_object": [
+          "object"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "pour_pour_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "tube",
+          "tube"
+        ],
+        "unseen_object": [
+          "tube",
+          "tube"
+        ],
+        "seen_container": [
+          "beaker"
+        ],
+        "unseen_container": [
+          "beaker"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "pour_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "object"
+        ],
+        "unseen_object": [
+          "object"
+        ],
+        "seen_container": [
+          "beaker",
+          "beaker"
+        ],
+        "unseen_container": [
+          "beaker",
+          "beaker"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "pick_up_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "pipettes_stand"
+        ],
+        "unseen_object": [
+          "pipettes_stand"
+        ],
+        "seen_container": [
+          "beaker"
+        ],
+        "unseen_container": [
+          "beaker"
         ]
       },
       "scene": {

@@ -1,0 +1,22 @@
+{
+  "action": "rotated",
+  "rotation": {
+    "axis": "x",
+    "degrees": 90
+  },
+  "initial_judgment": {
+    "is_upright": false,
+    "rotation": {
+      "axis": "x",
+      "degrees": 90
+    }
+  },
+  "verification_judgment": {
+    "is_upright": false,
+    "rotation": {
+      "axis": "x",
+      "degrees": 90
+    }
+  },
+  "verified": false
+}

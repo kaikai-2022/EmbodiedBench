@@ -28,4 +28,7 @@ name2config = {
     "shake_tube_series":["shake_tube"],
     "lift_petri_dish_series":["lift_petri_dish"],
     "pour_liquid_from_test_tube_into_beaker_series":["pour_liquid_from_test_tube_into_beaker"],
+    "pour_pour_series":["pour_pour"],
+    "test_chemistry_beaker_series":["test_chemistry_beaker"],
+    "lift_beaker_series":["lift_beaker"],
 }

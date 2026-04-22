@@ -50,14 +50,14 @@ class Franka(SingleArm):
         return ee2move_transform
     
     def get_ee_open_state(self, physics=None):
+        # 注意：返回值的实际含义是"夹爪是否关闭"（与函数名相反），
+        # 因为所有 skill_lib.py 调用方都用 gripper_closed = get_ee_open_state(...)
         left_finger_joint = self.mjcf_model.find("joint", "finger_joint1")
         right_finger_joint = self.mjcf_model.find("joint", "finger_joint2")
         left_finger_pos = physics.bind(left_finger_joint).qpos
         right_finger_pos = physics.bind(right_finger_joint).qpos
-        if left_finger_pos < 0.035 and right_finger_pos < 0.035:
-            return True # BUG: should be False
-        else:
-            return False
+        # finger_pos < 0.035 = 夹爪关闭 → 返回 True（表示 closed）
+        return bool(left_finger_pos < 0.035 and right_finger_pos < 0.035)
         
     def initialize_episode(self, physics, random_state):
         super().initialize_episode(physics, random_state)

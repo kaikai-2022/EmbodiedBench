@@ -1,0 +1,17 @@
+Model UID: 8724cdb3e4e94242bcb94ad3868765dc
+Model Name: Tablet
+
+Source Information:
+============================================================
+Source: unknown
+Objaverse UID: 8724cdb3e4e94242bcb94ad3868765dc
+
+HuggingFace Objaverse:
+Dataset: https://huggingface.co/datasets/allenai/objaverse
+Object Path: glbs/87/8724cdb3e4e94242bcb94ad3868765dc.glb
+
+Additional Metadata:
+Tags: lamp, red, pencil, clock, tablet
+Description: Simple tablet, with pencil and battery.
+
+If you like my free models, support me by purchasing any of my paid models, this is very important to me. Thanks...

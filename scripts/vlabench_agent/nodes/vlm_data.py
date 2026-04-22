@@ -36,8 +36,7 @@ def vlm_data_node(state: Dict) -> Dict:
     vlabench_root = os.environ.get("VLABENCH_ROOT")
     if not vlabench_root:
         return {
-            "current_stage": "error",
-            "errors": state.get("errors", []) + ["VLABENCH_ROOT 未设置"],
+                    "errors": state.get("errors", []) + ["VLABENCH_ROOT 未设置"],
         }
 
     project_root = Path(vlabench_root).parent
@@ -61,7 +60,7 @@ def vlm_data_node(state: Dict) -> Dict:
             logger.warning("[VLM Data] ⚠ episode_config 为空，跳过保存")
 
         # 3. 保存 instruction.txt
-        instruction = task_analysis.get("instruction_en", "")
+        instruction = state.get("user_instruction", "")
         (task_dir / "input" / "instruction.txt").write_text(instruction)
         logger.info(f"[VLM Data] ✓ 保存 instruction.txt: {instruction}")
 
@@ -125,12 +124,10 @@ def vlm_data_node(state: Dict) -> Dict:
             "task_save_path": str(task_dir),
             "rendered_images": rendered_images,
             "validation_report": validation_report,
-            "current_stage": "done",
-        }
+                }
 
     except Exception as e:
         logger.error(f"[VLM Data] ✗ VLM 数据生成失败: {e}")
         return {
-            "current_stage": "error",
-            "errors": state.get("errors", []) + [f"VLM 数据生成失败: {e}"],
+                    "errors": state.get("errors", []) + [f"VLM 数据生成失败: {e}"],
         }

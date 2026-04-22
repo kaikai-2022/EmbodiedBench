@@ -1,0 +1,200 @@
+{
+  "uri": "https://api.sketchfab.com/v3/models/1b418690fedc45739274d05e81b88ffd",
+  "uid": "1b418690fedc45739274d05e81b88ffd",
+  "name": "Tablet",
+  "staffpickedAt": null,
+  "viewCount": 4044,
+  "likeCount": 226,
+  "animationCount": 0,
+  "viewerUrl": "https://sketchfab.com/3d-models/1b418690fedc45739274d05e81b88ffd",
+  "embedUrl": "https://sketchfab.com/models/1b418690fedc45739274d05e81b88ffd/embed",
+  "commentCount": 2,
+  "isDownloadable": true,
+  "publishedAt": "2019-02-26T13:11:44.478332",
+  "tags": [
+    {
+      "name": "pencil",
+      "slug": "pencil",
+      "uri": "https://api.sketchfab.com/v3/tags/pencil"
+    },
+    {
+      "name": "prop",
+      "slug": "prop",
+      "uri": "https://api.sketchfab.com/v3/tags/prop"
+    },
+    {
+      "name": "tablet",
+      "slug": "tablet",
+      "uri": "https://api.sketchfab.com/v3/tags/tablet"
+    },
+    {
+      "name": "paper",
+      "slug": "paper",
+      "uri": "https://api.sketchfab.com/v3/tags/paper"
+    },
+    {
+      "name": "item",
+      "slug": "item",
+      "uri": "https://api.sketchfab.com/v3/tags/item"
+    },
+    {
+      "name": "dirty",
+      "slug": "dirty",
+      "uri": "https://api.sketchfab.com/v3/tags/dirty"
+    },
+    {
+      "name": "map",
+      "slug": "map",
+      "uri": "https://api.sketchfab.com/v3/tags/map"
+    },
+    {
+      "name": "pda",
+      "slug": "pda",
+      "uri": "https://api.sketchfab.com/v3/tags/pda"
+    },
+    {
+      "name": "game",
+      "slug": "game",
+      "uri": "https://api.sketchfab.com/v3/tags/game"
+    },
+    {
+      "name": "lowpoly",
+      "slug": "lowpoly",
+      "uri": "https://api.sketchfab.com/v3/tags/lowpoly"
+    },
+    {
+      "name": "free",
+      "slug": "free",
+      "uri": "https://api.sketchfab.com/v3/tags/free"
+    },
+    {
+      "name": "gameready",
+      "slug": "gameready",
+      "uri": "https://api.sketchfab.com/v3/tags/gameready"
+    }
+  ],
+  "categories": [
+    {
+      "name": "electronics-gadgets"
+    },
+    {
+      "name": "furniture-home"
+    }
+  ],
+  "thumbnails": {
+    "images": [
+      {
+        "uid": "a67b3f8b5d45487e8292409be160d19e",
+        "size": 254832,
+        "width": 1920,
+        "url": "https://media.sketchfab.com/models/1b418690fedc45739274d05e81b88ffd/thumbnails/8a15b76b2b064de6b7c974ec08b44bb9/5032aa70b02643989f11e911cfb1ccfd.jpeg",
+        "height": 1080
+      },
+      {
+        "uid": "9f189620d2b045b9a87bf7bf88c396db",
+        "size": 50670,
+        "width": 1024,
+        "url": "https://media.sketchfab.com/models/1b418690fedc45739274d05e81b88ffd/thumbnails/8a15b76b2b064de6b7c974ec08b44bb9/87c7c6a313e84b0fa04c1ff9967a7544.jpeg",
+        "height": 576
+      },
+      {
+        "uid": "15e4343398a54708a25c595c1e5d98ef",
+        "size": 28341,
+        "width": 720,
+        "url": "https://media.sketchfab.com/models/1b418690fedc45739274d05e81b88ffd/thumbnails/8a15b76b2b064de6b7c974ec08b44bb9/4bca9e0a6d3948aba35650072e491b89.jpeg",
+        "height": 405
+      },
+      {
+        "uid": "3503d00e7d6f41bc80eaf814193b8e7c",
+        "size": 5466,
+        "width": 256,
+        "url": "https://media.sketchfab.com/models/1b418690fedc45739274d05e81b88ffd/thumbnails/8a15b76b2b064de6b7c974ec08b44bb9/a1b5b88c28b248498eaea9a41208422d.jpeg",
+        "height": 144
+      },
+      {
+        "uid": "5748a9f457874d3ea62fcc50a5dd640c",
+        "size": 932,
+        "width": 64,
+        "url": "https://media.sketchfab.com/models/1b418690fedc45739274d05e81b88ffd/thumbnails/8a15b76b2b064de6b7c974ec08b44bb9/4d944b2808c4406e87cd08f16a16a177.jpeg",
+        "height": 36
+      }
+    ]
+  },
+  "user": {
+    "uid": "1193c1bb295240d1a4ad6aa8283f2486",
+    "username": "shedmon",
+    "displayName": "Shedmon",
+    "profileUrl": "https://sketchfab.com/shedmon",
+    "account": "basic",
+    "avatar": {
+      "uri": "https://api.sketchfab.com/v3/avatars/6ebd087df3fe4b70b0ba2cc95325de5d",
+      "images": [
+        {
+          "size": 2386,
+          "width": 32,
+          "url": "https://media.sketchfab.com/avatars/6ebd087df3fe4b70b0ba2cc95325de5d/5d315a343fbd45d39102eb7c66c57f76.png",
+          "height": 32
+        },
+        {
+          "size": 4976,
+          "width": 48,
+          "url": "https://media.sketchfab.com/avatars/6ebd087df3fe4b70b0ba2cc95325de5d/657529b5f8574579949f986c5bcfa33a.png",
+          "height": 48
+        },
+        {
+          "size": 16215,
+          "width": 90,
+          "url": "https://media.sketchfab.com/avatars/6ebd087df3fe4b70b0ba2cc95325de5d/01de0246fdf842f0acab675a174f6f90.png",
+          "height": 90
+        },
+        {
+          "size": 19871,
+          "width": 100,
+          "url": "https://media.sketchfab.com/avatars/6ebd087df3fe4b70b0ba2cc95325de5d/e863e1ea78934bfeba819a13ee1241a9.png",
+          "height": 100
+        }
+      ]
+    },
+    "uri": "https://api.sketchfab.com/v3/users/1193c1bb295240d1a4ad6aa8283f2486"
+  },
+  "description": "Simple tablet with clock and pencil.\n\nIf you like my free models, support me by purchasing any of my paid models, this is very important to me. Thanks)",
+  "faceCount": 1898,
+  "createdAt": "2019-02-26T13:04:32.238568",
+  "vertexCount": 988,
+  "isAgeRestricted": false,
+  "archives": {
+    "glb": {
+      "textureCount": 4,
+      "size": 35575012,
+      "type": "glb",
+      "textureMaxResolution": 4096,
+      "faceCount": 1898,
+      "vertexCount": 1075
+    },
+    "gltf": {
+      "textureCount": 4,
+      "size": 35191494,
+      "type": "gltf",
+      "textureMaxResolution": 4096,
+      "faceCount": 1898,
+      "vertexCount": 1075
+    },
+    "source": {
+      "textureCount": null,
+      "size": 43756812,
+      "type": "source",
+      "textureMaxResolution": null,
+      "faceCount": null,
+      "vertexCount": null
+    },
+    "usdz": {
+      "textureCount": null,
+      "size": 3519886,
+      "type": "usdz",
+      "textureMaxResolution": null,
+      "faceCount": null,
+      "vertexCount": null
+    }
+  },
+  "license": "by"
+}

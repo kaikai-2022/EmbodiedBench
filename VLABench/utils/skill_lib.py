@@ -4,7 +4,7 @@ Skill Library for data generation.
 import numpy as np
 import random
 import time as _time
-from VLABench.utils.utils import find_keypoint_and_prepare_grasp, distance, quaternion_to_euler, quaternion_from_axis_angle, quaternion_multiply
+from VLABench.utils.utils import find_keypoint_and_prepare_grasp, distance, quaternion_to_euler, euler_to_quaternion, quaternion_from_axis_angle, quaternion_multiply
 from VLABench.algorithms.motion_planning.rrt import rrt_motion_planning
 from VLABench.algorithms.utils import interpolate_path, qauternion_slerp
 
@@ -97,7 +97,16 @@ class SkillLib:
 
         assert len(observations) == len(waypoints), f"observations and waypoints should have the same length, {len(observations)} and {len(waypoints)}"
         return observations, waypoints, stage_success, task_success
-            
+
+    @staticmethod
+    def moveto_entity(env, target_entity_name, offset=None, gripper_state=None, **kwargs):
+        """移动到指定实体上方（自动从实体位置计算目标位置）"""
+        if offset is None:
+            offset = np.array([0, 0, 0.2])
+        entity = env.task.entities[target_entity_name]
+        target_pos = np.array(entity.get_xpos(env.physics)) + offset
+        return SkillLib.moveto(env, target_pos, gripper_state=gripper_state, **kwargs)
+
     @staticmethod
     def moveto(env,
                target_pos,
@@ -612,7 +621,116 @@ class SkillLib:
         observations.pop(-1)
         assert len(observations) == len(waypoints), f"observations and waypoints should have the same length, {len(observations)} and {len(waypoints)}"
         return observations, waypoints, True, task_success
-        
+
+    @staticmethod
+    def pour_to_entity(env, target_container_name, tilt_angle=np.pi/2, tilt_velocity=np.pi/80,
+                       n_repeat_step=6, lift_before=0.1, wait_time=10):
+        """
+        倾倒到指定容器上方。
+
+        策略：正上方抓取后，��过 IK 求解逐步倾斜末端执行器，
+        同时用 IK 保持末端位置不变（试管口不位移）。
+        先抬高避免碰撞，倾倒后等待液体流出。
+
+        Args:
+            target_container_name: 目标容器实体名
+            tilt_angle: 总倾斜角度（弧度，默认 π/2 = 90°）
+            tilt_velocity: 每步倾斜角速度
+            n_repeat_step: 每个动作步重复次数
+            lift_before: 倾倒前抬高距离（m）
+            wait_time: 倾倒后等待步数
+        """
+        observations = [env.get_observation()]
+        waypoints = []
+        task_success = False
+
+        # 获取容器位置
+        container_pos = np.array(env.task.entities[target_container_name].get_xpos(env.physics))
+        pour_target_pos = container_pos + np.array([0, 0, 0.3])
+
+        # 1. 抬高到倾倒高度
+        start_pos = np.array(env.robot.get_end_effector_pos(env.physics))
+        start_quat = np.array(env.robot.get_end_effector_quat(env.physics))
+        lift_pos = np.array([start_pos[0], start_pos[1], start_pos[2] + lift_before])
+        obs, wp, stage_success, _ = SkillLib.moveto(env, target_pos=lift_pos, gripper_state=np.zeros(2))
+        observations.extend(obs)
+        waypoints.extend(wp)
+        if not stage_success:
+            return observations, waypoints, False, task_success
+
+        # 2. 移到容器上方
+        obs, wp, stage_success, _ = SkillLib.moveto(env, target_pos=pour_target_pos, gripper_state=np.zeros(2))
+        observations.extend(obs)
+        waypoints.extend(wp)
+        if not stage_success:
+            return observations, waypoints, False, task_success
+
+        # 3. IK 补偿逐步倾倒（记录每步 qpos，用于逆向回放恢复）
+        current_quat = np.array(env.robot.get_end_effector_quat(env.physics))
+        current_euler = quaternion_to_euler(current_quat)
+        pre_tilt_quat = current_quat
+        n_steps = int(abs(tilt_angle / tilt_velocity))
+        tilt_sign = 1 if tilt_angle > 0 else -1
+        tilt_qpos_history = []  # 记录倾倒过程中每一步的 qpos
+
+        for i in range(1, n_steps + 1):
+            step_euler = np.array(current_euler)
+            step_euler[1] += tilt_sign * tilt_velocity * i
+            step_quat = euler_to_quaternion(step_euler[0], step_euler[1], step_euler[2])
+
+            success, target_qpos = env.robot.get_qpos_from_ee_pos(
+                env.physics, pour_target_pos, step_quat)
+
+            if not success:
+                continue
+
+            tilt_qpos_history.append(np.array(target_qpos))  # 记录 IK 解
+
+            gripper_state = np.zeros(2)
+            action = np.concatenate([target_qpos, gripper_state])
+            for _ in range(n_repeat_step):
+                timestep = env.step(action)
+                if timestep.last():
+                    task_success = True
+                    break
+
+            waypoint = np.concatenate([
+                env.robot.get_end_effector_pos(env.physics),
+                quaternion_to_euler(env.robot.get_end_effector_quat(env.physics)),
+                gripper_state
+            ])
+            observations.append(env.get_observation())
+            waypoints.append(waypoint)
+            if task_success:
+                break
+
+        # 4. 等待液体流出
+        if wait_time > 0:
+            obs, wp, _, _ = SkillLib.wait(env, wait_time=wait_time)
+            observations.extend(obs)
+            waypoints.extend(wp)
+
+        # 5. 逆向回放倾倒过程的 qpos（完全对称，无 IK 跳变）
+        for qpos in reversed(tilt_qpos_history):
+            action = np.concatenate([qpos, np.zeros(2)])
+            for _ in range(n_repeat_step):
+                timestep = env.step(action)
+                if timestep.last():
+                    task_success = True
+                    break
+
+            waypoint = np.concatenate([
+                env.robot.get_end_effector_pos(env.physics),
+                quaternion_to_euler(env.robot.get_end_effector_quat(env.physics)),
+                np.zeros(2)
+            ])
+            observations.append(env.get_observation())
+            waypoints.append(waypoint)
+            if task_success:
+                break
+
+        return observations, waypoints, True, task_success
+
     @staticmethod
     def lift(env, target_pos=None, target_quat=None, gripper_state=None, lift_height=0.3):
         """
@@ -720,7 +838,9 @@ class SkillLib:
                 break
         observations.pop(-1)
         assert len(observations) == len(waypoints), f"observations and waypoints should have the same length, {len(observations)} and {len(waypoints)}"
-        if env.robot.get_ee_open_state(env.physics):
+        # get_ee_open_state 实际返回"夹爪是否关闭"（与函数名相反）
+        # open_gripper 成功 = 夹爪不再关闭 = 返回 False
+        if not env.robot.get_ee_open_state(env.physics):
             stage_success = True
         return observations, waypoints, stage_success, task_success
     
@@ -971,3 +1091,104 @@ class SkillLib:
         if target_quat is None: target_quat = start_quat
         observations, waypoints, stage_success, task_success = SkillLib.moveto(env, target_pos, target_quat, gripper_state=gripper_state)
         return observations, waypoints, stage_success, task_success
+
+    @staticmethod
+    def insert_to_entity(env, target_entity_name, insert_depth=0.05, gripper_state=None):
+        """
+        将抓取的物体插入目标实体的孔位。
+
+        使用目标实体的 place point（group=2 site）作为插入点，
+        自动选择空闲孔位，用 RRT 规划路径，最后松开夹爪。
+
+        Args:
+            target_entity_name: 目标实体名（如 chemistry_tube_stand）
+            insert_depth: 插入深度（m），默认 5cm
+            gripper_state: 夹爪状态，默认保持当前状态
+        """
+        task_success = False
+        entity = env.task.entities[target_entity_name]
+        place_points = entity.get_place_point(env.physics)
+
+        if not place_points:
+            print(f"[insert_to_entity] {target_entity_name} 没有 place point")
+            return [env.get_observation()], [], False, False
+
+        if gripper_state is None:
+            gripper_state = np.zeros(2)
+
+        # 选择空闲孔位：找离当前夹持物体（末端执行器）XY 最近的空闲孔位
+        ee_pos = np.array(env.robot.get_end_effector_pos(env.physics))
+        # 按孔位与末端的 XY 距离排序——倾倒完后末端在烧杯上方，
+        # 但夹持的试管在末端正下方，所以按 XY 排序仍能找到正确孔列
+        # 更可靠的方式：按孔位与试管架中心的距离从近到远排序，
+        # 优先选择离末端 XY 最近的空闲孔
+        stand_xpos = np.array(entity.get_xpos(env.physics))
+        sorted_points = sorted(place_points, key=lambda p: np.linalg.norm(np.array(p)[:2] - ee_pos[:2]))
+        insert_point = None
+        for pp in sorted_points:
+            pp = np.array(pp)
+            # 检查该孔位附近是否已被其他物体占据（排除当前夹持的物体）
+            occupied = False
+            for name, other_entity in env.task.entities.items():
+                if name == target_entity_name:
+                    continue
+                other_pos = np.array(other_entity.get_xpos(env.physics))
+                # 孔位 XY 范围 4cm 内有物体且 Z 低于孔位，认为已占据
+                # 排除距离末端 15cm 内的物体（当前夹持的试管）
+                if (np.linalg.norm(other_pos[:2] - pp[:2]) < 0.04
+                        and other_pos[2] < pp[2] + 0.05
+                        and np.linalg.norm(other_pos - ee_pos) > 0.15):
+                    occupied = True
+                    break
+            if not occupied:
+                insert_point = pp
+                break
+
+        if insert_point is None:
+            insert_point = np.array(sorted_points[-1])
+
+        print(f"[insert_to_entity] EE 当前位置: {np.round(ee_pos, 3)}")
+        print(f"[insert_to_entity] 试管架中心: {np.round(stand_xpos, 3)}")
+        print(f"[insert_to_entity] 选中孔位: {np.round(insert_point, 3)}  offset={np.round(insert_point - stand_xpos, 3)}")
+
+        # 1. RRT 移动到孔位上方（偏移 15cm），指定竖直向下姿态
+        # 参考 insert_tube_series：hover 高度需足够让试管底部高于孔口
+        hover_pos = insert_point + np.array([0, 0, 0.15])
+        vertical_quat = euler_to_quaternion(-np.pi, 0, 0)  # 末端竖直向下
+        # 先初始化 observations，再调用 moveto，保证帧顺序正确
+        observations = [env.get_observation()]
+        waypoints = []
+        obs, wp, stage_success, _ = SkillLib.moveto(
+            env, target_pos=hover_pos, target_quat=vertical_quat, gripper_state=gripper_state
+        )
+        observations.extend(obs)
+        waypoints.extend(wp)
+
+        if not stage_success:
+            return observations, waypoints, False, False
+
+        # 2. 用 lift 负值从 hover_pos 直接下降到插入位置
+        # hover_pos = insert_point + [0,0,0.15]，只下降 0.12m，让试管口进入孔位即可
+        descend = -0.12
+        obs, wp, _, _ = SkillLib.lift(
+            env, lift_height=descend, gripper_state=gripper_state)
+        observations.extend(obs)
+        waypoints.extend(wp)
+
+        # 下降执行完毕即尝试松开（不依赖 lift 的位置误差判定）
+        insert_pos = insert_point - np.array([0, 0, insert_depth])
+        final_pos = np.array(env.robot.get_end_effector_pos(env.physics))
+        dist = np.linalg.norm(final_pos - insert_pos)
+        print(f"[insert_to_entity] 插入目标: {np.round(insert_pos,3)}  实际EE: {np.round(final_pos,3)}  误差: {dist:.4f}")
+
+        # 3. 松开夹爪
+        obs, wp, _, _ = SkillLib.open_gripper(env)
+        observations.extend(obs)
+        waypoints.extend(wp)
+
+        # 4. 抬回安全高度，避免后续技能受低位关节构型影响
+        obs, wp, _, _ = SkillLib.lift(env, lift_height=0.15, gripper_state=np.ones(2) * 0.04)
+        observations.extend(obs)
+        waypoints.extend(wp)
+
+        return observations, waypoints, True, task_success
