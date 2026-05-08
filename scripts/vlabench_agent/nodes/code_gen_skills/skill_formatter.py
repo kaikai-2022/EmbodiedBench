@@ -70,7 +70,7 @@ def _format_params(params: Dict, skill_name: str = "") -> str:
     parts = []
     for k, v in params.items():
         # 参数名映射
-        if k == "target_uid":
+        if k == "target_uid" or k == "target_container_uid":
             if skill_name in ("place", "pour_to_entity"):
                 k = "target_container_name"
             else:

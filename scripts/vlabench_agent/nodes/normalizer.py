@@ -32,7 +32,8 @@ logger = logging.getLogger(__name__)
 # 标准资产库列表 (从 constant.py 中提取的 key)
 STANDARD_ASSET_LIBRARY = [
     "beaker", "chemistry_beaker", "tube", "chemistry_tube_stand",
-    "flask", "petri_dish", "bunsen_burner", "centrifuge",
+    "flask", "conical_flask", "large_beaker", "small_beaker",
+    "petri_dish", "bunsen_burner", "centrifuge",
     "coverslip", "nametag", "microscope", "scale",
     "plate", "tray", "cabinet", "fridge", "microwave",
     "mug", "cup", "bottle", "bowl", "plate", "knife",
@@ -147,7 +148,15 @@ Examples:
     try:
         response = llm.invoke(prompt)
         # 扫描所有行，找第一个分类前缀（LLM 可能返回 thinking 内容）
-        lines = response.content.strip().split("\n")
+        raw = response.content
+        if isinstance(raw, list):
+            text_block = next((b for b in raw if isinstance(b, dict) and b.get('type') == 'text'), None)
+            if text_block is None:
+                text_block = next((b for b in raw if isinstance(b, dict) and 'text' in b), None)
+            text = (text_block['text'] if text_block else '').strip()
+        else:
+            text = raw
+        lines = text.strip().split("\n")
         result = None
         for line in lines:
             stripped = line.strip()

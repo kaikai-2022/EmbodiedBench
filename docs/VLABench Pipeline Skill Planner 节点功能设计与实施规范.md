@@ -150,7 +150,45 @@ JSON
 }
 ```
 
-## 6. 开发实施清单 (Implementation Checklist)
+## 6. 常见任务序列模式 (Common Task Patterns)
+
+### 6.1 Shake 任务（摇晃容器）
+
+**正确序列**：
+```json
+{
+  "atomic_sequence": [
+    {"skill": "pick", "params": {"target_uid": "beaker_0"}},
+    {"skill": "lift", "params": {"lift_height": 0.15}},
+    {"skill": "rotate", "params": {"rotation_angle": 0.7854}},
+    {"skill": "rotate", "params": {"rotation_angle": -0.7854}},
+    {"skill": "rotate", "params": {"rotation_angle": 0.7854}},
+    {"skill": "wait", "params": {"wait_time": 50}},
+    {"skill": "place", "params": {"target_uid": "table"}},
+    {"skill": "open_gripper", "params": {}}
+  ]
+}
+```
+
+**关键点**：
+- 使用多个 `rotate` 实现摇晃动作
+- **必须先 `place("table")` 再 `open_gripper`**，确保物体稳定放置而非掉落
+- 不要直接 `open_gripper` 松手，会导致物体掉落
+
+### 6.2 Place 技能用法
+
+**正确用法**：
+- `place("table")` — 放到桌面上
+- `place("beaker_0")` — 放到烧杯里
+- `place("shelf_0")` — 放到架子上
+
+**错误用法**：
+- ❌ `place("beaker_0")` 当 beaker_0 是被抓取的物体（不能把物体放回自己身上）
+- ❌ 直接 `open_gripper` 而不先 `place`（物体会掉落）
+
+**规则**：`target_uid` 必须是**可放置的容器/表面**，不是被抓取的物体本身。
+
+## 7. 开发实施清单 (Implementation Checklist)
 
 - [ ] 彻底删除旧版代码中关于 `$TARGET_ENTITY` 模板替换和硬编码动作序列的冗余逻辑。
 - [ ] 彻底删除旧版 JSON 结构中的 `conditions` 字段，确保所有目标指向全部集成到 `params` 中。

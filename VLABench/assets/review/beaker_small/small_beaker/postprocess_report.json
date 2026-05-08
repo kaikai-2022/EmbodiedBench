@@ -1,0 +1,28 @@
+{
+  "uid": "small_beaker",
+  "centered": true,
+  "scaled": true,
+  "scale_factor": 0.016820819459278477,
+  "orientation_warning": null,
+  "original_dims": {
+    "center": [
+      0.15706491500000008,
+      0.0,
+      4.46426018
+    ],
+    "ranges": [
+      7.0512900300000005,
+      6.72338008,
+      8.917520360000001
+    ],
+    "max_dim": 8.917520360000001
+  },
+  "final_dims": {
+    "ranges": [
+      0.11860847671784851,
+      0.11309276248178929,
+      0.15
+    ],
+    "max_dim": 0.15
+  }
+}

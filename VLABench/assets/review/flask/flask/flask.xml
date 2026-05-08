@@ -1,0 +1,39 @@
+<?xml version="1.0" ?>
+<mujoco model="flask">
+  <asset>
+    <texture type="2d" name="lab_erlenmeyer_a" file="lab_erlenmeyer_a.png"/>
+    <material name="lab_erlenmeyer_a" texture="lab_erlenmeyer_a" specular="0.4000000000000001" shininess="0.001"/>
+    <mesh file="flask.obj" scale="0.013126563322826317 0.013126563322826317 0.013126563322826317"/>
+      <material name="CaSO4" rgba="1 1 1 0.7"/>
+    <material name="CuCl2" rgba="0.141 1.0 0.174 0.4"/>
+    <material name="CuSO4" rgba="0 0.45 1 0.4"/>
+    <material name="FeCl3" rgba="0.6475 0.5686 0.023 0.4"/>
+    <material name="KMnO4" rgba="0.5 0 0.5 0.4"/>
+    <material name="I2" rgba="0.3 0.13 0.0 0.4"/>
+    <material name="K2CrO4" rgba="0.57 0.12 0.013 0.4"/>
+    <material name="NaCl" rgba="1 1 1 0.3"/>
+</asset>
+  <worldbody>
+    <body name="flask">
+      <inertial pos="0 0 0.100000" mass="0.02" diaginertia="0.0008 0.0008 0.0005"/>
+      <geom material="lab_erlenmeyer_a" mesh="flask" class="visual"/>
+      <geom type="mesh" mesh="flask" class="collision"/>
+      <site class="grasppoint" pos="0.0000 0.0000 0.1700"/>
+          <geom name="solution" type="cylinder" size="4.164760 4.570884" pos="0 0 7.618140" material="CaSO4" class="visual"/>
+      <site name="top_site" pos="0 0 15.236280" size="0.01" rgba="1 0 0 0"/>
+      <site name="bottom_site" pos="0 0 0.000000" size="0.01" rgba="0 1 0 0"/>
+</body>
+  </worldbody>
+  <compiler boundmass="0.015" boundinertia="1e-05" angle="radian"/>
+  <default>
+    <default class="visual">
+      <geom group="2" type="mesh" contype="0" conaffinity="0" density="50"/>
+    </default>
+    <default class="collision">
+      <geom group="3" type="mesh" density="50" friction="2 2 0.5" solimp="0.9 0.95 0.001" solref="0.02 1"/>
+    </default>
+    <default class="grasppoint">
+      <site type="sphere" size="0.005" group="4" rgba="0 0 1 1"/>
+    </default>
+  </default>
+</mujoco>

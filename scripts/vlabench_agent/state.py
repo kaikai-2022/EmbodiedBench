@@ -90,6 +90,15 @@ class VLABenchAgentState(TypedDict):
     #   ]
     skill_plan: Optional[Dict[str, Any]]
 
+    # ========== Condition Planner 输出 ==========
+    # condition_plan: per-step 的成功条件配置，格式:
+    #   [
+    #     {"step_id": 0, "condition_type": "contain", "params": {"container": "beaker_0", "entities": ["tube_0"]}},
+    #     {"step_id": 1, "condition_type": "pass"},  # 无条件通过
+    #   ]
+    # condition_type 为 condition.py 中注册的 17 种之一，或 "pass" 表示跳过
+    condition_plan: Optional[List[Dict[str, Any]]]
+
     # ========== Code Generator 输出 ==========
     generated_code: Optional[str]               # 生成的 Python 任务类源码
     task_module_path: Optional[str]             # 写入磁盘的文件路径

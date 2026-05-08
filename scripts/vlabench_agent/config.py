@@ -36,11 +36,11 @@ class AgentConfig:
 
     # API Key (已配置)
     # ANTHROPIC_API_KEY: str = "sk-NdKNGm3YPJK9GSWA808f2c87Cb9e422c86858610972cE265"
-    ANTHROPIC_API_KEY: str = "sk-FIauuBJizMdwBttvTao2d4oY6NeVakZVT2vhBfB8SmcX289R"
+    ANTHROPIC_API_KEY: str = "sk-1ba97346fbec05a2b4f4e2da63cf380117fb1a0a24db4043"
 
     # 自定义 API 端点 (去掉 /v1 后缀,库会自动添加)
     # BASE_URL: str = "http://apifs.shubiaobiao.cn"
-    BASE_URL: str = "https://us.novaiapi.com"
+    BASE_URL: str = "https://openox.tech"
 
     # ==================== 其他配置 ====================
 

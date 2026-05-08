@@ -1,0 +1,33 @@
+<?xml version="1.0" ?>
+<mujoco model="electronic_scale">
+  <asset>
+    <texture type="2d" name="material_0" file="material_0.png"/>
+    <material name="material_0" texture="material_0" specular="0.4000000000000001" shininess="0.001"/>
+    <mesh file="electronic_scale.obj" scale="0.025050099572893298 0.025050099572893298 0.025050099572893298"/>
+    <mesh file="electronic_scale/electronic_scale_collision_0.obj" scale="0.025050099572893298 0.025050099572893298 0.025050099572893298"/>
+    <mesh file="electronic_scale/electronic_scale_collision_1.obj" scale="0.025050099572893298 0.025050099572893298 0.025050099572893298"/>
+  </asset>
+  <worldbody>
+    <body name="electronic_scale">
+      <inertial pos="0 0 0.025000" mass="0.02" diaginertia="0.0008 0.0008 0.0005"/>
+      <geom material="material_0" mesh="electronic_scale" class="visual"/>
+      <geom mesh="electronic_scale_collision_0" rgba="0.4231319570626192 0.14693447540035798 0.7199863227159758 1" class="collision"/>
+      <geom mesh="electronic_scale_collision_1" rgba="0.17657340610594563 0.044154280195622175 0.24127049936771816 1" class="collision"/>
+      <site class="grasppoint" pos="0.0000 0.0000 0.0300"/>
+      <site class="grasppoint" pos="0.0000 0.0000 0.0400"/>
+      <site class="grasppoint" pos="0.0000 0.0000 0.0475"/>
+    </body>
+  </worldbody>
+  <compiler boundmass="0.015" boundinertia="1e-05" angle="radian"/>
+  <default>
+    <default class="visual">
+      <geom group="2" type="mesh" contype="0" conaffinity="0" density="50"/>
+    </default>
+    <default class="collision">
+      <geom group="3" type="mesh" density="50" friction="1.5 0.1 0.1" solimp="0.9 0.95 0.001" solref="0.02 1"/>
+    </default>
+    <default class="grasppoint">
+      <site type="sphere" size="0.005" group="4" rgba="0 0 1 1"/>
+    </default>
+  </default>
+</mujoco>

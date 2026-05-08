@@ -19,6 +19,7 @@ from pathlib import Path
 from typing import Dict
 
 from ..tools.asset_tools import check_asset_exists, download_asset, _register_downloaded_asset
+from ..tools.asset_cache import load_cache, save_cache, set_cached
 from ..tools.xml_injector import inject_xml
 from .node_logger import log_node_output_file
 
@@ -71,23 +72,28 @@ def _fetch_asset(spec: str, source_type: str) -> Dict:
     """
     工序 1: 获取资产
 
+    优先级: constant.py 注册 > 本地已有资产 > Objaverse 下载
+
     Returns:
         {"xml_path": str, "is_objaverse": bool}
     """
+    # 最高优先级: 检查 constant.py 注册（开发者维护的权威注册表）
+    # 无论缓存中 source_type 是什么，都优先用 constant.py
+    status = check_asset_exists(spec)
+    if status.get("found"):
+        return {
+            "xml_path": status["xml_path"],
+            "is_objaverse": False,
+        }
+
+    # constant.py 没有注册，根据 source_type 决定行为
     if source_type == "local":
-        # 本地查找
-        status = check_asset_exists(spec)
-        if status.get("found"):
-            return {
-                "xml_path": status["xml_path"],
-                "is_objaverse": False,
-            }
-        else:
-            raise AssetNotFoundError(f"本地资产不存在: {spec}")
+        # 明确说本地，但 constant.py 里没有 → 报错
+        raise AssetNotFoundError(f"本地资产不存在: {spec}")
 
     elif source_type == "objaverse":
-        # 云端下载
-        logger.info(f"  → 资产来源: objaverse，尝试下载...")
+        # 尝试下载
+        logger.info(f"  → constant.py 中未找到 {spec}，尝试从 Objaverse 下载...")
         result = download_asset(spec, max_downloads=3)
         if result["success"] and result["assets"]:
             abs_path = result["assets"][0]
@@ -97,6 +103,16 @@ def _fetch_asset(spec: str, source_type: str) -> Dict:
                 rel_path = os.path.relpath(abs_path, assets_dir)
             except ValueError:
                 rel_path = abs_path
+
+            # 下载成功后更新缓存: 下次直接走 constant.py，不再下载
+            try:
+                cache = load_cache()
+                set_cached(spec, spec, "local", True, cache)
+                save_cache(cache)
+                logger.info(f"  → 缓存已更新: {spec} source_type='local'")
+            except Exception as e:
+                logger.warning(f"  ⚠ 缓存更新失败: {e}")
+
             return {
                 "xml_path": rel_path,
                 "is_objaverse": True,

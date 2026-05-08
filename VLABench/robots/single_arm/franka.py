@@ -116,4 +116,36 @@ class Franka(SingleArm):
         ee_end_site = self.mjcf_model.find("site", "end_effector_move")
         ee_end_pos = physics.bind(ee_end_site).xpos
         return grasp_pos - ee_end_pos
+
+    def get_qpos_from_ee_pos(self, physics, pos, quat=None, inplace=False, **kwargs):
+        # Compensate offset from end_effector site to finger pad midpoint
+        # In link7 frame: finger_mid - ee_site = (0.7mm, 0.7mm, 6.4mm)
+        if quat is not None:
+            q = np.array(quat)
+            w, x, y, z = q
+            R_mat = np.array([
+                [1-2*(y*y+z*z), 2*(x*y-w*z), 2*(x*z+w*y)],
+                [2*(x*y+w*z), 1-2*(x*x+z*z), 2*(y*z-w*x)],
+                [2*(x*z-w*y), 2*(y*z+w*x), 1-2*(x*x+y*y)]
+            ])
+            offset_local = np.array([0.00070711, 0.00070711, 0.0064])
+            offset_world = R_mat @ offset_local
+            original_pos = np.array(pos)
+            pos = original_pos - offset_world
+            # DEBUG: 打印 IK 补偿信息
+            if hasattr(self, '_debug_ik') and self._debug_ik:
+                print(f"  [IK DEBUG] original_pos=({original_pos[0]:.4f},{original_pos[1]:.4f},{original_pos[2]:.4f})")
+                print(f"  [IK DEBUG] offset_world=({offset_world[0]:.6f},{offset_world[1]:.6f},{offset_world[2]:.6f})")
+                print(f"  [IK DEBUG] IK target=({pos[0]:.4f},{pos[1]:.4f},{pos[2]:.4f})")
+
+        from dm_control.utils.inverse_kinematics import qpos_from_site_pose
+        ik_result = qpos_from_site_pose(physics,
+                                        site_name=self.end_effector_site.full_identifier,
+                                        target_pos=pos,
+                                        target_quat=quat,
+                                        inplace=inplace,
+                                        **kwargs)
+        success = ik_result.success
+        target_qpos = ik_result.qpos
+        return success, target_qpos[:self.n_dof]
         

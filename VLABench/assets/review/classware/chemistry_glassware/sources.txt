@@ -1,0 +1,14 @@
+Model UID: chemistry_glassware
+Model Name: chemistry_glassware
+
+Source Information:
+============================================================
+Source: Local File
+Original Path: /ssd/mkqin/download/chemistry_glassware.glb
+File Name: chemistry_glassware.glb
+Keyword/Category: classware
+Rotation: 90.0° around X axis
+
+Processing:
+Pipeline: process_local_glb.py
+Steps: GLB->OBJ (trimesh) -> [rotate] -> MJCF (obj2mjcf) -> postprocess -> bottom-align -> validate -> size_fix

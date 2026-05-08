@@ -13,36 +13,25 @@ class LiftConfigManager(BenchTaskConfigManager):
     def __init__(self, task_name, num_objects=[1, 1], **kwargs):
         super().__init__(task_name, num_objects, **kwargs)
 
-    def load_containers(self, target_container):
-        if target_container is None:
-            return
-        container_config = dict(
-            name="beaker_0",
-            xml_path=name2class_xml["beaker"][-1],
-            position=[0.0, 0.0, 0.8],
-        )
-        container_config["class"] = "ChemistryBeaker"
-        self.config["task"]["components"].append(container_config)
-
     def load_objects(self, target_entity):
         obj_config = dict(
-            name="table_0",
-            xml_path=name2class_xml["table"][-1],
+            name="small_beaker_0",
+            xml_path=name2class_xml["small_beaker"][-1],
             position=[random.uniform(-0.3, 0.3), random.uniform(-0.2, 0.2), 0.8],
         )
-        obj_config["class"] = "CommonGraspedEntity"
+        obj_config["class"] = "ChemistryBeaker"
         obj_config["randomness"] = dict(pos=[0.02, 0.02, 0], quat=[0, 0, 0.05])
         self.config["task"]["components"].append(obj_config)
 
-    def get_instruction(self, target_entity, target_container, **kwargs):
-        self.config["task"]["instructions"] = ["Lift the <beaker_0> from the <table_0>."]
+    def get_instruction(self, target_entity, **kwargs):
+        self.config["task"]["instructions"] = ["Lift the <small_beaker_0>."]
 
-    def get_condition_config(self, target_entity, target_container, **kwargs):
+    def get_condition_config(self, target_entity, **kwargs):
         # 执行完即成功
         pass
 
     def get_target_entity(self):
-        return "table_0"
+        return "small_beaker_0"
 
 
 @register.add_task("lift")
@@ -52,8 +41,7 @@ class LiftTask(PrimitiveTask):
 
     def get_expert_skill_sequence(self, physics):
         skill_sequence = [
-            partial(SkillLib.moveto, target_pos=np.array([0.0, 0.0, 0.95])),
-            partial(SkillLib.pick, target_entity_name="beaker_0"),
-            partial(SkillLib.lift, lift_height=0.15),
+            partial(SkillLib.pick, target_entity_name="small_beaker_0", prior_eulers=[[-3.14159, 0, 0]]),
+            partial(SkillLib.lift, lift_height=0.15, gripper_state=[0, 0]),
         ]
         return skill_sequence

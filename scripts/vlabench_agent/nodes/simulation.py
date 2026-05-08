@@ -69,13 +69,9 @@ def extract_skill_sequence(skill_seq, entity_names: List[str]) -> List[Dict]:
         entity_names: 场景中的实体名称列表（用于映射到索引）
 
     Returns:
-        [{"name": "pick", "params": {"target_entity_name": 1}}, ...]
+        [{"name": "pick", "params": {"target_entity_name": "small_beaker_0"}}, ...]
+        注意：直接返回实体名称字符串，不做索引转换，避免映射错误
     """
-    # 构建名称到索引的映射
-    name_to_index = {}
-    for i, name in enumerate(entity_names):
-        name_to_index[name] = i
-
     sequence = []
     for skill in skill_seq:
         name = skill.func.__name__
@@ -83,17 +79,91 @@ def extract_skill_sequence(skill_seq, entity_names: List[str]) -> List[Dict]:
 
         keywords = skill.keywords if hasattr(skill, "keywords") else {}
 
+        # 直接使用实体名称字符串，不做索引映射
         if "target_entity_name" in keywords:
-            entity_name = keywords["target_entity_name"]
-            params["target_entity_name"] = name_to_index.get(entity_name, entity_name)
+            params["target_entity_name"] = keywords["target_entity_name"]
 
         if "target_container_name" in keywords:
-            container_name = keywords["target_container_name"]
-            params["target_container_name"] = name_to_index.get(container_name, container_name)
+            params["target_container_name"] = keywords["target_container_name"]
 
         sequence.append({"name": name, "params": params})
 
     return sequence
+
+
+# ========== Per-Step Condition Checking ==========
+# 数值参数键集合（这些参数不做 entity name 解析）
+NUMERIC_PARAM_KEYS = {
+    "positions", "target_pos_range", "orientations",
+    "duration", "xy_tolerance", "target_height", "tolerance_distance",
+    "tolerance_angle", "dimension", "offset", "threshold", "check_axes",
+    "layer", "tilt_angle", "wait_time", "insert_depth", "lift_height",
+    "push_distance", "rotation_angle", "gripper_state",
+}
+
+
+def _resolve_condition_params(params: Dict, entities_dict: Dict, robot) -> Dict:
+    """
+    将 condition params 中的字符串 entity name 解析为实际的 Entity 对象。
+
+    Args:
+        params: condition 配置中的参数字典，包含 entity name 字符串
+        entities_dict: env.task.entities 字典，key 为 entity name
+        robot: robot Entity 对象
+
+    Returns:
+        解析后的参数字典，entity name 字符串已被替换为 Entity 对象
+    """
+    from VLABench.utils.register import register
+    resolved = {}
+    for k, v in params.items():
+        if k == "robot":
+            resolved[k] = robot
+        elif k in NUMERIC_PARAM_KEYS:
+            resolved[k] = v
+        elif isinstance(v, str):
+            # 字符串可能是 entity name，尝试解析
+            resolved[k] = entities_dict.get(v, v)
+        elif isinstance(v, list):
+            resolved[k] = [
+                entities_dict.get(item, item) if isinstance(item, str) else item
+                for item in v
+            ]
+        else:
+            resolved[k] = v
+    return resolved
+
+
+def _check_step_condition(step_id: int, condition_entry: Dict, entities_dict: Dict, robot, physics) -> Dict:
+    """
+    检查单个 step 的 condition。
+
+    Args:
+        step_id: step 编号
+        condition_entry: condition_plan 中的单个条目
+        entities_dict: env.task.entities 字典
+        robot: robot Entity 对象
+        physics: mujoco physics 对象
+
+    Returns:
+        {"step_id": int, "condition_type": str, "met": bool, "error": str or None}
+    """
+    from VLABench.utils.register import register
+
+    cond_type = condition_entry.get("condition_type", "pass")
+    if cond_type == "pass":
+        return {"step_id": step_id, "condition_type": "pass", "met": True, "error": None}
+
+    params = condition_entry.get("params", {})
+    try:
+        condition_cls = register.load_condition(cond_type)
+        resolved_params = _resolve_condition_params(params, entities_dict, robot)
+        condition = condition_cls(**resolved_params)
+        met = condition.is_met(physics)
+        return {"step_id": step_id, "condition_type": cond_type, "met": met, "error": None}
+    except Exception as e:
+        logger.warning(f"[Simulation]   ⚠ Step {step_id} condition check error: {e}")
+        return {"step_id": step_id, "condition_type": cond_type, "met": False, "error": str(e)}
 
 
 def simulation_node(state: Dict) -> Dict:
@@ -114,6 +184,15 @@ def simulation_node(state: Dict) -> Dict:
     """
     logger.info("=" * 60)
     logger.info("[Simulation] 开始 MuJoCo 物理仿真...")
+
+    # 日志输出 condition_plan（方便调试）
+    condition_plan = state.get("condition_plan")
+    if condition_plan:
+        logger.info(f"[Simulation] 接收 condition_plan: {len(condition_plan)} 个 conditions")
+        for cp in condition_plan:
+            logger.info(f"  Step {cp.get('step_id')}: {cp.get('condition_type')} - params={cp.get('params', {})}")
+    else:
+        logger.info("[Simulation] 未收到 condition_plan（或为 None），将跳过 per-step condition 检查")
 
     # 确保 VLABENCH_ROOT 环境变量已设置（assets 在 VLABench 子目录下）
     if not os.environ.get("VLABENCH_ROOT"):
@@ -183,11 +262,35 @@ def simulation_node(state: Dict) -> Dict:
         waypoints = []
         task_success = False
 
+        # 获取 condition_plan 和 skill_plan
+        condition_plan = state.get("condition_plan", [])
+        skill_plan = state.get("skill_plan", {})
+        global_skill_plan = skill_plan.get("global_skill_plan", [])
+
+        # 初始化 per-step condition 检查结果
+        step_condition_results = []
+
+        # 构建 step_id -> skills 数量的映射
+        # atomic_sequence 中的 skill 数量决定何时检查 condition
+        step_skill_counts = []
+        step_skill_ends = []  # 累计索引，用于判断某 step 的 skills 何时完成
+        for step in global_skill_plan:
+            num_skills = len(step.get("atomic_sequence", []))
+            step_skill_counts.append(num_skills)
+            if step_skill_ends:
+                step_skill_ends.append(step_skill_ends[-1] + num_skills)
+            else:
+                step_skill_ends.append(num_skills)
+
+        logger.info(f"[Simulation]   共有 {len(global_skill_plan)} 个 steps, {len(skill_seq)} 个 skills")
+        logger.info(f"[Simulation]   Step skill counts: {step_skill_counts}, ends: {step_skill_ends}")
+
         # 设置整体仿真超时
         old_handler = signal.signal(signal.SIGALRM, _timeout_handler)
         signal.alarm(SIMULATION_TIMEOUT)
 
         try:
+            current_step_idx = 0
             for skill_idx, skill in enumerate(skill_seq):
                 skill_name = skill.func.__name__
                 logger.info(f"[Simulation]   执行技能 {skill_idx + 1}/{len(skill_seq)}: {skill_name}")
@@ -206,25 +309,67 @@ def simulation_node(state: Dict) -> Dict:
                 if skill_task_success:
                     task_success = True
                     break
+
+                # 检查是否完成了某个 step 的所有 skills
+                for step_idx, end_idx in enumerate(step_skill_ends):
+                    if skill_idx == end_idx - 1:  # 当前 skill 是该 step 的最后一个
+                        step_condition = None
+                        if condition_plan:
+                            step_condition = next(
+                                (c for c in condition_plan if c.get("step_id") == step_idx),
+                                None
+                            )
+                        if step_condition:
+                            result = _check_step_condition(
+                                step_idx, step_condition,
+                                env.task.entities, env.robot, env.physics
+                            )
+                            step_condition_results.append(result)
+                            status_icon = "✓" if result["met"] else "✗"
+                            logger.info(
+                                f"[Simulation]   Step {step_idx} condition '{result['condition_type']}': "
+                                f"{status_icon} (skill_idx={skill_idx})"
+                            )
+                        break
         except SkillTimeoutError:
             logger.error(f"[Simulation]   ✗ 技能执行超时 (>{SKILL_TIMEOUT}s)")
         finally:
             signal.alarm(0)  # 取消超时
             signal.signal(signal.SIGALRM, old_handler)  # 恢复原处理器
 
-        # 6. 检查任务条件
-        if not task_success and hasattr(env.task, "conditions") and env.task.conditions is not None:
-            try:
-                result = env.task.conditions.is_met(env.physics)
-                if result:
-                    task_success = True
-                    logger.info("[Simulation]   ✓ 任务条件满足")
-            except Exception as e:
-                logger.warning(f"[Simulation]   ⚠ 条件检查异常: {e}")
+        # 6. Per-step condition 检查结果汇总
+        # 如果有 condition_plan，检查是否所有 conditions 都满足
+        all_conditions_met = True
+        if condition_plan and step_condition_results:
+            failed_conditions = [r for r in step_condition_results if not r["met"]]
+            if failed_conditions:
+                all_conditions_met = False
+                logger.warning(f"[Simulation]   ✗ {len(failed_conditions)} 个 step conditions 未满足:")
+                for fc in failed_conditions:
+                    error_info = f", error: {fc['error']}" if fc.get("error") else ""
+                    logger.warning(f"[Simulation]     - Step {fc['step_id']}: {fc['condition_type']}{error_info}")
+            else:
+                logger.info(f"[Simulation]   ✓ 所有 {len(step_condition_results)} 个 step conditions 都满足")
+
+        # 综合判定：skill 执行完成 + 所有 conditions 满足
+        if not task_success:
+            if not condition_plan:
+                # 没有 condition_plan 时，回退到原有的条件检查机制
+                if hasattr(env.task, "conditions") and env.task.conditions is not None:
+                    try:
+                        result = env.task.conditions.is_met(env.physics)
+                        if result:
+                            task_success = True
+                            logger.info("[Simulation]   ✓ 任务条件满足（fallback）")
+                    except Exception as e:
+                        logger.warning(f"[Simulation]   ⚠ 条件检查异常: {e}")
+            elif all_conditions_met:
+                task_success = True
+                logger.info("[Simulation]   ✓ 所有 step conditions 满足，任务成功")
 
         logger.info(f"[Simulation]   任务结果: {'成功' if task_success else '失败'}")
 
-        # 7. 保存数据
+        # 8. 保存数据
         vlabench_root = os.environ.get("VLABENCH_ROOT")
         project_root = Path(vlabench_root).parent if vlabench_root else Path(".")
         task_dir = project_root / "dataset" / "training_data" / task_name
@@ -269,6 +414,7 @@ def simulation_node(state: Dict) -> Dict:
                 "simulation_hdf5_path": hdf5_path,
                 "episode_config": episode_config,
                 "executed_skill_sequence": executed_skill_sequence,
+                "step_condition_results": step_condition_results,
                 "error_feedback": None,
                 "current_stage": "vlm_data",
             }
@@ -278,17 +424,24 @@ def simulation_node(state: Dict) -> Dict:
             logger.warning("[Simulation] ✗ 仿真失败 - 任务未完成")
             logger.info("=" * 60 + "\n")
 
+            # 构建详细的错误反馈，包含 condition 检查结果
+            error_msg = f"仿真执行完毕但任务未成功完成。\n执行的技能: {[s.func.__name__ for s in skill_seq]}\n"
+            if condition_plan and step_condition_results:
+                failed_conditions = [r for r in step_condition_results if not r["met"]]
+                if failed_conditions:
+                    error_msg += f"\n未满足的 conditions:\n"
+                    for fc in failed_conditions:
+                        error_info = f" (error: {fc['error']})" if fc.get("error") else ""
+                        error_msg += f"  - Step {fc['step_id']}: {fc['condition_type']}{error_info}\n"
+            error_msg += "请检查 get_expert_skill_sequence 中的技能参数是否正确，特别是 target_entity_name 和 target_container_name 是否与实际实体名称匹配。"
+
             output = {
                 "simulation_success": False,
                 "simulation_video_path": video_path,
                 "episode_config": episode_config,
                 "executed_skill_sequence": executed_skill_sequence,
-                "error_feedback": (
-                    f"仿真执行完毕但任务未成功完成。\n"
-                    f"执行的技能: {[s.func.__name__ for s in skill_seq]}\n"
-                    f"请检查 get_expert_skill_sequence 中的技能参数是否正确，"
-                    f"特别是 target_entity_name 和 target_container_name 是否与实际实体名称匹配。"
-                ),
+                "step_condition_results": step_condition_results,
+                "error_feedback": error_msg,
                 "current_stage": "simulation",
             }
             log_node_output_file("simulation", state, output)

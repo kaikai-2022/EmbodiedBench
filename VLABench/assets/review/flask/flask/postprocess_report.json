@@ -1,0 +1,28 @@
+{
+  "uid": "flask",
+  "centered": true,
+  "scaled": true,
+  "scale_factor": 0.009844922492119736,
+  "orientation_warning": null,
+  "original_dims": {
+    "center": [
+      0.0,
+      -5.009999999749937e-06,
+      7.61814022
+    ],
+    "ranges": [
+      10.41189956,
+      10.41190958,
+      15.23628044
+    ],
+    "max_dim": 15.23628044
+  },
+  "final_dims": {
+    "ranges": [
+      0.10250434416393558,
+      0.10250444281005895,
+      0.15
+    ],
+    "max_dim": 0.15
+  }
+}

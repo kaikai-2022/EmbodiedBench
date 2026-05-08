@@ -72,7 +72,12 @@ def ask_llm_size(object_name: str) -> dict:
         ],
     )
 
-    response_text = response.content[0].text.strip()
+    raw = response.content
+    if isinstance(raw, list):
+        text_block = next((b for b in raw if hasattr(b, 'text')), None)
+        response_text = text_block.text.strip() if text_block else ''
+    else:
+        response_text = raw.strip()
     logger.info(f"  LLM 尺寸判断原始回复: {response_text}")
 
     # 提取 JSON

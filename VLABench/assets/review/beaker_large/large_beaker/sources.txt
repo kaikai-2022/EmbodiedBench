@@ -1,0 +1,13 @@
+Model UID: large_beaker
+Model Name: large_beaker
+
+Source Information:
+============================================================
+Source: Local File
+Original Path: /ssd/mkqin/download/large_beaker.glb
+File Name: large_beaker.glb
+Keyword/Category: beaker_large
+
+Processing:
+Pipeline: process_local_glb.py
+Steps: GLB->OBJ (trimesh) -> [rotate] -> MJCF (obj2mjcf) -> postprocess -> bottom-align -> validate -> size_fix

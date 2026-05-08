@@ -110,6 +110,15 @@ DEFAULT_PARENT_CONTAINERS = {
 }
 ```
 
+**UID 一致性保证：**
+
+父容器的 UID 必须与 `asset_status` 中的 key 一致。`_gen_init_containers()` 使用 `plan.uid`（而非 `parent_spec`）作为容器名，确保生成的代码中的 entity name 与 skill_plan 中的 UID 匹配。
+
+例如：
+- `asset_status` 中的 key：`chemistry_tube_stand_0`
+- 生成的代码：`name="chemistry_tube_stand_0"`（使用 UID）
+- skill_plan 中的 target：`insert_to_entity(target_entity_name="chemistry_tube_stand_0")`
+
 **试管孔位常量（世界坐标系，已考虑试管架 90° 旋转）：**
 
 ```python

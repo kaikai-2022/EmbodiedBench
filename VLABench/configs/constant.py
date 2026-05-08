@@ -133,7 +133,7 @@ name2class_xml = {
     "tube": [components.ChemistryTube, "obj/meshes/tube/tube/tube.xml"],
     "chemistry_tube_stand": [components.TubeStand, "obj/meshes/tube/tube_container/tube_stand.xml"],
     "nametag": [components.NameTag, "obj/meshes/tube/nametag/nametag.xml"],
-    "flask": [components.CommonContainer, "obj/meshes/tube/flask/flask.xml"],
+    "flask": [components.ChemistryBeaker, "review/flask/flask/flask.xml"],
     "centrifuge": [components.CommonContainer, "obj/meshes/lab_equipment/centrifuge/centrifuge.xml"],
     
     # breads
@@ -305,6 +305,14 @@ name2class_xml = {
     "beaker": [components.ChemistryBeaker, "obj/meshes/lab_equipment/beaker/chemistry_beaker/chemistry_beaker.xml"],
     "chemistry_beaker": [components.ChemistryBeaker, "obj/meshes/lab_equipment/beaker/chemistry_beaker/chemistry_beaker.xml"],
     "bunsen_burner": [components.CommonGraspedEntity, "review/bunsen_burner/7532be8f501d435194e3feec33a3addf/7532be8f501d435194e3feec33a3addf.xml"],
+# 本地 GLB 处理后的资产（通过 process_local_glb.py）
+    "pipettes_stand": [components.CommonGraspedEntity, "review/pipettes_stand/pipettes_stand-ver-/pipettes_stand-ver-.xml"],
+    "pipette": [components.CommonGraspedEntity, "review/pipette/mechanical_pipette/mechanical_pipette.xml"],
+    "conical_flask": [components.ChemistryBeaker, "review/flask/flask/flask.xml"],
+    "table": [components.CommonContainer, "obj/meshes/table/table.xml"],
+    "large_beaker": [components.ChemistryBeaker, "review/beaker_large/large_beaker/large_beaker.xml"],
+    "small_beaker": [components.ChemistryBeaker, "review/beaker_small/small_beaker/small_beaker.xml"],
+
 }
 
 additional_dict = {}

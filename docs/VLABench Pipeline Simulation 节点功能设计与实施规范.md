@@ -23,6 +23,8 @@
 | 字段 | 类型 | 来源 | 说明 |
 |------|------|------|------|
 | `state["task_analysis"]` | Dict | Analyzer | 包含 `task_name`，用于加载环境 |
+| `state["skill_plan"]` | Dict | Skill Planner | 包含 `global_skill_plan`，用于构建 step_skill_ends 映射 |
+| `state["condition_plan"]` | List/None | Condition Planner | 每个 step 的成功条件（可选） |
 
 ### 2.2 输出 (Output to State)
 
@@ -46,14 +48,20 @@
 3. 动态加载 <task_name>_series.py（触发 task 的 @register）
 4. load_env(task_name, robot="franka") 构建 MuJoCo 场景
 5. 获取 get_expert_skill_sequence() 返回的技能列表
-6. 循环执行每个技能，收集 observations 和 waypoints
-7. 技能返回 (obs, waypoints, stage_success, task_success)
+6. 构建 step_skill_ends 映射（从 skill_plan 中提取每个 step 的技能数量）
+7. 循环执行每个技能，收集 observations 和 waypoints
+8. 技能返回 (obs, waypoints, stage_success, task_success)
    - stage_success=False → 中断，仿真失败
    - task_success=True → 任务完成，跳出循环
-8. 执行完后检查 env.task.conditions.is_met()（兜底）
-9. 保存视频（无论成功/失败）
-10. 成功时：保存 HDF5 数据
-11. 关闭环境 env.close()
+9. **Per-Step Condition 检查**：当某个 step 的所有技能执行完后，检查对应的 condition
+   - 如果 condition_plan 存在，调用 _check_step_condition() 验证物理状态
+   - 记录每个 step 的 condition 检查结果（met: true/false）
+10. 执行完后汇总 condition 检查结果
+    - 如果有 condition_plan 且所有 conditions 满足 → task_success = True
+    - 如果没有 condition_plan，回退到 env.task.conditions.is_met()（兜底）
+11. 保存视频（无论成功/失败）
+12. 成功时：保存 HDF5 数据
+13. 关闭环境 env.close()
 ```
 
 ---
@@ -154,6 +162,26 @@ HDF5 中保存的 `trajectory` 是相对机器人基座的坐标（减去 `robot
 robot_frame_wp = waypoint - np.concatenate([robot_position, np.zeros(5)])
 ```
 
-### 9.3 条件兜底检查
+### 9.3 Per-Step Condition 检查机制
 
-即使所有技能执行完后 `task_success` 仍为 False，节点会额外调用 `env.task.conditions.is_met(physics)` 做一次兜底判断，允许某些任务通过物理条件（而非代码标志）来判定成功。
+从 Condition Planner 节点接收 `condition_plan` 后，Simulation 在每个 step 的技能执行完后进行物理状态验证：
+
+**检查时机**：根据 `step_skill_ends` 判断当前 skill_idx 是否为某个 step 的最后一个技能。
+
+**检查逻辑**：
+1. 从 `condition_plan` 中找到对应 `step_id` 的 condition
+2. 调用 `_resolve_condition_params()` 将 UID 字符串解析为 Entity 对象
+3. 实例化 Condition 类并调用 `is_met(physics)` 验证物理状态
+4. 记录结果：`{"step_id": int, "condition_type": str, "met": bool, "error": str or None}`
+
+**Fallback 机制**：
+- 如果 `condition_plan` 为 `None`（Condition Planner 生成失败），回退到旧的 `env.task.conditions.is_met()` 机制
+- 如果某个 condition 检查抛出异常，记录 error 但不中断仿真，该 step 判定为 `met: false`
+
+**最终判定**：
+- 所有 step conditions 都满足 → `task_success = True`
+- 任一 step condition 不满足 → `task_success = False`，`error_feedback` 中列出失败的 conditions
+
+### 9.4 条件兜底检查（已废弃）
+
+旧版的 `env.task.conditions.is_met(physics)` 兜底机制仅在 `condition_plan` 为 `None` 时启用，作为向后兼容的 fallback。新任务应优先使用 per-step condition 检查。

@@ -1,0 +1,28 @@
+{
+  "uid": "mechanical_pipette",
+  "centered": true,
+  "scaled": true,
+  "scale_factor": 0.06340161695933402,
+  "orientation_warning": null,
+  "original_dims": {
+    "center": [
+      -5.35657663,
+      3.500278,
+      0.004916910000000052
+    ],
+    "ranges": [
+      0.5368322800000005,
+      0.1787734999999997,
+      2.3658702600000003
+    ],
+    "max_dim": 2.3658702600000003
+  },
+  "final_dims": {
+    "ranges": [
+      0.03403603458796595,
+      0.011334528969479502,
+      0.15
+    ],
+    "max_dim": 0.15
+  }
+}

@@ -114,7 +114,12 @@ def ask_llm_orientation(image_bytes: bytes, object_name: str) -> dict:
         ],
     )
 
-    response_text = response.content[0].text.strip()
+    raw = response.content
+    if isinstance(raw, list):
+        text_block = next((b for b in raw if hasattr(b, 'text')), None)
+        response_text = text_block.text.strip() if text_block else ''
+    else:
+        response_text = raw.strip()
     logger.info(f"  LLM 朝向判断原始回复: {response_text}")
 
     # 提取 JSON（处理可能的 markdown 代码块包裹）

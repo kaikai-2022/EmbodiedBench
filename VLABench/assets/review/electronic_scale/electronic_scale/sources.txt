@@ -1,0 +1,14 @@
+Model UID: electronic_scale
+Model Name: electronic_scale
+
+Source Information:
+============================================================
+Source: Local File
+Original Path: /ssd/mkqin/download/electronic_scale.glb
+File Name: electronic_scale.glb
+Keyword/Category: electronic_scale
+Rotation: 90.0° around X axis
+
+Processing:
+Pipeline: process_local_glb.py
+Steps: GLB->OBJ (trimesh) -> [rotate] -> MJCF (obj2mjcf) -> postprocess -> bottom-align -> validate -> size_fix

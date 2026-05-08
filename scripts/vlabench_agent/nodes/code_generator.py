@@ -44,6 +44,7 @@ CONFIG_MANAGER_TEMPLATE = """\
 class {class_prefix}ConfigManager(BenchTaskConfigManager):
     def __init__(self, task_name, num_objects=[1, 1], **kwargs):
         super().__init__(task_name, num_objects, **kwargs)
+        self.config["task"]["n_distractor"] = 0
 
 {load_methods}
     def get_instruction(self, target_entity, {extra_params}**kwargs):
@@ -127,7 +128,7 @@ def code_generator_node(state: Dict) -> Dict:
     """
     Code Generator 节点 - 确定性模板代码生成
 
-    输入: state["normalized_context"] + state["asset_status"] + state["skill_plan"]
+    输入: state["normalized_context"] + state["asset_status"] + state["skill_plan"] + state["condition_plan"]
     输出: state["generated_code"] + state["task_module_path"]
     """
     logger.info("=" * 60)
@@ -136,7 +137,16 @@ def code_generator_node(state: Dict) -> Dict:
     normalized_context = state.get("normalized_context", {})
     asset_status = state.get("asset_status", {})
     skill_plan = state.get("skill_plan")
+    condition_plan = state.get("condition_plan")
     task_analysis = state.get("task_analysis", {})
+
+    # 日志输出 condition_plan（方便调试）
+    if condition_plan:
+        logger.info(f"[Code Generator] 接收 condition_plan: {len(condition_plan)} 个 conditions")
+        for cp in condition_plan:
+            logger.info(f"  Step {cp.get('step_id')}: {cp.get('condition_type')} - params={cp.get('params', {})}")
+    else:
+        logger.info("[Code Generator] 未收到 condition_plan（或为 None）")
 
     if skill_plan is None:
         error_msg = "skill_plan 为空，无法生成代码"
@@ -171,12 +181,9 @@ def code_generator_node(state: Dict) -> Dict:
     if not target_entity_uid and plans:
         target_entity_uid = plans[0].uid
 
-    # extra_params: 有容器时加参数
-    has_container = any(p.method_name == "load_containers" for p in plans)
+    # extra_params: 只有 init_container（试管架）时加参数
     has_init = any(p.method_name == "load_init_containers" for p in plans)
     extra_params = ""
-    if has_container:
-        extra_params += "target_container, "
     if has_init:
         extra_params += "init_container, "
 

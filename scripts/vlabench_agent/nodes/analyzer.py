@@ -289,7 +289,16 @@ Output:
             else:
                 response = llm.invoke(prompt)
 
-            content = response.content.strip()
+            raw = response.content
+            if isinstance(raw, list):
+                # blocks are dicts: {"type": "thinking", "thinking": "..."} or {"type": "text", "text": "..."}
+                text_block = next((b for b in raw if isinstance(b, dict) and b.get('type') == 'text'), None)
+                if text_block is None:
+                    # fallback: find any block with a 'text' key
+                    text_block = next((b for b in raw if isinstance(b, dict) and 'text' in b), None)
+                content = (text_block['text'] if text_block else '').strip()
+            else:
+                content = raw.strip()
             analysis = _extract_json(content)
 
             if analysis is None:

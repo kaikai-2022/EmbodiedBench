@@ -1,0 +1,28 @@
+{
+  "uid": "pipettes_stand-ver-",
+  "centered": true,
+  "scaled": true,
+  "scale_factor": 0.000625,
+  "orientation_warning": null,
+  "original_dims": {
+    "center": [
+      7.34500122,
+      -1.8320007300000043,
+      120.00000047500001
+    ],
+    "ranges": [
+      134.69000244,
+      240.0,
+      231.66400051
+    ],
+    "max_dim": 240.0
+  },
+  "final_dims": {
+    "ranges": [
+      0.084181251525,
+      0.15,
+      0.14479000031875
+    ],
+    "max_dim": 0.15
+  }
+}

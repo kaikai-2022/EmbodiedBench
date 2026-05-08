@@ -1,0 +1,14 @@
+Model UID: mechanical_pipette
+Model Name: mechanical_pipette
+
+Source Information:
+============================================================
+Source: Local File
+Original Path: /ssd/mkqin/download/mechanical_pipette.glb
+File Name: mechanical_pipette.glb
+Keyword/Category: pipette
+Rotation: 90.0° around X axis
+
+Processing:
+Pipeline: process_local_glb.py
+Steps: GLB->OBJ (trimesh) -> [rotate] -> MJCF (obj2mjcf) -> postprocess -> bottom-align -> validate -> size_fix

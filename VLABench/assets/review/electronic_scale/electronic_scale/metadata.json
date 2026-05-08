@@ -1,0 +1,14 @@
+{
+  "uid": "electronic_scale",
+  "name": "electronic_scale",
+  "source": "local",
+  "original_path": "/ssd/mkqin/download/electronic_scale.glb",
+  "keyword": "electronic_scale",
+  "tags": [],
+  "categories": [],
+  "description": "Local GLB model: electronic_scale.glb",
+  "rotation": {
+    "axis": "x",
+    "degrees": 90.0
+  }
+}

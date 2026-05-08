@@ -4,6 +4,7 @@ Provides a unified `solution` parameter interface for chemistry containers
 (e.g., beaker, flask, petri dish) to display colored liquid in MuJoCo rendering.
 """
 from VLABench.tasks.components.entity import CommonGraspedEntity
+from VLABench.tasks.components.container import ContainerMiXin
 from VLABench.utils.register import register
 
 
@@ -74,10 +75,22 @@ class SolutionMixin:
 
 
 @register.add_entity("ChemistryBeaker")
-class ChemistryBeaker(SolutionMixin, CommonGraspedEntity):
+class ChemistryBeaker(SolutionMixin, ContainerMiXin, CommonGraspedEntity):
     """
     Beaker with solution rendering capability.
     Pass `solution` parameter (e.g., solution="CuSO4") to display colored liquid.
     Without `solution`, the beaker renders empty.
+
+    Inherits from ContainerMiXin to support place operations (has get_place_point).
     """
-    pass
+    def get_place_point(self, physics):
+        """
+        Get place points for placing objects into/on the beaker.
+        For beaker, returns the grasp sites positions (opening area).
+        """
+        grasp_sites = self.grasp_sites(physics)
+        if grasp_sites:
+            place_points = [physics.bind(site).xpos for site in grasp_sites]
+            return place_points
+        # Fallback: use worldbody position with small offset
+        return [self.get_xpos(physics) + [0, 0, 0.05]]

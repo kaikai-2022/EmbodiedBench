@@ -1,0 +1,14 @@
+{
+  "uid": "mechanical_pipette",
+  "name": "mechanical_pipette",
+  "source": "local",
+  "original_path": "/ssd/mkqin/download/mechanical_pipette.glb",
+  "keyword": "pipette",
+  "tags": [],
+  "categories": [],
+  "description": "Local GLB model: mechanical_pipette.glb",
+  "rotation": {
+    "axis": "x",
+    "degrees": 90.0
+  }
+}

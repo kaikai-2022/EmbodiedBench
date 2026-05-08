@@ -1,0 +1,14 @@
+Model UID: pipettes_stand-ver-
+Model Name: pipettes_stand-ver-
+
+Source Information:
+============================================================
+Source: Local File
+Original Path: /ssd/mkqin/download/pipettes_stand-ver-.glb
+File Name: pipettes_stand-ver-.glb
+Keyword/Category: pipettes_stand
+Rotation: 90.0° around X axis
+
+Processing:
+Pipeline: process_local_glb.py
+Steps: GLB->OBJ (trimesh) -> [rotate] -> MJCF (obj2mjcf) -> postprocess -> bottom-align -> validate -> size_fix

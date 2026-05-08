@@ -20,7 +20,7 @@
     "is_physical": false
   },
   "Erlenmeyer flask": {
-    "spec": "flask",
+    "spec": "conical_flask",
     "source_type": "local",
     "is_physical": true
   },
@@ -84,9 +84,49 @@
     "source_type": "local",
     "is_physical": false
   },
-  "pipettes stand": {
-    "spec": "pipettes_stand",
+  "pipette": {
+    "spec": "pipette",
     "source_type": "objaverse",
     "is_physical": true
+  },
+  "conical flask": {
+    "spec": "conical_flask",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "small_beaker": {
+    "spec": "small_beaker",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "CuSO4 tube": {
+    "spec": "tube",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "FeCl3 tube": {
+    "spec": "tube",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "chemistry_tube_stand": {
+    "spec": "chemistry_tube_stand",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "small beaker": {
+    "spec": "small_beaker",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "flask": {
+    "spec": "flask",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "CuSCl2": {
+    "spec": "CuSCl2",
+    "source_type": "local",
+    "is_physical": false
   }
 }

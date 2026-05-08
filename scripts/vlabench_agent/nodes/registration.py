@@ -83,50 +83,30 @@ def registration_node(state: Dict) -> Dict:
         vlabench_root = os.environ.get("VLABENCH_ROOT")
         scene_name = task_analysis.get("scene", "laboratory") + "_0"
 
-        # 从 normalized_context["instances"] 推断容器/物体分类
-        # 适配新 pipeline：instance 的 spec 字段由 Normalizer 设置，class_name 由 Asset Manager 设置
+        # 从 normalized_context["instances"] 收集所有实体 spec
+        # 简化：不再区分 container 和 object，所有实体统一放入 seen_object
         instances = normalized_context.get("instances", [])
-
-        objects_specs = []
-        container_specs = []
-
-        # 容器类 class_name 白名单
-        CONTAINER_CLASSES = {
-            "CommonContainer", "ContainerWithDoor", "ContainerWithDrawer",
-            "FlatContainer", "Fridge", "Microwave", "Shelf",
-            "TubeStand", "Vase", "Plate", "Mug",
-            # Chemistry containers
-            "ChemistryBeaker", "ChemistryFlask", "ChemistryBottle",
-        }
+        all_specs = []
 
         if instances:
-            # 从 instance 的 spec 字段读分类
             for inst in instances:
                 if not inst.get("is_physical", True):
                     continue
-                uid = inst.get("uid", "")
-                spec = inst.get("spec", uid)
-                class_name = asset_status.get(uid, {}).get("class_name", "")
-                if class_name in CONTAINER_CLASSES or "Stand" in class_name:
-                    container_specs.append(spec)
-                else:
-                    objects_specs.append(spec)
+                spec = inst.get("spec", inst.get("uid", ""))
+                if spec not in all_specs:
+                    all_specs.append(spec)
         elif asset_status:
-            # 兼容：无 instances 时回退到遍历 asset_status
             logger.info("[Registration] 无 normalized_context.instances，使用 asset_status 兼容模式")
             for uid, info in asset_status.items():
-                class_name = info.get("class_name", "")
                 spec = info.get("spec", uid)
-                if class_name in CONTAINER_CLASSES or "Stand" in class_name:
-                    container_specs.append(spec)
-                else:
-                    objects_specs.append(spec)
+                if spec not in all_specs:
+                    all_specs.append(spec)
 
         series_config = {
             "task": {
                 "asset": {
-                    "seen_object": objects_specs if objects_specs else ["object"],
-                    "unseen_object": objects_specs if objects_specs else ["object"],
+                    "seen_object": all_specs,
+                    "unseen_object": all_specs,
                 },
                 "scene": {"name": scene_name},
                 "components": [
@@ -140,28 +120,22 @@ def registration_node(state: Dict) -> Dict:
             }
         }
 
-        if container_specs:
-            series_config["task"]["asset"]["seen_container"] = container_specs
-            series_config["task"]["asset"]["unseen_container"] = container_specs
-
         # 更新内存中的 TASK_CONFIG
         envs_module.TASK_CONFIG[series_name] = series_config
         logger.info(f"[Registration] ✓ 更新 envs.TASK_CONFIG[{series_name}]")
 
         # 写入 task_config.json（持久化）
-        # 仅在 task_name 是 pipeline 动态生成时写入，避免覆盖框架自带的配置
+        # 重要：每次都强制覆盖，确保使用最新的动态生成的配置
+        # 这样可以避免旧配置（如之前测试 tube 时生成的）残留导致问题
         if vlabench_root:
             config_json_path = Path(vlabench_root) / "configs" / "task_config.json"
             if config_json_path.exists():
                 with open(config_json_path, "r") as f:
                     all_config = json.load(f)
-                if series_name not in all_config:
-                    all_config[series_name] = series_config
-                    with open(config_json_path, "w") as f:
-                        json.dump(all_config, f, indent=2)
-                    logger.info(f"[Registration] ✓ 新增写入 task_config.json: {series_name}")
-                else:
-                    logger.info(f"[Registration] task_config.json 已有 {series_name}，跳过写入")
+                all_config[series_name] = series_config
+                with open(config_json_path, "w") as f:
+                    json.dump(all_config, f, indent=2)
+                logger.info(f"[Registration] ✓ 写入 task_config.json: {series_name}")
 
         # 4. 动态导入模块（触发 @register 装饰器）
         logger.info(f"[Registration] 导入模块: {module_name}")

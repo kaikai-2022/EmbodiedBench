@@ -34,20 +34,27 @@ SKILL_LIB_DOC = """
 ## 可用原子技能 (Atomic Skills)
 
 - pick(target_uid, prior_eulers=[[-pi, 0, 0]]): 从上方抓取物体。prior_eulers 决定抓取朝向。
-- place(target_uid): 放置到指定物体上方。
+- place(target_container_uid): **将当前抓取的物体放置到目标容器/表面上方**。target_container_uid 必须是可放置的容器（如 table, beaker, shelf），**不是被抓取的物体本身**。
 - pour(): 倾倒动作（假设手里已抓着容器）。仅旋转腕部关节，末端位置会偏移。
-- pour_to_entity(target_uid, tilt_angle=pi/2, wait_time=10): 倾倒到指定容器上方。使用 IK 保持末端位置不变，通过逐步倾斜实现稳定倾倒。**pour 操作优先使用此技能**。
+- pour_to_entity(target_uid, tilt_angle=1.8, wait_time=10): 倾倒到指定容器上方。使用 IK 保持末端位置不变，通过逐步倾斜实现稳定倾倒。**pour 操作优先使用此技能**。tilt_angle 默认 1.8 rad (~103°) 足以让液体流出。
 - insert_to_entity(target_uid, insert_depth=0.05): 将抓取的物体插入目标实体的孔位（如试管插入试管架）。自动松开夹爪，无需再添加 open_gripper。
 - lift(lift_height=0.15, gripper_state=np.zeros(2)): 举起当前抓取的物体。
 - moveto(target_pos, gripper_state=np.zeros(2)): 移动末端执行器到目标位置。
 - moveto_entity(target_uid, offset=[0,0,0.2], gripper_state=np.zeros(2)): 移动到指定实体上方，自动从实体运行时位置计算目标。
-- open_gripper(): 松开夹爪。
+- open_gripper(): 松开夹爪。用于在当前位置直接放下物体（不推荐用于精确放置）。
 - close_gripper(): 闭合夹爪。
 - wait(wait_time=50): 等待指定步数。
-- rotate(rotation_angle=pi/2): 旋转当前抓取的物体。
+- rotate(rotation_angle=pi/2): 旋转当前抓取的物体。常用于 shake（摇晃）操作。
 - press(target_pos): 按压目标位置。
 - push(target_pos, push_distance=0.1): 推动物体。
 - reset(): 重置环境。
+
+## Skill Usage Guidelines
+
+- **place**: 用于把物体精确放置到容器/表面上。例如：place("table") 放桌面上，place("beaker_0") 放到烧杯里。
+- **open_gripper**: 在当前位置直接松开夹爪，物体会掉落。仅用于不需要精确放置的场景。
+- **rotate**: 连续使用多个 rotate 可以实现 shake（摇晃）动作。
+- **shake 任务的正确序列**: pick -> lift -> [rotate, rotate, ...] -> wait -> place("table") -> open_gripper。先用 place 把物体放到桌面，再松开夹爪。
 """
 
 # ========== 原子技能白名单 ==========
@@ -200,7 +207,7 @@ def build_skill_planner_prompt(
 
 3. **Direct Output**: In atomic_sequence params, write uid strings or numeric values directly without extra quotes.
 
-4. **Success = Execution Complete**: No conditions dict needed. The task succeeds when all atomic_sequence actions are executed.
+4. **Condition Selection**: Success conditions are handled by the Condition Planner node (parallel to Skill Planner). Focus on generating the atomic skill sequence.
 
 5. **Use moveto_entity for targeting objects**: When you need to move to a specific object (e.g. to pour into a beaker), use moveto_entity(target_uid=<container_uid>) instead of moveto with hardcoded coordinates. NEVER use moveto with hardcoded target_pos for pour operations.
 
@@ -308,9 +315,17 @@ def skill_planner_node(state: Dict) -> Dict:
             else:
                 response = llm.invoke(prompt)
 
-            plan = _extract_json(response.content)
+            raw = response.content
+            if isinstance(raw, list):
+                text_block = next((b for b in raw if isinstance(b, dict) and b.get("type") == "text"), None)
+                if text_block is None:
+                    text_block = next((b for b in raw if isinstance(b, dict) and "text" in b), None)
+                text = (text_block["text"] if text_block else "").strip()
+            else:
+                text = raw
+            plan = _extract_json(text)
             if plan is None:
-                last_error = f"无法解析 JSON: {response.content[:200]}"
+                last_error = f"无法解析 JSON: {text[:200]}"
                 logger.warning(f"[Skill Planner] {last_error}")
                 continue
 

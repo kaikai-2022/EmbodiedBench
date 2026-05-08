@@ -4,9 +4,29 @@ Skill Library for data generation.
 import numpy as np
 import random
 import time as _time
+import mujoco
 from VLABench.utils.utils import find_keypoint_and_prepare_grasp, distance, quaternion_to_euler, euler_to_quaternion, quaternion_from_axis_angle, quaternion_multiply
 from VLABench.algorithms.motion_planning.rrt import rrt_motion_planning
 from VLABench.algorithms.utils import interpolate_path, qauternion_slerp
+
+
+# ========== Grasp Lock: Quaternion Helpers (shared with dm_env.py) ==========
+def _quat_conjugate(q):
+    return np.array([q[0], -q[1], -q[2], -q[3]])
+
+def _quat_mul(q1, q2):
+    w1, x1, y1, z1 = q1
+    w2, x2, y2, z2 = q2
+    return np.array([
+        w1*w2 - x1*x2 - y1*y2 - z1*z2,
+        w1*x2 + x1*w2 + y1*z2 - z1*y2,
+        w1*y2 - x1*z2 + y1*w2 + z1*x2,
+        w1*z2 + x1*y2 - y1*x2 + z1*w2
+    ])
+
+def _quat_rotate(q, v):
+    qv = np.array([0, v[0], v[1], v[2]])
+    return _quat_mul(_quat_mul(q, qv), _quat_conjugate(q))[1:]
 
 PRIOR_EULERS = [[np.pi, 0, -np.pi/2], # face down, horizontal
                 [np.pi, 0, 0], # face down, vertical
@@ -15,6 +35,16 @@ PRIOR_EULERS = [[np.pi, 0, -np.pi/2], # face down, horizontal
             ]
 
 class SkillLib:
+    @staticmethod
+    def _get_gripper_state(env, gripper_state=None):
+        """获取正确的 gripper_state：lock 模式下保持当前宽度，否则使用传入值"""
+        if gripper_state is not None:
+            return gripper_state
+        if hasattr(env, "_lock_gripper_state") and env._lock_gripper_state is not None:
+            return env._lock_gripper_state
+        # 默认关闭
+        return np.zeros(2)
+
     @staticmethod
     def step_trajectory(env,
                         points,
@@ -46,23 +76,42 @@ class SkillLib:
         task_success = False
         last_executed_waypoint = -1
 
+        # DEBUG: 只在 pick 的路径上打印最后5个点的实际手指位置
+        import mujoco as mj
+        raw_m = env.physics.model._model
+        raw_d = env.physics.data._data
+        gripper_geoms = env.robot.gripper_geoms
+        pad_ids = []
+        for geom in gripper_geoms:
+            eid = env.physics.bind(geom).element_id
+            gname = mj.mj_id2name(raw_m, mj.mjtObj.mjOBJ_GEOM, eid) or ''
+            if 'pad' in gname.lower():
+                pad_ids.append(eid)
+
+        # DEBUG: 只在最后几个点启用 IK 调试
+        debug_ik_enabled = False
+
         for i, (point, quat) in enumerate(zip(points, quats)):
+            # 在最后 5 个路径点启用 IK 调试
+            if i >= len(points) - 5:
+                if not debug_ik_enabled:
+                    debug_ik_enabled = True
+                    env.robot._debug_ik = True
+            else:
+                env.robot._debug_ik = False
+
             success, action = env.robot.get_qpos_from_ee_pos(physics=env.physics, pos=point, quat=quat)
-            # if not success: # a wrong action beyond the embodied limit
-            #     return None, None, False, False
             action = np.concatenate([action, gripper_state])
             waypoint = np.concatenate([point, quaternion_to_euler(quat), gripper_state])
 
             for substep_idx in range(max_n_substep):
                 timestep = env.step(action)
 
-                # 检查任务是否完成
                 if timestep.last():
                     print(f"[STEP] 路径点 {i}/{len(points)} 处 timestep.last()=True")
                     task_success = True
                     break
 
-                # 检查关节位置收敛
                 current_qpos = np.array(env.task.robot.get_qpos(env.physics)).reshape(-1)
                 qpos_max_error = np.max(current_qpos - np.array(action[:7]))
                 qpos_min_error = np.min(current_qpos - np.array(action[:7]))
@@ -71,6 +120,13 @@ class SkillLib:
                     break
 
             last_executed_waypoint = i
+
+            # DEBUG: 打印最后5个路径点时的手指 pad 世界坐标
+            if i >= len(points) - 5 and len(pad_ids) >= 2:
+                pad1 = raw_d.geom_xpos[pad_ids[0]]
+                pad2 = raw_d.geom_xpos[pad_ids[1]]
+                finger_mid = (pad1 + pad2) / 2
+                print(f"[STEP] path_idx={i}: target=({point[0]:.4f},{point[1]:.4f},{point[2]:.4f}), finger_mid=({finger_mid[0]:.4f},{finger_mid[1]:.4f},{finger_mid[2]:.4f})")
 
             if task_success:
                 break
@@ -130,8 +186,7 @@ class SkillLib:
         task_success = False
         gripper_closed = env.robot.get_ee_open_state(env.physics)
         if gripper_state is None:
-            if gripper_closed: gripper_state = np.zeros(2)
-            else: gripper_state = np.ones(2) * 0.04
+            gripper_state = SkillLib._get_gripper_state(env)
         # env_pcd = observations[0]["masked_point_cloud"]
         # obstacle_pcd = np.asarray(env_pcd.points)
 
@@ -274,11 +329,36 @@ class SkillLib:
         
         interplate_path, interplate_quat = interpolate_path(path, quats_in_path, target_velocity)
 
-        print(f"DEBUG [pick]: 插值后的路径")
-        print(f"  路径点数: {len(interplate_path)}")
-        print(f"  最后5个路径点:")
+        print(f"DEBUG [pick]: interpolated path")
+        print(f"  path points: {len(interplate_path)}")
+        print(f"  last 5 points:")
         for i, p in enumerate(interplate_path[-5:]):
             print(f"    [{len(interplate_path)-5+i}]: {p}")
+
+        # DEBUG: print finger midpoint vs beaker center
+        import mujoco as mj
+        raw_m = env.physics.model._model
+        raw_d = env.physics.data._data
+        # 用 gripper_geoms 获取手指 geom 的世界坐标
+        gripper_geoms = env.robot.gripper_geoms
+        gripper_positions = []
+        for geom in gripper_geoms:
+            eid = env.physics.bind(geom).element_id
+            gname = mj.mj_id2name(raw_m, mj.mjtObj.mjOBJ_GEOM, eid) or ''
+            gpos = raw_d.geom_xpos[eid]
+            gripper_positions.append((gname, gpos, eid))
+            print(f"DEBUG [pick]: gripper geom '{gname}' id={eid}: ({gpos[0]:.4f}, {gpos[1]:.4f}, {gpos[2]:.4f})")
+        # 取所有 pad geom 的中点
+        pad_positions = [pos for name, pos, _ in gripper_positions if 'pad' in name.lower()]
+        if len(pad_positions) >= 2:
+            finger_mid = sum(pad_positions) / len(pad_positions)
+        else:
+            finger_mid = sum([pos for _, pos, _ in gripper_positions]) / len(gripper_positions)
+        beaker_pos = np.array(target_entity.get_xpos(env.physics))
+        print(f"DEBUG [pick]: === BEFORE GRASP ===")
+        print(f"  finger_mid: ({finger_mid[0]:.4f}, {finger_mid[1]:.4f}, {finger_mid[2]:.4f})")
+        print(f"  beaker:     ({beaker_pos[0]:.4f}, {beaker_pos[1]:.4f}, {beaker_pos[2]:.4f})")
+        print(f"  XY_diff_mm: ({abs(finger_mid[0]-beaker_pos[0])*1000:.1f}, {abs(finger_mid[1]-beaker_pos[1])*1000:.1f})")
 
         waypoints = []
         stage_success = False
@@ -298,27 +378,82 @@ class SkillLib:
         print(f"  目标位置: {key_pos}")
         print(f"  XY误差: {np.linalg.norm(env.robot.get_end_effector_pos(env.physics)[:2] - key_pos[:2])}")
         print(f"  Z误差: {abs(env.robot.get_end_effector_pos(env.physics)[2] - key_pos[2])}")
+        # DEBUG: 打印 step_trajectory 完成后手指中点和烧杯中心
+        import mujoco as mj
+        raw_m = env.physics.model._model
+        raw_d = env.physics.data._data
+        gripper_geoms = env.robot.gripper_geoms
+        pad_positions = []
+        for geom in gripper_geoms:
+            eid = env.physics.bind(geom).element_id
+            gname = mj.mj_id2name(raw_m, mj.mjtObj.mjOBJ_GEOM, eid) or ''
+            if 'pad' in gname.lower():
+                pad_positions.append(raw_d.geom_xpos[eid])
+        if len(pad_positions) >= 2:
+            finger_mid = sum(pad_positions) / len(pad_positions)
+            beaker_pos = np.array(target_entity.get_xpos(env.physics))
+            print(f"DEBUG [pick]: === AFTER STEP_TRAJECTORY ===")
+            print(f"  finger1: ({pad_positions[0][0]:.4f}, {pad_positions[0][1]:.4f}, {pad_positions[0][2]:.4f})")
+            print(f"  finger2: ({pad_positions[1][0]:.4f}, {pad_positions[1][1]:.4f}, {pad_positions[1][2]:.4f})")
+            print(f"  finger_mid: ({finger_mid[0]:.4f}, {finger_mid[1]:.4f}, {finger_mid[2]:.4f})")
+            print(f"  beaker:     ({beaker_pos[0]:.4f}, {beaker_pos[1]:.4f}, {beaker_pos[2]:.4f})")
+            print(f"  XY_diff_mm: ({abs(finger_mid[0]-beaker_pos[0])*1000:.1f}, {abs(finger_mid[1]-beaker_pos[1])*1000:.1f})")
         observations.extend(new_obs)
         waypoints.extend(new_waypoints)
-        if task_success:
-            observations.pop(-1)
-            return observations, waypoints, True, task_success
+        # 无论 step_trajectory 返回什么，都要执行 close_gripper 完成抓取
         # grasp
-        new_obs, new_waypoints, _, task_success = SkillLib.close_gripper(env)
+        new_obs, new_waypoints, _, _ = SkillLib.close_gripper(env)
         observations.extend(new_obs)
         waypoints.extend(new_waypoints)
-        
+
         observations.pop(-1)
         assert len(observations) == len(waypoints), f"observations and waypoints should have the same length, {len(observations)} and {len(waypoints)}"
         if env.task.entities[target_entity_name].is_grasped(env.physics, env.robot):
             stage_success = True
             print(f"DEBUG [pick]: ✓ 抓取成功! stage_success=True")
+
+            # ========== close_gripper 完成后立即设置 lock ==========
+            # 关键：立即启用同步，让 step() 中的同步逻辑生效
+            # 不再等待手指"完全稳定"，因为那时物体可能已经开始滑动
+            if hasattr(env, "_grasp_lock_mode") and env._grasp_lock_mode > 0:
+                raw_m = env.physics.model._model
+                raw_d = env.physics.data._data
+                hand_id = mujoco.mj_name2id(raw_m, mujoco.mjtObj.mjOBJ_BODY, "franka/hand")
+                if hand_id >= 0:
+                    hand_pos = raw_d.xpos[hand_id].copy()
+                    hand_quat = raw_d.xquat[hand_id].copy()
+                    obj_pos = np.array(env.task.entities[target_entity_name].get_xpos(env.physics))
+                    obj_quat = np.array(env.task.entities[target_entity_name].get_xqaut(env.physics))
+                    rel_pos = obj_pos - hand_pos
+                    rel_quat = _quat_mul(_quat_conjugate(hand_quat), obj_quat)
+                    env._grasped_entity_info = {
+                        "name": target_entity_name,
+                        "rel_pos_local": _quat_rotate(_quat_conjugate(hand_quat), rel_pos),
+                        "rel_quat_local": rel_quat,
+                    }
+                    # 读取当前手指关节的实际 qpos，lock 模式下保持这个宽度不再合紧
+                    finger1_qpos = raw_d.qpos[raw_m.jnt_qposadr[mujoco.mj_name2id(raw_m, mujoco.mjtObj.mjOBJ_JOINT, "franka/finger_joint1")]]
+                    finger2_qpos = raw_d.qpos[raw_m.jnt_qposadr[mujoco.mj_name2id(raw_m, mujoco.mjtObj.mjOBJ_JOINT, "franka/finger_joint2")]]
+                    env._lock_gripper_state = np.array([finger1_qpos, finger2_qpos])
+                    print(f"DEBUG [pick]: ✓ lock 模式 {env._grasp_lock_mode} 已启用, 手指保持宽度: [{finger1_qpos:.4f}, {finger2_qpos:.4f}]")
+
+                    # Mode 2: 创建 weld 约束
+                    if env._grasp_lock_mode == 2 and hasattr(env, "_setup_weld_constraint"):
+                        env._setup_weld_constraint()
+
+                # 等几帧让 lock 同步稳定
+                for wait_frame in range(5):
+                    arm_qpos = np.array(env.robot.get_qpos(env.physics))
+                    action = np.concatenate([arm_qpos, env._lock_gripper_state])
+                    env.step(action)
+                    mujoco.mj_forward(raw_m, raw_d)
         else:
             print(f"DEBUG [pick]: ✗ 抓取失败! is_grasped=False")
             print(f"  末端执行器最终位置: {env.robot.get_end_effector_pos(env.physics)}")
             print(f"  目标抓取点位置: {key_pos}")
             print(f"  位置误差: {np.linalg.norm(env.robot.get_end_effector_pos(env.physics) - key_pos)}")
-        return observations, waypoints, stage_success, task_success
+        # pick 只是中间步骤，不是任务完成，所以 task_success 始终为 False
+        return observations, waypoints, stage_success, False
     
     @staticmethod
     def place(env, 
@@ -375,6 +510,24 @@ class SkillLib:
             init2target_path = [start_pos, mid_point, target_pos]
         path = np.array(init2target_path)
         path += offset
+
+        # 补偿被抓取物体的高度：
+        # path += offset 后，end_effector_move 会到达 target_pos（桌面高度）
+        # 但物体底部可能在 end_effector_move 下方（被夹爪夹在中上部）
+        # 需要把路径抬高，让物体底部刚好在 target_pos Z 高度
+        grasped_names, grasped_entities = env.get_grasped_entity()
+        if grasped_entities:
+            grasped_entity = grasped_entities[0]
+            obj_bottom_z = np.array(grasped_entity.get_xpos(env.physics))[2]
+            ee_move_site = env.robot._mjcf_model.find("site", "end_effector_move")
+            ee_move_z = env.physics.bind(ee_move_site).xpos[2]
+            z_offset = obj_bottom_z - ee_move_z
+            if z_offset < 0:
+                path[:, 2] += (-z_offset)
+            print(f"DEBUG [place]: 物体高度补偿")
+            print(f"  物体底部 Z: {obj_bottom_z:.4f}, ee_move Z: {ee_move_z:.4f}")
+            print(f"  z_offset: {z_offset:.4f}m, 抬高量: {max(0, -z_offset):.4f}m")
+
         path_point_len = len(init2target_path)
         quats = [start_quat for _ in range(path_point_len)]
         quats[-1] = target_quat
@@ -383,10 +536,10 @@ class SkillLib:
         waypoints = []
         stage_success = True
         task_success = False
-        new_obs, new_waypoints, _, task_success = SkillLib.step_trajectory(env, 
-                                                                interplate_path, 
-                                                                interplate_quat, 
-                                                                np.zeros(2))
+        new_obs, new_waypoints, _, task_success = SkillLib.step_trajectory(env,
+                                                                interplate_path,
+                                                                interplate_quat,
+                                                                SkillLib._get_gripper_state(env))
         observations.extend(new_obs)
         waypoints.extend(new_waypoints)
         if task_success:
@@ -564,9 +717,7 @@ class SkillLib:
         waypoints = []
         task_success = False
         if gripper_state is None:
-            gripper_closed = env.robot.get_ee_open_state(env.physics)
-            if gripper_closed: gripper_state = np.zeros(2)
-            else: gripper_state = np.ones(2) * 0.04
+            gripper_state = SkillLib._get_gripper_state(env)
         new_obs, new_waypoints, stage_success, task_success = SkillLib.step_trajectory(env, 
                                                            interplate_path, 
                                                            interplate_quat, 
@@ -594,7 +745,7 @@ class SkillLib:
         
         init_qpos = np.array(env.robot.get_qpos(env.physics))
         gripper_closed = env.robot.get_ee_open_state(env.physics)
-        if gripper_closed: gripper_state = np.zeros(2)
+        if gripper_closed: gripper_state = SkillLib._get_gripper_state(env)
         else: gripper_state = np.ones(2) * 0.04
         timesteps = int(target_delta_qpos / target_q_velocity)
         for i in range(timesteps):
@@ -652,14 +803,15 @@ class SkillLib:
         start_pos = np.array(env.robot.get_end_effector_pos(env.physics))
         start_quat = np.array(env.robot.get_end_effector_quat(env.physics))
         lift_pos = np.array([start_pos[0], start_pos[1], start_pos[2] + lift_before])
-        obs, wp, stage_success, _ = SkillLib.moveto(env, target_pos=lift_pos, gripper_state=np.zeros(2))
+        _gs = SkillLib._get_gripper_state(env)
+        obs, wp, stage_success, _ = SkillLib.moveto(env, target_pos=lift_pos, gripper_state=_gs)
         observations.extend(obs)
         waypoints.extend(wp)
         if not stage_success:
             return observations, waypoints, False, task_success
 
         # 2. 移到容器上方
-        obs, wp, stage_success, _ = SkillLib.moveto(env, target_pos=pour_target_pos, gripper_state=np.zeros(2))
+        obs, wp, stage_success, _ = SkillLib.moveto(env, target_pos=pour_target_pos, gripper_state=_gs)
         observations.extend(obs)
         waypoints.extend(wp)
         if not stage_success:
@@ -686,7 +838,7 @@ class SkillLib:
 
             tilt_qpos_history.append(np.array(target_qpos))  # 记录 IK 解
 
-            gripper_state = np.zeros(2)
+            gripper_state = SkillLib._get_gripper_state(env)  # 保持 lock 模式的手指宽度
             action = np.concatenate([target_qpos, gripper_state])
             for _ in range(n_repeat_step):
                 timestep = env.step(action)
@@ -711,8 +863,9 @@ class SkillLib:
             waypoints.extend(wp)
 
         # 5. 逆向回放倾倒过程的 qpos（完全对称，无 IK 跳变）
+        _gs = SkillLib._get_gripper_state(env)
         for qpos in reversed(tilt_qpos_history):
-            action = np.concatenate([qpos, np.zeros(2)])
+            action = np.concatenate([qpos, _gs])
             for _ in range(n_repeat_step):
                 timestep = env.step(action)
                 if timestep.last():
@@ -722,7 +875,7 @@ class SkillLib:
             waypoint = np.concatenate([
                 env.robot.get_end_effector_pos(env.physics),
                 quaternion_to_euler(env.robot.get_end_effector_quat(env.physics)),
-                np.zeros(2)
+                _gs
             ])
             observations.append(env.get_observation())
             waypoints.append(waypoint)
@@ -737,24 +890,57 @@ class SkillLib:
         Common lift function.
         """
         start_pos, start_quat = env.robot.get_end_effector_pos(env.physics), env.robot.get_end_effector_quat(env.physics)
-        if target_pos is None: 
+
+        # DEBUG: 打印 lift 前后烧杯位置
+        grasped_names, grasped_entities = env.get_grasped_entity()
+        beaker_before = None
+        beaker_name = None
+        if grasped_entities:
+            for name, entity in zip(grasped_names, grasped_entities):
+                beaker_before = np.array(entity.get_xpos(env.physics))
+                beaker_name = name
+                print(f"\n{'='*60}")
+                print(f"DEBUG [lift]: LIFT 前 - {name}")
+                print(f"  beaker pos: ({beaker_before[0]:.4f}, {beaker_before[1]:.4f}, {beaker_before[2]:.4f})")
+                print(f"  finger_mid Z: {env.robot.get_end_effector_pos(env.physics)[2]:.4f}")
+                print(f"{'='*60}\n")
+
+        if target_pos is None:
             target_pos = np.array(start_pos) + np.array([0, 0, lift_height])
-        if target_quat is None: 
+        if target_quat is None:
             target_quat = start_quat
         interplate_path, interplate_quat = interpolate_path([start_pos, target_pos], [np.array(start_quat), np.array(target_quat)])
         observations = [env.get_observation()]
         waypoints = []
         if gripper_state is None:
-            gripper_closed = env.robot.get_ee_open_state(env.physics)
-            if gripper_closed: gripper_state = np.zeros(2)
-            else: gripper_state = np.ones(2) * 0.04
-        obs, new_waypoints, stage_success, task_success = SkillLib.step_trajectory(env, 
-                                                           interplate_path, 
-                                                           interplate_quat, 
+            gripper_state = SkillLib._get_gripper_state(env)
+        obs, new_waypoints, stage_success, task_success = SkillLib.step_trajectory(env,
+                                                           interplate_path,
+                                                           interplate_quat,
                                                            gripper_state)
         observations.extend(obs)
         waypoints.extend(new_waypoints)
         observations.pop(-1)
+
+        # DEBUG: 打印 lift 后烧杯位置
+        if beaker_before is not None and beaker_name is not None:
+            grasped_names, grasped_entities = env.get_grasped_entity()
+            beaker_after = None
+            for name, entity in zip(grasped_names, grasped_entities):
+                if name == beaker_name:
+                    beaker_after = np.array(entity.get_xpos(env.physics))
+                    break
+            if beaker_after is not None:
+                ee_pos = env.robot.get_end_effector_pos(env.physics)
+                print(f"\n{'='*60}")
+                print(f"DEBUG [lift]: LIFT 后 - {beaker_name}")
+                print(f"  beaker pos: ({beaker_after[0]:.4f}, {beaker_after[1]:.4f}, {beaker_after[2]:.4f})")
+                print(f"  finger_mid Z: {ee_pos[2]:.4f}")
+                print(f"  beaker lift 高度: {beaker_after[2] - beaker_before[2]:.4f}m")
+                print(f"  ee lift 高度: {ee_pos[2] - start_pos[2]:.4f}m")
+                print(f"  是否被提起: {'✓ YES' if abs(beaker_after[2] - beaker_before[2]) > 0.05 else '✗ NO (可能滑落)'}")
+                print(f"{'='*60}\n")
+
         assert len(observations) == len(waypoints), f"observations and waypoints should have the same length, {len(observations)} and {len(waypoints)}"
         return observations, waypoints, stage_success, task_success
     
@@ -786,9 +972,44 @@ class SkillLib:
         observations = [env.get_observation()]
         waypoints = []
         success = False
+
+        # DEBUG: 获取夹爪和被抓物体信息
+        import mujoco as mj
+        raw_m = env.physics.model._model
+        raw_d = env.physics.data._data
+        gripper_geoms = env.robot.gripper_geoms
+
+        # 收集 pad geom ids
+        pad_info = []
+        for geom in gripper_geoms:
+            eid = env.physics.bind(geom).element_id
+            gname = mj.mj_id2name(raw_m, mj.mjtObj.mjOBJ_GEOM, eid) or ''
+            if 'pad' in gname.lower():
+                pad_info.append((gname, eid))
+
+        print(f"DEBUG [close_gripper]: 开始关闭夹爪")
+        print(f"  手指关节初始位置: finger1={raw_d.qpos[7]:.4f}, finger2={raw_d.qpos[8]:.4f}")
+        print(f"  夹爪控制目标 qpos: {qpos}")
+
+        # 获取夹爪 pad 的世界坐标
+        def get_pad_info():
+            pads = []
+            for gname, eid in pad_info:
+                pos = raw_d.geom_xpos[eid]
+                pads.append((gname, pos))
+            return pads
+
+        # 打印初始 pad 位置
+        initial_pads = get_pad_info()
+        for gname, pos in initial_pads:
+            print(f"  pad '{gname}': ({pos[0]:.4f}, {pos[1]:.4f}, {pos[2]:.4f})")
+        if len(initial_pads) >= 2:
+            pad_dist = np.linalg.norm(initial_pads[0][1][:2] - initial_pads[1][1][:2])
+            print(f"  pad XY间距: {pad_dist:.4f}m")
+
         for i in range(10):
-            gripper_state = np.ones(2) * (0.04 - i * 0.04/10)
-            action = np.concatenate([qpos, gripper_state])
+            gripper_target = np.ones(2) * (0.04 - i * 0.04/10)
+            action = np.concatenate([qpos, gripper_target])
             for _ in range(repeat):
                 timestep = env.step(action)
                 if timestep.last():
@@ -797,14 +1018,49 @@ class SkillLib:
                     observations.append(obs)
                     waypoints.append(np.concatenate([env.robot.get_end_effector_pos(env.physics),
                                              quaternion_to_euler(env.robot.get_end_effector_quat(env.physics)),
-                                             gripper_state]))
+                                             gripper_target]))
                     break
+
+            # DEBUG: 每步打印手指位置和接触力
+            f1_actual = raw_d.qpos[7]
+            f2_actual = raw_d.qpos[8]
+            ctrl = raw_d.ctrl[-2:]  # 夹爪控制信号
+            ctrlerr = gripper_target - np.array([f1_actual, f2_actual])
+
+            # 检查接触力
+            contacts = raw_d.contact
+            contact_count = 0
+            finger_tube_contact = False
+            for c in contacts:
+                if c.dist < 0.01:  # 距离小于1cm的接触
+                    contact_count += 1
+                    g1 = mj.mj_id2name(raw_m, mj.mjtObj.mjOBJ_GEOM, c.geom1) or ''
+                    g2 = mj.mj_id2name(raw_m, mj.mjtObj.mjOBJ_GEOM, c.geom2) or ''
+                    if ('finger' in g1.lower() or 'finger' in g2.lower()) and \
+                       ('tube' in g1.lower() or 'tube' in g2.lower()):
+                        finger_tube_contact = True
+
+            # 获取 pad 世界坐标
+            current_pads = get_pad_info()
+            if len(current_pads) >= 2:
+                pad_dist = np.linalg.norm(current_pads[0][1][:2] - current_pads[1][1][:2])
+
+            print(f"  step {i}: target={gripper_target[0]:.4f}, actual f1={f1_actual:.4f} f2={f2_actual:.4f}, "
+                  f"ctrl_err={ctrlerr[0]:.4f}/{ctrlerr[1]:.4f}, contacts={contact_count}, "
+                  f"finger_tube={finger_tube_contact}, pad_dist={pad_dist:.4f}m")
+
             obs = env.get_observation()
             observations.append(obs)
             waypoints.append(np.concatenate([env.robot.get_end_effector_pos(env.physics),
                                              quaternion_to_euler(env.robot.get_end_effector_quat(env.physics)),
-                                             gripper_state]))
-            
+                                             gripper_target]))
+
+        # DEBUG: 打印关闭后的手指状态和接触情况
+        f1_final = raw_d.qpos[7]
+        f2_final = raw_d.qpos[8]
+        print(f"  关闭后: finger1={f1_final:.4f}, finger2={f2_final:.4f}")
+        print(f"  夹爪闭合程度: {1 - f1_final/0.04:.1%} / {1 - f2_final/0.04:.1%}")
+
         observations.pop(-1)
         assert len(observations) == len(waypoints), f"observations and waypoints should have the same length, {len(observations)} and {len(waypoints)}"
         return observations, waypoints, True, success
@@ -842,6 +1098,15 @@ class SkillLib:
         # open_gripper 成功 = 夹爪不再关闭 = 返回 False
         if not env.robot.get_ee_open_state(env.physics):
             stage_success = True
+            # ========== Grasp Lock: 夹爪打开后清除抓取状态 ==========
+            if hasattr(env, "_grasped_entity_info"):
+                env._grasped_entity_info = None
+            if hasattr(env, "_lock_gripper_state"):
+                env._lock_gripper_state = None
+            # Mode 2: 移除 weld 约束
+            if hasattr(env, "_grasp_lock_mode") and env._grasp_lock_mode == 2:
+                if hasattr(env, "_remove_weld_constraint"):
+                    env._remove_weld_constraint()
         return observations, waypoints, stage_success, task_success
     
     @staticmethod
@@ -850,9 +1115,7 @@ class SkillLib:
         observations = [env.get_observation()]
         waypoints = []
         if gripper_state is None:
-            gripper_closed = env.robot.get_ee_open_state(env.physics)
-            if gripper_closed: gripper_state = np.zeros(2)
-            else: gripper_state = np.ones(2) * 0.04
+            gripper_state = SkillLib._get_gripper_state(env)
         timestep = int(np.pi / target_q_velocity)
         success = False
         for i in range(timestep):
@@ -904,9 +1167,7 @@ class SkillLib:
         observations = [env.get_observation()]
         waypoints = []
         if gripper_state is None:
-            gripper_closed = env.robot.get_ee_open_state(env.physics)
-            if gripper_closed: gripper_state = np.zeros(2)
-            else: gripper_state = np.ones(2) * 0.04
+            gripper_state = SkillLib._get_gripper_state(env)
 
         # Calculate number of timesteps based on rotation angle
         timesteps = int(abs(rotation_angle) / target_q_velocity)
@@ -995,9 +1256,7 @@ class SkillLib:
         print(f"wait for {wait_time} steps")
         current_qpos = np.array(env.robot.get_qpos(env.physics)).reshape(-1)
         if gripper_state is None:
-            gripper_closed = env.robot.get_ee_open_state(env.physics)
-            if gripper_closed: gripper_state = np.zeros(2)
-            else: gripper_state = np.ones(2) * 0.04
+            gripper_state = SkillLib._get_gripper_state(env)
         observations = [env.get_observation()]
         waypoints = []
         task_success = False
@@ -1031,12 +1290,7 @@ class SkillLib:
         start_quat = np.array(env.robot.get_end_effector_quat(env.physics))
 
         if gripper_state is None:
-            gripper_closed = env.robot.get_ee_open_state(env.physics)
-            if gripper_closed:
-                gripper_state = np.zeros(2)
-            else:
-                gripper_state = np.ones(2) * 0.04
-
+            gripper_state = SkillLib._get_gripper_state(env)
         observations = [env.get_observation()]
         waypoints = []
         task_success = False
@@ -1114,16 +1368,25 @@ class SkillLib:
             return [env.get_observation()], [], False, False
 
         if gripper_state is None:
-            gripper_state = np.zeros(2)
+            gripper_state = SkillLib._get_gripper_state(env)
 
-        # 选择空闲孔位：找离当前夹持物体（末端执行器）XY 最近的空闲孔位
+        # 选择空闲孔位：找离当前夹持物体 XY 最近的空闲孔位
         ee_pos = np.array(env.robot.get_end_effector_pos(env.physics))
-        # 按孔位与末端的 XY 距离排序——倾倒完后末端在烧杯上方，
-        # 但夹持的试管在末端正下方，所以按 XY 排序仍能找到正确孔列
-        # 更可靠的方式：按孔位与试管架中心的距离从近到远排序，
-        # 优先选择离末端 XY 最近的空闲孔
+
+        # 获取当前夹持的物体位置（更准确的插入目标）
+        grasped_obj_names, grasped_objs = env.get_grasped_entity()
+        if grasped_obj_names:
+            # 使用夹持物体的位置来选择最近的孔位
+            grasped_obj_pos = np.array(grasped_objs[0].get_xpos(env.physics))
+            ref_pos = grasped_obj_pos
+            print(f"[insert_to_entity] 夹持物体位置: {np.round(grasped_obj_pos, 3)}")
+        else:
+            # 没有夹持物体时回退到 EE 位置
+            ref_pos = ee_pos
+
+        # 按孔位与参考位置的 XY 距离排序
         stand_xpos = np.array(entity.get_xpos(env.physics))
-        sorted_points = sorted(place_points, key=lambda p: np.linalg.norm(np.array(p)[:2] - ee_pos[:2]))
+        sorted_points = sorted(place_points, key=lambda p: np.linalg.norm(np.array(p)[:2] - ref_pos[:2]))
         insert_point = None
         for pp in sorted_points:
             pp = np.array(pp)
@@ -1151,9 +1414,9 @@ class SkillLib:
         print(f"[insert_to_entity] 试管架中心: {np.round(stand_xpos, 3)}")
         print(f"[insert_to_entity] 选中孔位: {np.round(insert_point, 3)}  offset={np.round(insert_point - stand_xpos, 3)}")
 
-        # 1. RRT 移动到孔位上方（偏移 15cm），指定竖直向下姿态
-        # 参考 insert_tube_series：hover 高度需足够让试管底部高于孔口
-        hover_pos = insert_point + np.array([0, 0, 0.15])
+        # 1. RRT 移动到孔位上方（偏移 12cm），指定竖直向下姿态
+        # 降低 hover 高度避免试管底部怼到桌面
+        hover_pos = insert_point + np.array([0, 0, 0.12])
         vertical_quat = euler_to_quaternion(-np.pi, 0, 0)  # 末端竖直向下
         # 先初始化 observations，再调用 moveto，保证帧顺序正确
         observations = [env.get_observation()]
@@ -1168,8 +1431,10 @@ class SkillLib:
             return observations, waypoints, False, False
 
         # 2. 用 lift 负值从 hover_pos 直接下降到插入位置
-        # hover_pos = insert_point + [0,0,0.15]，只下降 0.12m，让试管口进入孔位即可
-        descend = -0.12
+        # hover_pos = insert_point + [0,0,0.12]
+        # 需要下降到 insert_point - [0,0,insert_depth]
+        # 总下降距离 = 0.12 + insert_depth
+        descend = -(0.12 + insert_depth)
         obs, wp, _, _ = SkillLib.lift(
             env, lift_height=descend, gripper_state=gripper_state)
         observations.extend(obs)

@@ -1,0 +1,13 @@
+Model UID: flask
+Model Name: flask
+
+Source Information:
+============================================================
+Source: Local File
+Original Path: /ssd/mkqin/workspace/VLABench/VLABench/assets/review/classware/chemistry_glassware/split/flask.glb
+File Name: flask.glb
+Keyword/Category: flask
+
+Processing:
+Pipeline: process_local_glb.py
+Steps: GLB->OBJ (trimesh) -> [rotate] -> MJCF (obj2mjcf) -> postprocess -> bottom-align -> validate -> size_fix

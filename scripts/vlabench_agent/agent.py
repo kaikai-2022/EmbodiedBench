@@ -20,8 +20,10 @@ from .nodes import (
     analyzer_node,
     asset_manager_node,
 )
+from .nodes.condition_planner import condition_planner_node
 from .nodes.normalizer import normalizer_node
 from .nodes.skill_planner import skill_planner_node
+from .nodes.condition_planner import condition_planner_node
 from .nodes.code_generator import code_generator_node
 from .nodes.registration import registration_node
 from .nodes.simulation import simulation_node
@@ -131,6 +133,7 @@ def build_vlabench_agent():
     workflow.add_node("normalizer", normalizer_node)
     workflow.add_node("asset_manager", asset_manager_node)
     workflow.add_node("skill_planner", skill_planner_node)
+    workflow.add_node("condition_planner", condition_planner_node)  # 新增：条件规划节点
     workflow.add_node("code_generator", code_generator_node)
     workflow.add_node("registration", registration_node)
     workflow.add_node("simulation", simulation_node)
@@ -142,8 +145,15 @@ def build_vlabench_agent():
     workflow.add_edge(START, "analyzer")
     workflow.add_edge("analyzer", "normalizer")
     workflow.add_edge("normalizer", "asset_manager")
+
+    # asset_manager 之后，skill_planner 和 condition_planner 并行执行（fan-in）
     workflow.add_edge("asset_manager", "skill_planner")
+    workflow.add_edge("asset_manager", "condition_planner")
+
+    # skill_planner 和 condition_planner 都完成后进入 code_generator
     workflow.add_edge("skill_planner", "code_generator")
+    workflow.add_edge("condition_planner", "code_generator")
+
     workflow.add_edge("code_generator", "registration")
     workflow.add_edge("registration", "simulation")
     workflow.add_edge("simulation", "vlm_data")
@@ -190,6 +200,7 @@ def create_initial_state(user_instruction: str) -> Dict:
         "task_graph": {},
         "asset_status": {},
         "skill_plan": None,
+        "condition_plan": None,  # 新增：per-step 成功条件配置
         "generated_code": None,
         "task_module_path": None,
         "registration_success": None,

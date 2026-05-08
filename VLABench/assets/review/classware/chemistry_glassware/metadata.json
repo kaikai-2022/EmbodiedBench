@@ -1,0 +1,14 @@
+{
+  "uid": "chemistry_glassware",
+  "name": "chemistry_glassware",
+  "source": "local",
+  "original_path": "/ssd/mkqin/download/chemistry_glassware.glb",
+  "keyword": "classware",
+  "tags": [],
+  "categories": [],
+  "description": "Local GLB model: chemistry_glassware.glb",
+  "rotation": {
+    "axis": "x",
+    "degrees": 90.0
+  }
+}
