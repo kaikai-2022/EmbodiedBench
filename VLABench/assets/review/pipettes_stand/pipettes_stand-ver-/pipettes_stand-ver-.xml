@@ -99,7 +99,7 @@
     <site name="bottom_site" pos="0 0 0.0" size="0.01" rgba="0 1 0 0"/>
 </body>>
   </worldbody>
-  <compiler boundmass="0.015" boundinertia="1e-05" angle="radian"/>
+  <compiler boundmass="0.015" boundinertia="1e-03" angle="radian"/>
   <default>
     <default class="visual">
       <geom group="2" type="mesh" contype="0" conaffinity="0" density="50"/>

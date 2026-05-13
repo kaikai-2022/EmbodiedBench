@@ -1,49 +1,4 @@
 {
-  "beaker": {
-    "spec": "beaker",
-    "source_type": "local",
-    "is_physical": true
-  },
-  "table": {
-    "spec": "table",
-    "source_type": "objaverse",
-    "is_physical": true
-  },
-  "volumetric pipet": {
-    "spec": "volumetric_pipette",
-    "source_type": "objaverse",
-    "is_physical": true
-  },
-  "unknown acid solution": {
-    "spec": "acid solution",
-    "source_type": "local",
-    "is_physical": false
-  },
-  "Erlenmeyer flask": {
-    "spec": "conical_flask",
-    "source_type": "local",
-    "is_physical": true
-  },
-  "phenolphthalein indicator": {
-    "spec": "phenolphthalein indicator",
-    "source_type": "local",
-    "is_physical": false
-  },
-  "HCl solution": {
-    "spec": "HCl solution",
-    "source_type": "local",
-    "is_physical": false
-  },
-  "NaOH": {
-    "spec": "NaOH",
-    "source_type": "local",
-    "is_physical": false
-  },
-  "tube stand": {
-    "spec": "chemistry_tube_stand",
-    "source_type": "local",
-    "is_physical": true
-  },
   "tube": {
     "spec": "tube",
     "source_type": "local",
@@ -54,62 +9,7 @@
     "source_type": "local",
     "is_physical": false
   },
-  "CuCl2": {
-    "spec": "CuCl2",
-    "source_type": "local",
-    "is_physical": false
-  },
-  "KMnO4": {
-    "spec": "KMnO4",
-    "source_type": "local",
-    "is_physical": false
-  },
-  "microwave": {
-    "spec": "microwave",
-    "source_type": "local",
-    "is_physical": true
-  },
-  "test tube": {
-    "spec": "tube",
-    "source_type": "local",
-    "is_physical": true
-  },
-  "liquid": {
-    "spec": "liquid",
-    "source_type": "local",
-    "is_physical": false
-  },
-  "FeCl3": {
-    "spec": "FeCl3",
-    "source_type": "local",
-    "is_physical": false
-  },
-  "pipette": {
-    "spec": "pipette",
-    "source_type": "objaverse",
-    "is_physical": true
-  },
-  "conical flask": {
-    "spec": "conical_flask",
-    "source_type": "local",
-    "is_physical": true
-  },
-  "small_beaker": {
-    "spec": "small_beaker",
-    "source_type": "local",
-    "is_physical": true
-  },
-  "CuSO4 tube": {
-    "spec": "tube",
-    "source_type": "local",
-    "is_physical": true
-  },
-  "FeCl3 tube": {
-    "spec": "tube",
-    "source_type": "local",
-    "is_physical": true
-  },
-  "chemistry_tube_stand": {
+  "tube stand": {
     "spec": "chemistry_tube_stand",
     "source_type": "local",
     "is_physical": true
@@ -119,14 +19,49 @@
     "source_type": "local",
     "is_physical": true
   },
-  "flask": {
-    "spec": "flask",
+  "beaker": {
+    "spec": "beaker",
     "source_type": "local",
     "is_physical": true
   },
-  "CuSCl2": {
-    "spec": "CuSCl2",
+  "small_beaker": {
+    "spec": "small_beaker",
     "source_type": "local",
-    "is_physical": false
+    "is_physical": true
+  },
+  "big beaker": {
+    "spec": "large_beaker",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "cylinder_small": {
+    "spec": "cylinder_small",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "cylinder_big": {
+    "spec": "cylinder_big",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "cylinder_mid": {
+    "spec": "cylinder_mid",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "glass_stirring_rod": {
+    "spec": "glass_stirring_rod",
+    "source_type": "objaverse",
+    "is_physical": true
+  },
+  "glass stirring rod": {
+    "spec": "glass_stirring_rod",
+    "source_type": "objaverse",
+    "is_physical": true
+  },
+  "big_beaker": {
+    "spec": "large_beaker",
+    "source_type": "local",
+    "is_physical": true
   }
 }

@@ -67,39 +67,13 @@ class SkillLib:
             stage_success: bool, whether the stage is successful
             task_success: bool, whether the task is successful
         """
-        _t_start = _time.time()
-        print(f"\n[STEP] step_trajectory 开始: {len(points)} 个路径点, max_substep={max_n_substep}")
-
         observations = []
         waypoints = []
         stage_success = False
         task_success = False
         last_executed_waypoint = -1
 
-        # DEBUG: 只在 pick 的路径上打印最后5个点的实际手指位置
-        import mujoco as mj
-        raw_m = env.physics.model._model
-        raw_d = env.physics.data._data
-        gripper_geoms = env.robot.gripper_geoms
-        pad_ids = []
-        for geom in gripper_geoms:
-            eid = env.physics.bind(geom).element_id
-            gname = mj.mj_id2name(raw_m, mj.mjtObj.mjOBJ_GEOM, eid) or ''
-            if 'pad' in gname.lower():
-                pad_ids.append(eid)
-
-        # DEBUG: 只在最后几个点启用 IK 调试
-        debug_ik_enabled = False
-
         for i, (point, quat) in enumerate(zip(points, quats)):
-            # 在最后 5 个路径点启用 IK 调试
-            if i >= len(points) - 5:
-                if not debug_ik_enabled:
-                    debug_ik_enabled = True
-                    env.robot._debug_ik = True
-            else:
-                env.robot._debug_ik = False
-
             success, action = env.robot.get_qpos_from_ee_pos(physics=env.physics, pos=point, quat=quat)
             action = np.concatenate([action, gripper_state])
             waypoint = np.concatenate([point, quaternion_to_euler(quat), gripper_state])
@@ -108,7 +82,6 @@ class SkillLib:
                 timestep = env.step(action)
 
                 if timestep.last():
-                    print(f"[STEP] 路径点 {i}/{len(points)} 处 timestep.last()=True")
                     task_success = True
                     break
 
@@ -121,13 +94,6 @@ class SkillLib:
 
             last_executed_waypoint = i
 
-            # DEBUG: 打印最后5个路径点时的手指 pad 世界坐标
-            if i >= len(points) - 5 and len(pad_ids) >= 2:
-                pad1 = raw_d.geom_xpos[pad_ids[0]]
-                pad2 = raw_d.geom_xpos[pad_ids[1]]
-                finger_mid = (pad1 + pad2) / 2
-                print(f"[STEP] path_idx={i}: target=({point[0]:.4f},{point[1]:.4f},{point[2]:.4f}), finger_mid=({finger_mid[0]:.4f},{finger_mid[1]:.4f},{finger_mid[2]:.4f})")
-
             if task_success:
                 break
 
@@ -135,21 +101,11 @@ class SkillLib:
             observations.append(obs)
             waypoints.append(waypoint)
 
-            # 每50步或最后一步打印进度
-            if i % 50 == 0 or i == len(points) - 1:
-                print(f"[STEP] 进度 {i+1}/{len(points)}, 耗时 {_time.time()-_t_start:.1f}s")
-
-        # 最终检查
         if len(points) > 0:
             final_ee_pos = env.robot.get_end_effector_pos(env.physics)
             final_distance = distance(points[-1], final_ee_pos)
             if final_distance < tolerance:
                 stage_success = True
-            print(f"[STEP] step_trajectory 完成: {last_executed_waypoint+1}/{len(points)} 点, "
-                  f"final_dist={final_distance:.4f}, stage={stage_success}, task={task_success}, "
-                  f"耗时 {_time.time()-_t_start:.1f}s")
-        else:
-            print(f"[STEP] step_trajectory 完成: 空路径, 耗时 {_time.time()-_t_start:.1f}s")
 
         assert len(observations) == len(waypoints), f"observations and waypoints should have the same length, {len(observations)} and {len(waypoints)}"
         return observations, waypoints, stage_success, task_success
@@ -174,70 +130,40 @@ class SkillLib:
         start_pos, start_quat = env.robot.get_end_effector_pos(env.physics), env.robot.get_end_effector_quat(env.physics)
 
         # DEBUG: 打印 moveto 开始信息
-        print(f"\n{'='*60}")
-        print(f"DEBUG [moveto]: 开始移动")
-        print(f"  起始位置: {start_pos}")
-        print(f"  目标位置: {target_pos}")
-        print(f"  移动距离: {np.linalg.norm(target_pos - start_pos):.4f}m")
-        print(f"{'='*60}\n")
-
         observations = [env.get_observation()]
         waypoints = []
         task_success = False
         gripper_closed = env.robot.get_ee_open_state(env.physics)
         if gripper_state is None:
             gripper_state = SkillLib._get_gripper_state(env)
-        # env_pcd = observations[0]["masked_point_cloud"]
-        # obstacle_pcd = np.asarray(env_pcd.points)
 
         obstacle_pcd = np.asarray(env.get_obstacle_pcd().points)
-        print(f"DEBUG [moveto]: 障碍物点云数量: {len(obstacle_pcd)}")
 
         if target_quat is None:
             target_quat = start_quat
 
-        print(f"DEBUG [moveto]: 开始 RRT 运动规划...")
         motion_planning_path = rrt_motion_planning(tuple(start_pos),
                                                 tuple(target_pos),
                                                 obstacle_pcd)
         if motion_planning_path is None:
-            print(f"DEBUG [moveto]: ⚠️  RRT 规划失败，使用直线路径")
             motion_planning_path = [start_pos, target_pos]
-        else:
-            print(f"DEBUG [moveto]: ✓ RRT 规划成功，路径点数: {len(motion_planning_path)}")
 
         quats_in_path = []
         for t in np.linspace(0, 1, len(motion_planning_path), endpoint=False):
             quats_in_path.append(qauternion_slerp(start_quat, target_quat, t))
 
-        print(f"DEBUG [moveto]: 插值路径...")
         interplate_path, interplate_quat = interpolate_path(np.array(motion_planning_path),
                                                             np.array(quats_in_path),
                                                             target_velocity)
-        print(f"DEBUG [moveto]: 插值后路径点数: {len(interplate_path)}")
 
-        print(f"DEBUG [moveto]: 执行轨迹...")
         new_obs, new_waypoints, stage_success, task_success = SkillLib.step_trajectory(env,
                                                                    interplate_path,
                                                                    interplate_quat,
                                                                    gripper_state,
                                                                    **kwargs)
-        # if new_obs is None:
-            # return None, None, False, False
         observations.extend(new_obs)
         waypoints.extend(new_waypoints)
         observations.pop(-1)
-
-        # DEBUG: 打印执行结果
-        final_pos = env.robot.get_end_effector_pos(env.physics)
-        pos_error = np.linalg.norm(final_pos - target_pos)
-        print(f"\nDEBUG [moveto]: 执行完成")
-        print(f"  最终位置: {final_pos}")
-        print(f"  目标位置: {target_pos}")
-        print(f"  位置误差: {pos_error:.4f}m")
-        print(f"  Stage success: {stage_success}")
-        print(f"  Task success: {task_success}")
-        print(f"{'='*60}\n")
 
         assert len(observations) == len(waypoints), f"observations and waypoints should have the same length, {len(observations)} and {len(waypoints)}"
         return observations, waypoints, stage_success, task_success
@@ -1457,3 +1383,96 @@ class SkillLib:
         waypoints.extend(wp)
 
         return observations, waypoints, True, task_success
+
+    @staticmethod
+    def stir_entity_with_tool(env, target_container_name, stir_radius=0.01, stir_duration=5, insert_ratio=2/3):
+        """
+        使用搅拌工具搅动容器内的液体。
+
+        假设当前夹爪已抓取搅拌工具，执行以下步骤：
+        1. 获取容器的 place_point 作为圆心
+        2. 移动到 place_point 正上方 25cm 处
+        3. 下降到容器内部 insert_ratio 深度处
+        4. 以 place_point XY 为圆心，做半径 stir_radius 的圆周运动
+
+        Args:
+            target_container_name: 目标容器实体名
+            stir_radius: 圆周运动半径（m），默认 1cm
+            stir_duration: 搅拌持续时间（s），默认 5s
+            insert_ratio: 插入深度比例（容器高度的倍数），默认 2/3
+        """
+        gripper_state = SkillLib._get_gripper_state(env)
+        observations = [env.get_observation()]
+        waypoints = []
+
+        container = env.task.entities[target_container_name]
+        place_points = container.get_place_point(env.physics)
+        if not place_points:
+            return [env.get_observation()], [], False, False
+        place_point = np.array(place_points[0]) if isinstance(place_points, list) else np.array(place_points)
+
+        top_site = container.mjcf_model.find("site", "top_site")
+        bottom_site = container.mjcf_model.find("site", "bottom_site")
+        bottom_z = env.physics.bind(bottom_site).xpos[2] if bottom_site else 0
+        top_z = env.physics.bind(top_site).xpos[2] if top_site else (place_point[2] + 0.126)
+        internal_height = top_z - bottom_z
+        insert_target_z = bottom_z + internal_height * insert_ratio
+
+        grasped_names, grasped_entities = env.get_grasped_entity()
+        tool_offset_z = 0.0
+        if grasped_entities:
+            grasp_keypoints = grasped_entities[0].get_grasped_keypoints(env.physics)
+            if grasp_keypoints:
+                tool_bottom_site = grasped_entities[0].mjcf_model.find("site", "bottom_site")
+                tool_bottom_z = env.physics.bind(tool_bottom_site).xpos[2] if tool_bottom_site else 0
+                tool_offset_z = grasp_keypoints[0][2] - tool_bottom_z
+
+        vertical_quat = euler_to_quaternion(-np.pi, 0, 0)
+        hover_pos = np.array([place_point[0], place_point[1], place_point[2] + 0.25 + tool_offset_z])
+
+        print(f"[stir_entity_with_tool] moving to hover: {hover_pos}")
+        obs, wp, success, _ = SkillLib.moveto(env, target_pos=hover_pos, target_quat=vertical_quat, gripper_state=gripper_state)
+        print(f"[stir_entity_with_tool] hover moveto result: success={success}, obs={len(obs)}, wp={len(wp)}")
+        if not success:
+            return observations, waypoints, False, False
+        observations.extend(obs)
+        waypoints.extend(wp)
+
+        descend_pos = np.array([place_point[0], place_point[1], insert_target_z + tool_offset_z])
+        print(f"[stir_entity_with_tool] descending to: {descend_pos}")
+        obs, wp, _, _ = SkillLib.moveto(env, target_pos=descend_pos, target_quat=vertical_quat, gripper_state=gripper_state)
+        print(f"[stir_entity_with_tool] descend moveto result: obs={len(obs)}, wp={len(wp)}")
+        observations.extend(obs)
+        waypoints.extend(wp)
+
+        current_quat = np.array(env.robot.get_end_effector_quat(env.physics))
+        # 每圈 36 步（每步 10°），转 stir_duration 圈
+        steps_per_circle = 36
+        angle_step = 2 * np.pi / steps_per_circle
+        total_circles = stir_duration  # stir_duration 作为圈数
+        total_steps = int(total_circles * steps_per_circle)
+        circle_z = insert_target_z + tool_offset_z
+
+        for i in range(total_steps):
+            angle = angle_step * (i + 1)
+            circle_x = place_point[0] + stir_radius * np.cos(angle)
+            circle_y = place_point[1] + stir_radius * np.sin(angle)
+            success, target_qpos = env.robot.get_qpos_from_ee_pos(env.physics, [circle_x, circle_y, circle_z], current_quat)
+            if success:
+                action = np.concatenate([target_qpos, gripper_state])
+                # 每步重复执行直到机器人到达目标位置
+                for _ in range(10):
+                    timestep = env.step(action)
+                    if timestep.last():
+                        break
+                    current_qpos = np.array(env.robot.get_qpos(env.physics)).reshape(-1)
+                    if np.max(np.abs(current_qpos - action[:7])) < 0.02:
+                        break
+            waypoints.append(np.concatenate([env.robot.get_end_effector_pos(env.physics),
+                                              quaternion_to_euler(env.robot.get_end_effector_quat(env.physics)),
+                                              gripper_state]))
+            observations.append(env.get_observation())
+
+        observations.pop(-1)
+        return observations, waypoints, True, False
+

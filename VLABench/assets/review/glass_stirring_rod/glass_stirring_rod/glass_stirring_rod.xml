@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<mujoco model="glass_stirring_rod">
+  <compiler boundmass="0.015" boundinertia="1e-03" angle="radian"/>
+  <default>
+    <default class="visual">
+      <geom group="2" type="mesh" contype="0" conaffinity="0" density="50"/>
+    </default>
+    <default class="collision">
+      <geom group="3" type="mesh" density="50" friction="1 1 0.001" solimp="0.998 0.998 0.001" solref="0.001 2"/>
+    </default>
+    <default class="grasppoint">
+      <site type="sphere" size="0.005" group="4" rgba="0 0 1 1"/>
+    </default>
+  </default>
+  <asset>
+    <material name="glass_stirring_rod" specular="0.9" shininess="0.9" rgba="0.85 0.92 0.97 0.3"/>
+    <mesh file="glass_stirring_rod.obj" scale="1 1 1"/>
+  </asset>
+  <worldbody>
+    <body name="glass_stirring_rod">
+      <inertial pos="0 0 0.1" mass="0.001" diaginertia="0.0001 0.0001 0.00001"/>
+      <geom material="glass_stirring_rod" mesh="glass_stirring_rod" class="visual"/>
+      <geom mesh="glass_stirring_rod" class="collision"/>
+      <site class="grasppoint" pos="0.0000 0.0000 0.1700"/>
+      <site name="top_site" pos="0 0 0.2" size="0.01" rgba="1 0 0 0"/>
+      <site name="bottom_site" pos="0 0 0.0" size="0.01" rgba="0 1 0 0"/>
+    </body>
+  </worldbody>
+</mujoco>

@@ -33,6 +33,7 @@ logger = logging.getLogger(__name__)
 STANDARD_ASSET_LIBRARY = [
     "beaker", "chemistry_beaker", "tube", "chemistry_tube_stand",
     "flask", "conical_flask", "large_beaker", "small_beaker",
+    "cylinder_small", "cylinder_mid", "cylinder_big",
     "petri_dish", "bunsen_burner", "centrifuge",
     "coverslip", "nametag", "microscope", "scale",
     "plate", "tray", "cabinet", "fridge", "microwave",

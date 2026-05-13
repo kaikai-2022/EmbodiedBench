@@ -312,6 +312,10 @@ name2class_xml = {
     "table": [components.CommonContainer, "obj/meshes/table/table.xml"],
     "large_beaker": [components.ChemistryBeaker, "review/beaker_large/large_beaker/large_beaker.xml"],
     "small_beaker": [components.ChemistryBeaker, "review/beaker_small/small_beaker/small_beaker.xml"],
+    "cylinder_small": [components.ChemistryBeaker, "review/cylinder_small/cylinder_small/cylinder_small/cylinder_small.xml"],
+    "cylinder_mid": [components.ChemistryBeaker, "review/cylinder_mid/cylinder_mid/cylinder_mid/cylinder_mid.xml"],
+    "cylinder_big": [components.ChemistryBeaker, "review/cylinder_big/cylinder_big/cylinder_big/cylinder_big.xml"],
+    "glass_stirring_rod": [components.CommonGraspedEntity, "review/glass_stirring_rod/glass_stirring_rod/glass_stirring_rod.xml"],
 
 }
 

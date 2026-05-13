@@ -1,8 +1,28 @@
 <?xml version="1.0" ?>
 <mujoco model="small_beaker">
+  <compiler boundmass="0.015" boundinertia="1e-03" angle="radian"/>
+  <default>
+    <default class="visual">
+      <geom group="2" type="mesh" contype="0" conaffinity="0" density="50"/>
+    </default>
+    <default class="collision">
+      <geom group="3" type="mesh" density="50" friction="1 1 0.001" solimp="0.998 0.998 0.001" solref="0.001 2"/>
+    </default>
+    <default class="grasppoint">
+      <site type="sphere" size="0.005" group="4" rgba="0 0 1 1"/>
+    </default>
+  </default>
   <asset>
     <texture type="2d" name="lab_beaker_a" file="lab_beaker_a.png"/>
-    <material name="lab_beaker_a" texture="lab_beaker_a" specular="0.4000000000000001" shininess="0.001"/>
+    <material name="lab_beaker_a" texture="lab_beaker_a" specular="0.4" shininess="0.001" rgba="1 1 1 0.3"/>
+    <material name="CaSO4" rgba="1 1 1 0.7"/>
+    <material name="CuCl2" rgba="0.141 1.0 0.174 0.4"/>
+    <material name="CuSO4" rgba="0 0.45 1 0.4"/>
+    <material name="FeCl3" rgba="0.6475 0.5686 0.023 0.4"/>
+    <material name="KMnO4" rgba="0.5 0 0.5 0.4"/>
+    <material name="I2" rgba="0.3 0.13 0.0 0.4"/>
+    <material name="K2CrO4" rgba="0.57 0.12 0.013 0.4"/>
+    <material name="NaCl" rgba="1 1 1 0.3"/>
     <mesh file="small_beaker.obj" scale="0.010092491675567085 0.010092491675567085 0.010092491675567085"/>
     <mesh file="small_beaker/small_beaker_collision_0.obj" scale="0.010092491675567085 0.010092491675567085 0.010092491675567085"/>
     <mesh file="small_beaker/small_beaker_collision_1.obj" scale="0.010092491675567085 0.010092491675567085 0.010092491675567085"/>
@@ -27,60 +47,38 @@
     <mesh file="small_beaker/small_beaker_collision_20.obj" scale="0.010092491675567085 0.010092491675567085 0.010092491675567085"/>
     <mesh file="small_beaker/small_beaker_collision_21.obj" scale="0.010092491675567085 0.010092491675567085 0.010092491675567085"/>
     <mesh file="small_beaker/small_beaker_collision_22.obj" scale="0.010092491675567085 0.010092491675567085 0.010092491675567085"/>
-      <material name="CaSO4" rgba="1 1 1 0.7"/>
-    <material name="CuCl2" rgba="0.141 1.0 0.174 0.4"/>
-    <material name="CuSO4" rgba="0 0.45 1 0.4"/>
-    <material name="FeCl3" rgba="0.6475 0.5686 0.023 0.4"/>
-    <material name="KMnO4" rgba="0.5 0 0.5 0.4"/>
-    <material name="I2" rgba="0.3 0.13 0.0 0.4"/>
-    <material name="K2CrO4" rgba="0.57 0.12 0.013 0.4"/>
-    <material name="NaCl" rgba="1 1 1 0.3"/>
-</asset>
+  </asset>
   <worldbody>
     <body name="small_beaker">
       <inertial pos="0 0 0.045000" mass="0.02" diaginertia="0.0008 0.0008 0.0005"/>
       <geom material="lab_beaker_a" mesh="small_beaker" class="visual"/>
-      <geom mesh="small_beaker_collision_0" rgba="0.08326740509397745 0.5149712464989823 0.7563179240099243 1" class="collision"/>
-      <geom mesh="small_beaker_collision_1" rgba="0.1175904744077606 0.5504948094637034 0.7620628952465346 1" class="collision"/>
-      <geom mesh="small_beaker_collision_2" rgba="0.30577805308043926 0.7860323991323654 0.7682966523411492 1" class="collision"/>
-      <geom mesh="small_beaker_collision_3" rgba="0.268979750208426 0.8731858972063877 0.4438998487183391 1" class="collision"/>
-      <geom mesh="small_beaker_collision_4" rgba="0.26908108473275716 0.3959905467670106 0.5172371742525257 1" class="collision"/>
-      <geom mesh="small_beaker_collision_5" rgba="0.5752350866514457 0.2388254586103986 0.032345126046624206 1" class="collision"/>
-      <geom mesh="small_beaker_collision_6" rgba="0.36836516530366914 0.863223380495847 0.08815255660445165 1" class="collision"/>
-      <geom mesh="small_beaker_collision_7" rgba="0.3341117678413338 0.16704961852565625 0.7867776065506157 1" class="collision"/>
-      <geom mesh="small_beaker_collision_8" rgba="0.9990672208296324 0.14787302267141167 0.8168846166678625 1" class="collision"/>
-      <geom mesh="small_beaker_collision_9" rgba="0.4958266802752672 0.14595971838794686 0.1451318356132778 1" class="collision"/>
-      <geom mesh="small_beaker_collision_10" rgba="0.009271457088589452 0.4383999945919671 0.7971362678072608 1" class="collision"/>
-      <geom mesh="small_beaker_collision_11" rgba="0.8894621121706705 0.5002252830685929 0.15470367433352716 1" class="collision"/>
-      <geom mesh="small_beaker_collision_12" rgba="0.39179127078417575 0.07232246204088755 0.2797397435432376 1" class="collision"/>
-      <geom mesh="small_beaker_collision_13" rgba="0.6459631252425481 0.0018386464692670135 0.1989392763112211 1" class="collision"/>
-      <geom mesh="small_beaker_collision_14" rgba="0.3658079914271146 0.3750359144587073 0.04642434725731681 1" class="collision"/>
-      <geom mesh="small_beaker_collision_15" rgba="0.16990349865917742 0.89704143774021 0.06741522735129912 1" class="collision"/>
-      <geom mesh="small_beaker_collision_16" rgba="0.4560380142942426 0.19547052438375745 0.23884725525384964 1" class="collision"/>
-      <geom mesh="small_beaker_collision_17" rgba="0.6499625051642587 0.915093379672126 0.7556065488392286 1" class="collision"/>
-      <geom mesh="small_beaker_collision_18" rgba="0.752072851899141 0.3811275082025768 0.506471304555982 1" class="collision"/>
-      <geom mesh="small_beaker_collision_19" rgba="0.8006816450589422 0.8289706348119932 0.41947860539139536 1" class="collision"/>
-      <geom mesh="small_beaker_collision_20" rgba="0.8466017751275838 0.11571495313581659 0.38537563943656494 1" class="collision"/>
-      <geom mesh="small_beaker_collision_21" rgba="0.38251511180293785 0.24851570528553235 0.15436678161313544 1" class="collision"/>
-      <geom mesh="small_beaker_collision_22" rgba="0.742404991644919 0.19092353469160062 0.7443979091281971 1" class="collision"/>
-      <site class="grasppoint" pos="0.0000 0.0000 0.0540"/>
-      <site class="grasppoint" pos="0.0000 0.0000 0.0720"/>
-      <site class="grasppoint" pos="0.0000 0.0000 0.0855"/>
-          <geom name="solution" type="cylinder" size="2.689352 2.675256" pos="0 0 4.458760" material="CaSO4" class="visual"/>
-      <site name="top_site" pos="0 0 8.917520" size="0.01" rgba="1 0 0 0"/>
+      <geom mesh="small_beaker_collision_0" class="collision"/>
+      <geom mesh="small_beaker_collision_1" class="collision"/>
+      <geom mesh="small_beaker_collision_2" class="collision"/>
+      <geom mesh="small_beaker_collision_3" class="collision"/>
+      <geom mesh="small_beaker_collision_4" class="collision"/>
+      <geom mesh="small_beaker_collision_5" class="collision"/>
+      <geom mesh="small_beaker_collision_6" class="collision"/>
+      <geom mesh="small_beaker_collision_7" class="collision"/>
+      <geom mesh="small_beaker_collision_8" class="collision"/>
+      <geom mesh="small_beaker_collision_9" class="collision"/>
+      <geom mesh="small_beaker_collision_10" class="collision"/>
+      <geom mesh="small_beaker_collision_11" class="collision"/>
+      <geom mesh="small_beaker_collision_12" class="collision"/>
+      <geom mesh="small_beaker_collision_13" class="collision"/>
+      <geom mesh="small_beaker_collision_14" class="collision"/>
+      <geom mesh="small_beaker_collision_15" class="collision"/>
+      <geom mesh="small_beaker_collision_16" class="collision"/>
+      <geom mesh="small_beaker_collision_17" class="collision"/>
+      <geom mesh="small_beaker_collision_18" class="collision"/>
+      <geom mesh="small_beaker_collision_19" class="collision"/>
+      <geom mesh="small_beaker_collision_20" class="collision"/>
+      <geom mesh="small_beaker_collision_21" class="collision"/>
+      <geom mesh="small_beaker_collision_22" class="collision"/>
+      <site class="grasppoint" pos="0.0000 0.0000 0.0650"/>
+      <geom name="solution" type="cylinder" size="0.0269 0.0268" pos="0 0 0.0446" material="CaSO4" class="visual"/>
+      <site name="top_site" pos="0 0 0.0892" size="0.01" rgba="1 0 0 0"/>
       <site name="bottom_site" pos="0 0 0.000000" size="0.01" rgba="0 1 0 0"/>
-</body>
+    </body>
   </worldbody>
-  <compiler boundmass="0.015" boundinertia="1e-05" angle="radian"/>
-  <default>
-    <default class="visual">
-      <geom group="2" type="mesh" contype="0" conaffinity="0" density="50"/>
-    </default>
-    <default class="collision">
-      <geom group="3" type="mesh" density="50" friction="2 2 0.5" solimp="0.9 0.95 0.001" solref="0.02 1"/>
-    </default>
-    <default class="grasppoint">
-      <site type="sphere" size="0.005" group="4" rgba="0 0 1 1"/>
-    </default>
-  </default>
 </mujoco>

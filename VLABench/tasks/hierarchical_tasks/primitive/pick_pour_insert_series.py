@@ -36,7 +36,7 @@ class PickPourInsertConfigManager(BenchTaskConfigManager):
             init_container_config["subentities"] = []
         obj_config = dict(
             name="tube_0",
-            solution="CuSO4",
+            solution="contains CuSO4",
             xml_path=name2class_xml["tube"][-1],
             position=pos,
         )
@@ -46,7 +46,7 @@ class PickPourInsertConfigManager(BenchTaskConfigManager):
         obj_config = dict(
             name="small_beaker_0",
             xml_path=name2class_xml["small_beaker"][-1],
-            position=[random.uniform(0.15, 0.25), random.uniform(-0.15, -0.05), 0.8],
+            position=[random.uniform(0.05, 0.15), random.uniform(-0.15, -0.05), 0.8],
         )
         obj_config["class"] = "ChemistryBeaker"
         obj_config["randomness"] = dict(pos=[0.02, 0.02, 0], quat=[0, 0, 0.05])

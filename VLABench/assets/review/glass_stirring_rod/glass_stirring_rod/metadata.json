@@ -1,0 +1,11 @@
+{
+  "uid": "glass_stirring_rod",
+  "name": "Glass Stirring Rod",
+  "source": "generated",
+  "original_path": null,
+  "keyword": "glass_stirring_rod",
+  "tags": ["glass", "stirring", "rod", "lab", "chemistry"],
+  "categories": ["glassware", "lab_equipment"],
+  "description": "A glass stirring rod used in chemistry labs for mixing solutions",
+  "rotation": null
+}

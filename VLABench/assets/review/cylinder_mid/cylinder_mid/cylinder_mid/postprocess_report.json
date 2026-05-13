@@ -1,0 +1,28 @@
+{
+  "uid": "cylinder_mid",
+  "centered": true,
+  "scaled": true,
+  "scale_factor": 0.009007829616311894,
+  "orientation_warning": null,
+  "original_dims": {
+    "center": [
+      0.0,
+      0.0,
+      8.347699989999999
+    ],
+    "ranges": [
+      4.65556002,
+      4.65556002,
+      16.65217998
+    ],
+    "max_dim": 16.65217998
+  },
+  "final_dims": {
+    "ranges": [
+      0.041936491428673596,
+      0.041936491428673596,
+      0.15
+    ],
+    "max_dim": 0.15
+  }
+}

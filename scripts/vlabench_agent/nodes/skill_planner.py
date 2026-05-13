@@ -44,7 +44,9 @@ SKILL_LIB_DOC = """
 - open_gripper(): 松开夹爪。用于在当前位置直接放下物体（不推荐用于精确放置）。
 - close_gripper(): 闭合夹爪。
 - wait(wait_time=50): 等待指定步数。
-- rotate(rotation_angle=pi/2): 旋转当前抓取的物体。常用于 shake（摇晃）操作。
+- shake(n_shakes=3, shake_angle=0.5, steps_per_swing=5): **独立的摇晃技能**。通过四元数球面插值（slerp）生成正负角度的平滑摇摆轨迹。n_shakes=3 表示完整往返 3 次，shake_angle=0.5 表示每次摆动 ±0.5 rad（约 28.6°）。
+- stir_entity_with_tool(target_uid, stir_radius=0.02, stir_duration=5, insert_ratio=2/3): **使用搅拌工具搅动容器内液体**。假设当前夹爪已抓取搅拌工具。步骤：①获取容器的 place_point；②移动到 place_point 正上方 25cm；③下降到插入位置（深度 = 容器高度 × insert_ratio）；④以 place_point XY 为圆心做圆周运动。stir_radius=0.02 表示半径 2cm，stir_duration=5 表示持续 5 秒。
+- rotate(rotation_angle=pi/2): 旋转腕部关节实现物体翻转或小幅摇晃。适合单次大幅旋转。
 - press(target_pos): 按压目标位置。
 - push(target_pos, push_distance=0.1): 推动物体。
 - reset(): 重置环境。
@@ -53,8 +55,7 @@ SKILL_LIB_DOC = """
 
 - **place**: 用于把物体精确放置到容器/表面上。例如：place("table") 放桌面上，place("beaker_0") 放到烧杯里。
 - **open_gripper**: 在当前位置直接松开夹爪，物体会掉落。仅用于不需要精确放置的场景。
-- **rotate**: 连续使用多个 rotate 可以实现 shake（摇晃）动作。
-- **shake 任务的正确序列**: pick -> lift -> [rotate, rotate, ...] -> wait -> place("table") -> open_gripper。先用 place 把物体放到桌面，再松开夹爪。
+- **shake 任务的正确序列**: pick -> lift -> shake(n_shakes=3) -> wait -> place("table") -> open_gripper。先用 place 把物体放到桌面，再松开夹爪。
 """
 
 # ========== 原子技能白名单 ==========
@@ -62,7 +63,7 @@ VALID_SKILLS = {
     "pick", "place", "lift", "moveto", "moveto_entity", "pour", "pour_to_entity", "push", "press",
     "flip", "wait", "rotate", "open_gripper", "close_gripper",
     "open_door", "close_door", "open_drawer", "open_laptop",
-    "move_offset", "reset", "insert_to_entity",
+    "move_offset", "reset", "insert_to_entity", "shake", "stir_entity_with_tool",
 }
 
 # ========== 动作 → 技能模式映射 (LLM 参考，非硬编码) ==========

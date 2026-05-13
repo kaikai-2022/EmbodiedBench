@@ -18,7 +18,7 @@ class PickShakeConfigManager(BenchTaskConfigManager):
         obj_config = dict(
             name="small_beaker_0",
             xml_path=name2class_xml["small_beaker"][-1],
-            position=[random.uniform(-0.3, 0.3), random.uniform(-0.2, 0.2), 0.8],
+            position=[random.uniform(0.15, 0.25), random.uniform(-0.15, -0.05), 0.8],
         )
         obj_config["class"] = "ChemistryBeaker"
         obj_config["randomness"] = dict(pos=[0.02, 0.02, 0], quat=[0, 0, 0.05])
@@ -44,11 +44,8 @@ class PickShakeTask(PrimitiveTask):
         skill_sequence = [
             partial(SkillLib.pick, target_entity_name="small_beaker_0", prior_eulers=[[-3.14159, 0, 0]]),
             partial(SkillLib.lift, lift_height=0.15, gripper_state=[0, 0]),
-            partial(SkillLib.rotate, rotation_angle=1.5708),
-            partial(SkillLib.rotate, rotation_angle=-1.5708),
-            partial(SkillLib.rotate, rotation_angle=1.5708),
-            partial(SkillLib.rotate, rotation_angle=-1.5708),
-            partial(SkillLib.wait, wait_time=20),
+            partial(SkillLib.shake, n_shakes=3, shake_angle=0.5, steps_per_swing=5),
+            partial(SkillLib.wait, wait_time=50),
             partial(SkillLib.place, target_container_name="table"),
             partial(SkillLib.open_gripper),
         ]

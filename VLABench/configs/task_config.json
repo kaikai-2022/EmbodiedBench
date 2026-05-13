@@ -2364,10 +2364,10 @@
     "task": {
       "asset": {
         "seen_object": [
-          "tube"
+          "glass_stirring_rod"
         ],
         "unseen_object": [
-          "tube"
+          "glass_stirring_rod"
         ]
       },
       "scene": {
@@ -2389,14 +2389,12 @@
     "task": {
       "asset": {
         "seen_object": [
-          "tube",
-          "chemistry_tube_stand",
-          "small_beaker"
+          "small_beaker",
+          "large_beaker"
         ],
         "unseen_object": [
-          "tube",
-          "chemistry_tube_stand",
-          "small_beaker"
+          "small_beaker",
+          "large_beaker"
         ]
       },
       "scene": {
@@ -2447,15 +2445,9 @@
     "task": {
       "asset": {
         "seen_object": [
-          "object"
-        ],
-        "unseen_object": [
-          "object"
-        ],
-        "seen_container": [
           "small_beaker"
         ],
-        "unseen_container": [
+        "unseen_object": [
           "small_beaker"
         ]
       },
@@ -2478,10 +2470,10 @@
     "task": {
       "asset": {
         "seen_object": [
-          "pipette"
+          "glass_stirring_rod"
         ],
         "unseen_object": [
-          "pipette"
+          "glass_stirring_rod"
         ]
       },
       "scene": {
@@ -2567,6 +2559,62 @@
           "tube",
           "chemistry_tube_stand",
           "small_beaker"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "pick_pour_place_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "flask",
+          "small_beaker",
+          "table"
+        ],
+        "unseen_object": [
+          "flask",
+          "small_beaker",
+          "table"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "pick_stir_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "glass_stirring_rod",
+          "large_beaker"
+        ],
+        "unseen_object": [
+          "glass_stirring_rod",
+          "large_beaker"
         ]
       },
       "scene": {

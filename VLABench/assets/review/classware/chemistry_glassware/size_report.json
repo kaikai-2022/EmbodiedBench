@@ -1,4 +1,0 @@
-{
-  "action": "skipped",
-  "reason": "llm_error: 'ThinkingBlock' object has no attribute 'text'"
-}

@@ -31,4 +31,5 @@ name2config = {
     "pour_pour_series":["pour_pour"],
     "test_chemistry_beaker_series":["test_chemistry_beaker"],
     "lift_beaker_series":["lift_beaker"],
+    "pick_stir_series":["pick_stir"],
 }
