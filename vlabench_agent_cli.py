@@ -20,8 +20,8 @@ sys.path.insert(0, str(PROJECT_ROOT))
 if "VLABENCH_ROOT" not in os.environ:
     os.environ["VLABENCH_ROOT"] = str(PROJECT_ROOT / "VLABench")
 
-from scripts.vlabench_agent.agent import build_vlabench_agent, create_initial_state
-from scripts.vlabench_agent.config import AgentConfig
+from VLABench.pipeline.agent import build_vlabench_agent, create_initial_state
+from VLABench.pipeline.config import AgentConfig
 
 
 def setup_logging(verbose: bool = False):
@@ -184,7 +184,7 @@ def main():
         print("\n方式 1: 设置环境变量")
         print("  export ANTHROPIC_API_KEY='your-api-key'")
         print("\n方式 2: 修改配置文件")
-        print("  编辑 scripts/vlabench_agent/config.py")
+        print("  编辑 VLABench/pipeline/config.py")
         print("  设置 ANTHROPIC_API_KEY = 'your-api-key'")
         sys.exit(1)
 

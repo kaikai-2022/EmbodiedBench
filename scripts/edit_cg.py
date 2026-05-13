@@ -1,7 +1,7 @@
 """Apply targeted edits to code_generator.py using Python file manipulation."""
 import re
 
-path = "/ssd/mkqin/workspace/VLABench/scripts/vlabench_agent/nodes/code_generator.py"
+path = "/ssd/mkqin/workspace/VLABench/VLABench/pipeline/nodes/code_generator.py"
 with open(path) as f:
     content = f.read()
 

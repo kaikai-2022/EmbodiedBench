@@ -13,7 +13,7 @@ from typing import Dict, Optional
 
 logger = logging.getLogger(__name__)
 
-CACHE_FILE = Path(__file__).resolve().parent.parent.parent / "VLABench" / "assets" / "asset_cache.json"
+CACHE_FILE = Path(__file__).resolve().parent / "asset_cache.json"
 
 
 def load_cache() -> Dict[str, Dict]:

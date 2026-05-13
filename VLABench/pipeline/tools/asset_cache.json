@@ -63,5 +63,10 @@
     "spec": "large_beaker",
     "source_type": "local",
     "is_physical": true
+  },
+  "glass_stirring": {
+    "spec": "glass_stirring_rod",
+    "source_type": "objaverse",
+    "is_physical": true
   }
 }

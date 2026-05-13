@@ -55,16 +55,16 @@ print("-" * 70)
 
 modules_ok = True
 try:
-    from scripts.vlabench_agent import build_vlabench_agent, VLABenchAgentState
+    from VLABench.pipeline import build_vlabench_agent, VLABenchAgentState
     print("  ✓ 核心模块 (build_vlabench_agent, VLABenchAgentState)")
 
-    from scripts.vlabench_agent.nodes import (
-        analyzer_node, asset_manager_node,
-        task_creator_node, render_executor_node
+    from VLABench.pipeline.nodes import (
+        analyzer_node, asset_manager_node, skill_planner_node, condition_planner_node,
+        code_generator_node, registration_node, simulation_node, vlm_data_node
     )
-    print("  ✓ 节点模块 (4 个节点)")
+    print("  ✓ 节点模块 (8 个节点)")
 
-    from scripts.vlabench_agent.tools import check_asset_exists, download_asset
+    from VLABench.pipeline.tools import check_asset_exists, download_asset
     print("  ✓ 工具模块 (check_asset_exists, download_asset)")
 
     # 尝试构建 Agent
@@ -100,19 +100,17 @@ print("✓ 文件结构检查")
 print("-" * 70)
 
 required_files = [
-    'scripts/vlabench_agent/__init__.py',
-    'scripts/vlabench_agent/agent.py',
-    'scripts/vlabench_agent/state.py',
-    'scripts/vlabench_agent/nodes/analyzer.py',
-    'scripts/vlabench_agent/nodes/asset_manager.py',
-    'scripts/vlabench_agent/nodes/task_creator.py',
-    'scripts/vlabench_agent/nodes/render_executor.py',
-    'scripts/vlabench_agent/tools/asset_tools.py',
+    'VLABench/pipeline/__init__.py',
+    'VLABench/pipeline/agent.py',
+    'VLABench/pipeline/state.py',
+    'VLABench/pipeline/config.py',
+    'VLABench/pipeline/nodes/analyzer.py',
+    'VLABench/pipeline/nodes/asset_manager.py',
+    'VLABench/pipeline/nodes/skill_planner.py',
+    'VLABench/pipeline/nodes/condition_planner.py',
+    'VLABench/pipeline/nodes/code_generator.py',
+    'VLABench/pipeline/tools/asset_tools.py',
     'vlabench_agent_cli.py',
-    'requirements_agent.txt',
-    'docs/LangGraph_Agent_Integration_Plan.md',
-    'docs/VLABench_Agent_User_Guide.md',
-    'docs/QUICKSTART.md'
 ]
 
 files_ok = True

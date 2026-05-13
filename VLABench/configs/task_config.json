@@ -2495,10 +2495,10 @@
     "task": {
       "asset": {
         "seen_object": [
-          "pipette"
+          "glass_stirring_rod"
         ],
         "unseen_object": [
-          "pipette"
+          "glass_stirring_rod"
         ]
       },
       "scene": {

@@ -415,6 +415,12 @@ class LM4ManipDMEnv(composer.Environment):
                 if entity.is_grasped(self.physics, self.robot):
                     name_list.append(name)
                     entity_list.append(entity)
+        # grasp lock 模式下接触力检测可能失效，从 _grasped_entity_info 补充
+        if not entity_list and hasattr(self, "_grasped_entity_info") and self._grasped_entity_info:
+            fallback_name = self._grasped_entity_info.get("name")
+            if fallback_name and fallback_name in self.task.entities:
+                name_list = [fallback_name]
+                entity_list = [self.task.entities[fallback_name]]
         return name_list, entity_list
     
     def _reset_attempt(self):

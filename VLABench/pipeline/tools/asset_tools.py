@@ -103,9 +103,17 @@ def download_asset(keyword: str, max_downloads: int = 3) -> Dict:
             "error": "VLABENCH_ROOT 未设置"
         }
 
-    # get_assets.py 在项目根目录的 scripts/ 下，不在 VLABench 包内
-    project_root = Path(vlabench_root).parent  # VLABench/ -> workspace/VLABench/
-    script_path = project_root / "scripts" / "get_assets.py"
+    # get_assets.py 在 VLABench/pipeline/tools/ 下
+    vlabench_root = os.environ.get('VLABENCH_ROOT')
+    if not vlabench_root:
+        return {
+            "success": False,
+            "downloaded_count": 0,
+            "assets": [],
+            "error": "VLABENCH_ROOT 未设置"
+        }
+
+    script_path = Path(vlabench_root) / "VLABench" / "pipeline" / "tools" / "get_assets.py"
 
     if not script_path.exists():
         return {
@@ -124,11 +132,11 @@ def download_asset(keyword: str, max_downloads: int = 3) -> Dict:
             "--max_downloads", str(max_downloads),
             "--output_dir", "./VLABench/assets/review",
             "--skip_existing"
-        ], capture_output=True, text=True, timeout=600, cwd=project_root)  # 在项目根目录运行
+        ], capture_output=True, text=True, timeout=600, cwd=vlabench_root)  # 在 VLABench 目录运行
 
         if result.returncode == 0:
             # 解析输出,提取下载的资产信息
-            output_dir = project_root / "VLABench" / "assets" / "review" / keyword.lower()
+            output_dir = Path(vlabench_root) / "VLABench" / "assets" / "review" / keyword.lower()
 
             # 后处理：修复 XML 文件中的路径引用
             # obj2mjcf 生成的结构是: uuid/uuid.xml 和 uuid/uuid/*.obj

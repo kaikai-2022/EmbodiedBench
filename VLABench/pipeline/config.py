@@ -94,7 +94,7 @@ class AgentConfig:
 
 
 # 使用示例:
-# from scripts.vlabench_agent.config import AgentConfig
+# from VLABench.pipeline.config import AgentConfig
 # from langchain_anthropic import ChatAnthropic
 #
 # # 方法 1: 直接使用

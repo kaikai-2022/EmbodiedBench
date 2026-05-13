@@ -20,7 +20,7 @@ export ANTHROPIC_BASE_URL='https://your-proxy.com/v1'
 # 配置示例 2: 直接在 config.py 中设置
 # ============================================================================
 """
-编辑 scripts/vlabench_agent/config.py:
+编辑 VLABench/pipeline/config.py:
 
 class AgentConfig:
     # 模型配置

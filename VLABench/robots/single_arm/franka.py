@@ -128,7 +128,7 @@ class Franka(SingleArm):
                 [2*(x*y+w*z), 1-2*(x*x+z*z), 2*(y*z-w*x)],
                 [2*(x*z-w*y), 2*(y*z+w*x), 1-2*(x*x+y*y)]
             ])
-            offset_local = np.array([0.00070711, 0.00070711, 0.0064])
+            offset_local = np.array([0.0007, 0.0007, 0.0064])
             offset_world = R_mat @ offset_local
             original_pos = np.array(pos)
             pos = original_pos - offset_world

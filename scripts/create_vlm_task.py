@@ -14,7 +14,7 @@ VLM 评测任务批量生成脚本（v2 - 基于仿真环境）
      d. extract_skill_sequence() -> 转换为 operation_sequence.json 格式
      e. env.task.get_instruction() -> 获取 instruction
      f. 写入 dataset/vlm_evaluation_v1.0/{dimension}/{task_name}/example{i}/
-  3. 可选: 调用 render_vlm_dataset.py 渲染图像
+  3. 可选: 调用 VLABench/pipeline/tools/render_vlm_dataset.py 渲染图像
 
 前置条件:
   - 任务的 series 文件已创建 (VLABench/tasks/hierarchical_tasks/primitive/{task}_series.py)
@@ -178,7 +178,7 @@ def create_example_from_env(
 
 def render_task_images(task_name: str, dimension: str, overwrite: bool = False) -> bool:
     """调用 render_vlm_dataset.py 渲染任务图像"""
-    render_script = SCRIPT_DIR / "render_vlm_dataset.py"
+    render_script = Path(os.environ.get("VLABENCH_ROOT", str(SCRIPT_DIR.parent))) / "pipeline" / "tools" / "render_vlm_dataset.py"
 
     cmd = [
         sys.executable,
@@ -341,11 +341,11 @@ def main():
             print("\n渲染完成")
         else:
             print("\n渲染失败，请手动运行:")
-            print(f"  python scripts/render_vlm_dataset.py --task {task_name} --dimension \"{dimension}\"")
+            print(f"  python VLABench/pipeline/tools/render_vlm_dataset.py --task {task_name} --dimension \"{dimension}\"")
 
     elif success_count > 0 and not args.render:
         print("下一步:")
-        print(f"  1. 渲染: python scripts/render_vlm_dataset.py --task {task_name} --dimension \"{dimension}\"")
+        print(f"  1. 渲染: python VLABench/pipeline/tools/render_vlm_dataset.py --task {task_name} --dimension \"{dimension}\"")
         print(f"  2. 评测: python scripts/evaluate_vlm.py --vlm_name Qwen2_VL --eval-dimension \"{dimension}\" --tasks {task_name}")
 
     return 0 if failed_count == 0 else 1
