@@ -1,0 +1,14 @@
+{
+  "uid": "rag",
+  "name": "rag",
+  "source": "local",
+  "original_path": "/tmp/rag_only/rag.glb",
+  "keyword": "rag",
+  "tags": [],
+  "categories": [],
+  "description": "Local GLB model: rag.glb",
+  "rotation": {
+    "axis": "x",
+    "degrees": 90.0
+  }
+}

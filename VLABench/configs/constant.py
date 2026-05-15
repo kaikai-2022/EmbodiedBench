@@ -317,6 +317,11 @@ name2class_xml = {
     "cylinder_big": [components.ChemistryBeaker, "review/cylinder_big/cylinder_big/cylinder_big/cylinder_big.xml"],
     "glass_stirring_rod": [components.CommonGraspedEntity, "review/glass_stirring_rod/glass_stirring_rod/glass_stirring_rod.xml"],
 
+    "funnel": [components.CommonGraspedEntity, "review/funnel/funnel/funnel.xml"],
+    "hot_plate": [components.FlatContainer, "review/hot_plate/hot_plate/hot_plate.xml"],
+    "magnetic_stir_plate": [components.FlatContainer, "review/magnetic_stir_plate/magnetic_stir_plate/magnetic_stir_plate.xml"],
+    "rag": [components.CommonGraspedEntity, "review/rag/rag/rag.xml"],
+    "water_bath": [components.CommonContainer, "review/water_bath/water_bath/water_bath.xml"],
 }
 
 additional_dict = {}

@@ -33,7 +33,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 _SCRIPTS_DIR = Path(__file__).resolve().parent
-_PROJECT_ROOT = _SCRIPTS_DIR.parent
+_PROJECT_ROOT = _SCRIPTS_DIR.parent.parent.parent  # tests -> pipeline -> VLABench
 
 # 允许的类名列表
 VALID_CLASSES = {

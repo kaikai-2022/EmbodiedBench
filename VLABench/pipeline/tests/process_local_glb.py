@@ -53,11 +53,15 @@ logger = logging.getLogger(__name__)
 
 # 将 scripts 目录加入 path，以便复用 get_assets.py 的方法
 _SCRIPTS_DIR = Path(__file__).resolve().parent
-_PROJECT_ROOT = _SCRIPTS_DIR.parent
+_PROJECT_ROOT = _SCRIPTS_DIR.parent.parent  # tests -> pipeline -> VLABench
+_TESTS_DIR = _SCRIPTS_DIR
+_TOOLS_DIR = _PROJECT_ROOT / "pipeline" / "tools"
 if str(_SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(_SCRIPTS_DIR))
 if str(_PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(_PROJECT_ROOT))
+if str(_TOOLS_DIR) not in sys.path:
+    sys.path.insert(0, str(_TOOLS_DIR))
 
 # Import from project root (must be after sys.path setup)
 from fix_obj2mjcf_xml import get_obj_dimensions

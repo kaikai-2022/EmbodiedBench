@@ -16,9 +16,12 @@
 
 | 脚本 | 路径 | 用途 |
 |------|------|------|
-| **split_glb.py** | `scripts/split_glb.py` | 将包含多个几何体的 GLB 文件拆分为独立 GLB |
-| **process_local_glb.py** | `scripts/process_local_glb.py` | GLB → OBJ 转换、collision mesh 生成、尺寸归一化、XML 生成 |
-| **register_model.py** | `scripts/register_model.py` | XML 注入（grasppoint/solution 等）+ 注册到 constant.py |
+| **split_glb.py** | `VLABench/pipeline/tests/split_glb.py` | 将包含多个几何体的 GLB 文件拆分为独立 GLB |
+| **process_local_glb.py** | `VLABench/pipeline/tests/process_local_glb.py` | GLB → OBJ 转换、collision mesh 生成、尺寸归一化、XML 生成 |
+| **register_model.py** | `VLABench/pipeline/tests/register_model.py` | XML 注入（grasppoint/solution 等）+ 注册到 constant.py |
+| **validate_asset.py** | `VLABench/pipeline/tests/validate_asset.py` | 验证生成的模型能否被 MuJoCo 正确加载 |
+
+> **注意**：`process_local_glb.py` 依赖 `fix_obj2mjcf_xml` 模块，如果遇到 `ModuleNotFoundError`，需要从 `scripts/` 目录复制该模块到 Python path，或使用场景 C 的简化方法直接用 trimesh 转换。
 
 ### 2.2 模型输出目录
 
@@ -51,7 +54,7 @@ VLABench/assets/review/large_beaker/
 | 文件 | 路径 | 作用 |
 |------|------|------|
 | **constant.py** | `VLABench/configs/constant.py` | 资产注册表 `name2class_xml`，框架通过此文件查找模型 |
-| **normalizer.py** | `scripts/vlabench_agent/nodes/normalizer.py` | `STANDARD_ASSET_LIBRARY` 列表，LLM 分类时匹配模型名称 |
+| **normalizer.py** | `VLABench/pipeline/nodes/normalizer.py` | `STANDARD_ASSET_LIBRARY` 列表，LLM 分类时匹配模型名称 |
 | **asset_cache.json** | `scripts/VLABench/assets/asset_cache.json` | Normalizer 缓存，已分类的模型会缓存 spec 映射 |
 
 ### 2.4 实体类对照表
@@ -78,7 +81,7 @@ VLABench/assets/review/large_beaker/
 ```bash
 cd /ssd/mkqin/workspace/VLABench
 
-python scripts/process_local_glb.py \
+python VLABench/pipeline/tests/process_local_glb.py \
     --input_dir <GLB所在目录> \
     --keyword <模型关键词> \
     --output_dir VLABench/assets/review/<model_name>
@@ -97,7 +100,7 @@ python scripts/process_local_glb.py \
 #### Step 2：注册模型
 
 ```bash
-python scripts/register_model.py \
+python VLABench/pipeline/tests/register_model.py \
     --model_dir VLABench/assets/review/<model_name>/<model_name>/<model_name> \
     --class_name <实体类名> \
     --name <注册名>
@@ -175,7 +178,7 @@ content = re.sub(
 
 #### Step 5：注册到 Normalizer 标准资产库
 
-编辑 `scripts/vlabench_agent/nodes/normalizer.py`，在 `STANDARD_ASSET_LIBRARY` 列表中添加新模型名：
+编辑 `VLABench/pipeline/nodes/normalizer.py`，在 `STANDARD_ASSET_LIBRARY` 列表中添加新模型名：
 
 ```python
 STANDARD_ASSET_LIBRARY = [
@@ -221,6 +224,9 @@ grep '<model_name>' VLABench/configs/constant.py
 # 3. 端到端测试
 cd /ssd/mkqin/workspace/VLABench
 MUJOCO_GL=egl PYOPENGL_PLATFORM=egl python scripts/test_e2e.py "Lift the <model_name>"
+
+# 使用 validate_asset.py 验证模型
+python VLABench/pipeline/tests/validate_asset.py --asset_dir VLABench/assets/review/<model_name>
 ```
 
 ---
@@ -265,11 +271,14 @@ for i, (name, geom) in enumerate(scene.geometry.items()):
 **注意**：每个模型需要单独放到一个临时输入目录中，因为 `process_local_glb.py` 按 keyword 匹配文件名：
 
 ```bash
+# 使用 split_glb.py 拆分多合一 GLB
+python VLABench/pipeline/tests/split_glb.py /path/to/combined.glb --output_dir /tmp/split
+
 # 为每个模型创建临时目录
 mkdir -p /tmp/<model_name>_input
 cp /ssd/mkqin/download/<split_file>.glb /tmp/<model_name>_input/<model_name>.glb
 
-python scripts/process_local_glb.py \
+python VLABench/pipeline/tests/process_local_glb.py \
     --input_dir /tmp/<model_name>_input \
     --keyword <model_name> \
     --output_dir VLABench/assets/review/<model_name>

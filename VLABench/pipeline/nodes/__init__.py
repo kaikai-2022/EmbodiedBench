@@ -10,6 +10,7 @@ from .code_generator import code_generator_node
 from .registration import registration_node
 from .simulation import simulation_node
 from .vlm_data import vlm_data_node
+from .reviewer import reviewer_node
 from .normalizer import normalizer_node
 
 __all__ = [
@@ -22,4 +23,5 @@ __all__ = [
     "registration_node",
     "simulation_node",
     "vlm_data_node",
+    "reviewer_node",
 ]

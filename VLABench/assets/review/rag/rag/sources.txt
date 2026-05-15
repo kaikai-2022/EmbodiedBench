@@ -1,0 +1,14 @@
+Model UID: rag
+Model Name: rag
+
+Source Information:
+============================================================
+Source: Local File
+Original Path: /tmp/rag_only/rag.glb
+File Name: rag.glb
+Keyword/Category: rag
+Rotation: 90.0° around X axis
+
+Processing:
+Pipeline: process_local_glb.py
+Steps: GLB->OBJ (trimesh) -> [rotate] -> MJCF (obj2mjcf) -> postprocess -> bottom-align -> validate -> size_fix

@@ -42,6 +42,12 @@ STANDARD_ASSET_LIBRARY = [
     "apple", "banana", "orange", "avocado", "pear",
     "bread", "croissant", "bagel", "cake", "donut",
     "hammer", "cord", "laptop",
+    "rag",
+    "water_bath",
+    "funnel",
+    "hot_plate",
+    "magnetic_stir_plate",
+    "petri_dish",
 ]
 
 

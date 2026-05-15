@@ -68,5 +68,10 @@
     "spec": "glass_stirring_rod",
     "source_type": "objaverse",
     "is_physical": true
+  },
+  "rag": {
+    "spec": "rag",
+    "source_type": "local",
+    "is_physical": true
   }
 }

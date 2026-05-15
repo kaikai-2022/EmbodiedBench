@@ -9,6 +9,7 @@ import json
 import logging
 import os
 import signal
+import time
 import traceback
 import numpy as np
 from pathlib import Path
@@ -270,6 +271,10 @@ def simulation_node(state: Dict) -> Dict:
         # 初始化 per-step condition 检查结果
         step_condition_results = []
 
+        # ========== 时间戳记录初始化 ==========
+        video_start_time = time.time()  # 视频开始录制的绝对时间
+        step_timestamps = []  # 记录每个大 step 和原子操作的时间戳
+
         # 构建 step_id -> skills 数量的映射
         # atomic_sequence 中的 skill 数量决定何时检查 condition
         step_skill_counts = []
@@ -291,9 +296,13 @@ def simulation_node(state: Dict) -> Dict:
 
         try:
             current_step_idx = 0
+            current_atomic_timestamps = []  # 当前 step 的原子操作时间戳列表
             for skill_idx, skill in enumerate(skill_seq):
                 skill_name = skill.func.__name__
                 logger.info(f"[Simulation]   执行技能 {skill_idx + 1}/{len(skill_seq)}: {skill_name}")
+
+                # 记录原子操作开始时间
+                atomic_start = time.time() - video_start_time
 
                 # 每个技能重置超时
                 signal.alarm(SKILL_TIMEOUT)
@@ -301,6 +310,14 @@ def simulation_node(state: Dict) -> Dict:
                 obs, waypoint, stage_success, skill_task_success = skill(env)
                 observations.extend(obs)
                 waypoints.extend(waypoint)
+
+                # 记录原子操作结束时间
+                atomic_end = time.time() - video_start_time
+                current_atomic_timestamps.append({
+                    "atomic_idx": skill_idx,
+                    "start": atomic_start,
+                    "end": atomic_end
+                })
 
                 if not stage_success:
                     logger.warning(f"[Simulation]   ⚠ 技能 {skill_name} 执行失败")
@@ -313,6 +330,16 @@ def simulation_node(state: Dict) -> Dict:
                 # 检查是否完成了某个 step 的所有 skills
                 for step_idx, end_idx in enumerate(step_skill_ends):
                     if skill_idx == end_idx - 1:  # 当前 skill 是该 step 的最后一个
+                        # 记录 step 结束时间
+                        step_end = time.time() - video_start_time
+                        step_timestamps.append({
+                            "step_id": step_idx,
+                            "atomic_timestamps": current_atomic_timestamps,
+                            "step_end": step_end
+                        })
+                        # 重置当前 step 的原子操作时间戳列表
+                        current_atomic_timestamps = []
+
                         step_condition = None
                         if condition_plan:
                             step_condition = next(
@@ -415,8 +442,9 @@ def simulation_node(state: Dict) -> Dict:
                 "episode_config": episode_config,
                 "executed_skill_sequence": executed_skill_sequence,
                 "step_condition_results": step_condition_results,
+                "step_timestamps": step_timestamps,  # 时间戳记录，供 Reviewer 使用
                 "error_feedback": None,
-                "current_stage": "vlm_data",
+                "current_stage": "reviewer",  # 修改为进入 Reviewer 节点
             }
             log_node_output_file("simulation", state, output)
             return output
@@ -441,8 +469,9 @@ def simulation_node(state: Dict) -> Dict:
                 "episode_config": episode_config,
                 "executed_skill_sequence": executed_skill_sequence,
                 "step_condition_results": step_condition_results,
+                "step_timestamps": step_timestamps,  # 时间戳记录，供 Reviewer 使用
                 "error_feedback": error_msg,
-                "current_stage": "simulation",
+                "current_stage": "reviewer",  # 修改为进入 Reviewer 节点
             }
             log_node_output_file("simulation", state, output)
             return output
@@ -471,8 +500,9 @@ def simulation_node(state: Dict) -> Dict:
         output = {
             "simulation_success": False,
             "simulation_video_path": video_path,
+            "step_timestamps": step_timestamps if 'step_timestamps' in dir() else [],  # 时间戳记录，供 Reviewer 使用
             "error_feedback": f"仿真异常:\n{error_tb}",
-            "current_stage": "simulation",
+            "current_stage": "reviewer",  # 修改为进入 Reviewer 节点
         }
         log_node_output_file("simulation", state, output)
         return output

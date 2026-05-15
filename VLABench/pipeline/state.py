@@ -127,3 +127,13 @@ class VLABenchAgentState(TypedDict):
     warnings: List[str]                          # 警告记录
     asset_cache: Dict                           # Normalizer 本地缓存（raw_type → {spec, source_type}）
     _log_filepath: Optional[str]               # 当前运行日志文件路径
+
+    # ========== Reviewer 相关 ==========
+    # step_timestamps: 记录每个大 step 和原子操作的执行时间戳
+    # 格式: [{"step_id": int, "atomic_timestamps": [{"atomic_idx": int, "start": float, "end": float}, ...], "step_end": float}]
+    step_timestamps: Optional[List[Dict]]
+    # review_results: Reviewer 节点对每个 step 的审核结果
+    # 格式: [{"step_id": int, "passed": bool, "reason": str}]
+    review_results: Optional[List[Dict]]
+    # review_passed: 所有 step 都通过则为 True
+    review_passed: Optional[bool]
