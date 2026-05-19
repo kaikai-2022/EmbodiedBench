@@ -77,6 +77,37 @@ Pipeline Log
     return str(log_filepath)
 
 
+def log_instruction_entry(log_filepath: str, instruction: str) -> None:
+    """
+    写入 [Instruction] 条目到日志文件（在 [analyzer] 之前）。
+
+    Args:
+        log_filepath: 日志文件路径字符串
+        instruction: 用户指令文本
+    """
+    log_path = Path(log_filepath)
+    if not log_path.exists():
+        log_path.write_text("", encoding="utf-8")
+
+    timestamp = datetime.now().strftime("%H:%M:%S")
+    entry = {
+        "timestamp": datetime.now().isoformat(),
+        "instruction": instruction,
+    }
+
+    try:
+        entry_json = json.dumps(entry, indent=2, ensure_ascii=False, default=_sanitize_for_json)
+        separator = f"\n{'—' * 80}\n"
+        block = f"{separator}[Instruction] {timestamp}{separator}\n{entry_json}\n"
+
+        with open(log_path, "a", encoding="utf-8") as f:
+            f.write(block)
+
+        logger.info(f"[NodeLogger] ✓ [Instruction] 已记录")
+    except Exception as e:
+        logger.error(f"[NodeLogger] ✗ [Instruction] 写入失败: {e}")
+
+
 def log_node_output_file(node_name: str, state: Dict, output: Dict) -> None:
     """
     将节点输出追加到当前运行的日志文件。

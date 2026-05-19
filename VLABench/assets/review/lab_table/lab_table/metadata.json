@@ -1,0 +1,14 @@
+{
+  "uid": "lab_table",
+  "name": "lab_table",
+  "source": "local",
+  "original_path": "/tmp/lab_table_rebuild/lab_table.glb",
+  "keyword": "lab_table",
+  "tags": [],
+  "categories": [],
+  "description": "Local GLB model: lab_table.glb",
+  "rotation": {
+    "axis": "x",
+    "degrees": 90.0
+  }
+}

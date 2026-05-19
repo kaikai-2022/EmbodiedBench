@@ -135,31 +135,42 @@ def _resolve_condition_params(params: Dict, entities_dict: Dict, robot) -> Dict:
     return resolved
 
 
-def _check_step_condition(step_id: int, condition_entry: Dict, entities_dict: Dict, robot, physics) -> Dict:
+def _create_condition(step_id: int, condition_entry: Dict, entities_dict: Dict, robot, physics):
     """
-    检查单个 step 的 condition。
-
-    Args:
-        step_id: step 编号
-        condition_entry: condition_plan 中的单个条目
-        entities_dict: env.task.entities 字典
-        robot: robot Entity 对象
-        physics: mujoco physics 对象
+    创建 condition 实例并记录初始状态（技能执行前调用）。
 
     Returns:
-        {"step_id": int, "condition_type": str, "met": bool, "error": str or None}
+        (condition_instance, condition_type) or (None, "pass")
     """
     from VLABench.utils.register import register
 
     cond_type = condition_entry.get("condition_type", "pass")
     if cond_type == "pass":
-        return {"step_id": step_id, "condition_type": "pass", "met": True, "error": None}
+        return None, "pass"
 
     params = condition_entry.get("params", {})
     try:
         condition_cls = register.load_condition(cond_type)
         resolved_params = _resolve_condition_params(params, entities_dict, robot)
         condition = condition_cls(**resolved_params)
+        condition.record_initial_state(physics)
+        return condition, cond_type
+    except Exception as e:
+        logger.warning(f"[Simulation]   ⚠ Step {step_id} condition creation error: {e}")
+        return None, cond_type
+
+
+def _evaluate_condition(step_id: int, condition, cond_type: str, physics) -> Dict:
+    """
+    检查 condition 是否满足（技能执行后调用）。
+
+    Returns:
+        {"step_id": int, "condition_type": str, "met": bool, "error": str or None}
+    """
+    if condition is None:
+        return {"step_id": step_id, "condition_type": cond_type, "met": True, "error": None}
+
+    try:
         met = condition.is_met(physics)
         return {"step_id": step_id, "condition_type": cond_type, "met": met, "error": None}
     except Exception as e:
@@ -279,6 +290,7 @@ def simulation_node(state: Dict) -> Dict:
         # atomic_sequence 中的 skill 数量决定何时检查 condition
         step_skill_counts = []
         step_skill_ends = []  # 累计索引，用于判断某 step 的 skills 何时完成
+        step_skill_starts = []  # 每个 step 的起始 skill 索引
         for step in global_skill_plan:
             num_skills = len(step.get("atomic_sequence", []))
             step_skill_counts.append(num_skills)
@@ -287,18 +299,45 @@ def simulation_node(state: Dict) -> Dict:
             else:
                 step_skill_ends.append(num_skills)
 
+        # 计算每个 step 的起始索引
+        for i, count in enumerate(step_skill_counts):
+            if i == 0:
+                step_skill_starts.append(0)
+            else:
+                step_skill_starts.append(step_skill_starts[-1] + step_skill_counts[i - 1])
+
+        # 存储 step_idx -> (condition_instance, condition_type) 的映射
+        step_conditions = {}
+
         logger.info(f"[Simulation]   共有 {len(global_skill_plan)} 个 steps, {len(skill_seq)} 个 skills")
-        logger.info(f"[Simulation]   Step skill counts: {step_skill_counts}, ends: {step_skill_ends}")
+        logger.info(f"[Simulation]   Step skill counts: {step_skill_counts}, starts: {step_skill_starts}, ends: {step_skill_ends}")
 
         # 设置整体仿真超时
         old_handler = signal.signal(signal.SIGALRM, _timeout_handler)
         signal.alarm(SIMULATION_TIMEOUT)
 
         try:
-            current_step_idx = 0
-            current_atomic_timestamps = []  # 当前 step 的原子操作时间戳列表
+            current_atomic_timestamps = []
             for skill_idx, skill in enumerate(skill_seq):
                 skill_name = skill.func.__name__
+
+                # step 开始前：创建 condition 实例并记录初始状态
+                for step_idx, start_idx in enumerate(step_skill_starts):
+                    if skill_idx == start_idx:
+                        step_condition_entry = None
+                        if condition_plan:
+                            step_condition_entry = next(
+                                (c for c in condition_plan if c.get("step_id") == step_idx),
+                                None
+                            )
+                        if step_condition_entry:
+                            cond_instance, cond_type = _create_condition(
+                                step_idx, step_condition_entry,
+                                env.task.entities, env.robot, env.physics
+                            )
+                            step_conditions[step_idx] = (cond_instance, cond_type)
+                        break
+
                 logger.info(f"[Simulation]   执行技能 {skill_idx + 1}/{len(skill_seq)}: {skill_name}")
 
                 # 记录原子操作开始时间
@@ -327,29 +366,21 @@ def simulation_node(state: Dict) -> Dict:
                     task_success = True
                     break
 
-                # 检查是否完成了某个 step 的所有 skills
+                # step 结束后：评估 condition
                 for step_idx, end_idx in enumerate(step_skill_ends):
-                    if skill_idx == end_idx - 1:  # 当前 skill 是该 step 的最后一个
-                        # 记录 step 结束时间
+                    if skill_idx == end_idx - 1:
                         step_end = time.time() - video_start_time
                         step_timestamps.append({
                             "step_id": step_idx,
                             "atomic_timestamps": current_atomic_timestamps,
                             "step_end": step_end
                         })
-                        # 重置当前 step 的原子操作时间戳列表
                         current_atomic_timestamps = []
 
-                        step_condition = None
-                        if condition_plan:
-                            step_condition = next(
-                                (c for c in condition_plan if c.get("step_id") == step_idx),
-                                None
-                            )
-                        if step_condition:
-                            result = _check_step_condition(
-                                step_idx, step_condition,
-                                env.task.entities, env.robot, env.physics
+                        if step_idx in step_conditions:
+                            cond_instance, cond_type = step_conditions[step_idx]
+                            result = _evaluate_condition(
+                                step_idx, cond_instance, cond_type, env.physics
                             )
                             step_condition_results.append(result)
                             status_icon = "✓" if result["met"] else "✗"

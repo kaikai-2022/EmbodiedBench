@@ -6,10 +6,14 @@ from VLABench.tasks.components.entity import Entity
 class Condition:
     def __init__(self):
         pass
-    
+
+    def record_initial_state(self, physics=None):
+        """在技能执行前调用，记录初始状态。子类可重写以支持前态-终态对比。"""
+        pass
+
     def is_met(self, physics=None):
         raise NotImplementedError()
-    
+
     def met_progress(self, physics=None):
         return self.is_met(physics)
 
@@ -281,19 +285,43 @@ class JointInRangeCondition(Condition):
 class LiftCondition(Condition):
     """
     The entity should be lifted above the target height.
+
+    支持两种模式：
+    1. 绝对高度: target_height 指定固定高度（如 0.9m）
+    2. 相对高度: lift_height 指定相对于初始位置的高度增量（通过 record_initial_state 记录前态）
+
     params:
         entities: the target entities to be lifted
-        target_height: the target height to achieve
+        target_height: the target height to achieve (absolute height in meters)
+        lift_height: the height to lift relative to initial position (in meters)
     """
-    def __init__(self, entities, target_height):
+    def __init__(self, entities, target_height=None, lift_height=None):
         self.entities = entities
         self.target_height = target_height
-    
+        self.lift_height = lift_height
+        self._initial_z = {}  # entity_name -> initial z height
+        self._tolerance = 0.05  # 5cm tolerance
+
+    def record_initial_state(self, physics=None):
+        """技能执行前记录物体高度"""
+        for entity in self.entities:
+            name = entity.name if hasattr(entity, 'name') else str(id(entity))
+            xpos = physics.bind(entity.mjcf_model.worldbody).xpos
+            self._initial_z[name] = xpos[-1]
+
     def is_met(self, physics=None):
         for entity in self.entities:
             entity_xpos = physics.bind(entity.mjcf_model.worldbody).xpos
-            if entity_xpos[-1] < self.target_height:
-                return False
+            name = entity.name if hasattr(entity, 'name') else str(id(entity))
+
+            if self.lift_height is not None and self._initial_z:
+                initial_z = self._initial_z.get(name, entity_xpos[-1])
+                target_z = initial_z + self.lift_height - self._tolerance
+                if entity_xpos[-1] < target_z:
+                    return False
+            elif self.target_height is not None:
+                if entity_xpos[-1] < self.target_height - self._tolerance:
+                    return False
         return True
 
 class ConditionSet:

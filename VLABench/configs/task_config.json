@@ -2376,7 +2376,7 @@
       "components": [
         {
           "name": "table",
-          "xml_path": "obj/meshes/table/table.xml",
+          "xml_path": "review/lab_table/lab_table/lab_table.xml",
           "class": "Table",
           "randomness": {
             "texture": false
@@ -2482,7 +2482,7 @@
       "components": [
         {
           "name": "table",
-          "xml_path": "obj/meshes/table/table.xml",
+          "xml_path": "review/lab_table/lab_table/lab_table.xml",
           "class": "Table",
           "randomness": {
             "texture": false
@@ -2615,6 +2615,31 @@
         "unseen_object": [
           "glass_stirring_rod",
           "large_beaker"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "pick_rag_lift_rag_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "rag"
+        ],
+        "unseen_object": [
+          "rag"
         ]
       },
       "scene": {

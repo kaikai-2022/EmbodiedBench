@@ -29,7 +29,7 @@ from .nodes.registration import registration_node
 from .nodes.simulation import simulation_node
 from .nodes.vlm_data import vlm_data_node
 from .nodes.reviewer import reviewer_node
-from .nodes.node_logger import init_run_log
+from .nodes.node_logger import init_run_log, log_instruction_entry
 
 logger = logging.getLogger(__name__)
 
@@ -186,6 +186,7 @@ def build_vlabench_agent():
 def create_initial_state(user_instruction: str) -> Dict:
     """创建初始状态"""
     log_filepath = init_run_log(user_instruction)
+    log_instruction_entry(log_filepath, user_instruction)
     return {
         "messages": [],
         "user_instruction": user_instruction,

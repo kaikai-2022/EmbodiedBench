@@ -92,9 +92,9 @@ python VLABench/pipeline/tests/process_local_glb.py \
 - `--keyword`：GLB 文件名的子串（用于匹配，如目录中有 `flask.glb` 则 keyword 为 `flask`）
 - `--output_dir`：输出路径
 
-**注意**：如果原始模型朝向不对（如横躺着），可加：
+**注意**：大部分待处理模型都需要绕 X 轴旋转 90 度才能正过来：
 ```bash
---rotate_axis x --rotate_degrees -90
+--rotate_axis x --rotate_degrees 90
 ```
 
 #### Step 2：注册模型
@@ -432,15 +432,16 @@ MUJOCO_GL=egl PYOPENGL_PLATFORM=egl python scripts/test_e2e.py "Lift the <model_
 cd /ssd/mkqin/workspace/VLABench
 
 # ===== Step 1: 处理 GLB =====
-python scripts/process_local_glb.py \
+python VLABench/pipeline/tests/process_local_glb.py \
     --input_dir /path/to/glb/directory \
     --keyword model_keyword \
-    --output_dir VLABench/assets/review/my_new_model
+    --output_dir VLABench/assets/review/my_new_model \
+    --rotate_axis x --rotate_degrees 90
 
 # ===== Step 2: 注册 =====
-python scripts/register_model.py \
-    --model_dir VLABench/assets/review/my_new_model/my_new_model/my_new_model \
-    --class_name ChemistryBeaker \
+python VLABench/pipeline/tests/register_model.py \
+    --model_dir VLABench/assets/review/my_new_model/my_new_model \
+    --class_name CommonGraspedEntity \
     --name my_new_model
 
 # ===== Step 3: 修复 XML（手动编辑） =====

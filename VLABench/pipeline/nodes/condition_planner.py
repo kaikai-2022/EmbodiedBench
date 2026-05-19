@@ -55,8 +55,10 @@ Select from these condition types (registered in VLABench/tasks/condition.py):
   Target entity has been above heat source for cumulative duration seconds.
   Use for: "heat X over Y", "warm X with Y"
 
-- **lift**(entities=[<uid>], target_height=0.9): Entity is above target height.
+- **lift**(entities=[<uid>], lift_height=0.15): Entity is lifted above its initial height.
   Use for: "lift X", "raise X", "elevate X"
+  **IMPORTANT**: Use `lift_height` parameter (relative height in meters, default 0.15) instead of `target_height`.
+  The condition will check if entity_z >= initial_z + lift_height.
 
 - **on_position**(entities=[<uid>], positions=[[x,y,z],...], tolerance_distance=0.03, dimension=2):
   Entity is near target position. Use for: "move X to position", "place X at location"
@@ -197,6 +199,7 @@ def _validate_condition_plan(plan: List[Dict], num_steps: int, valid_uids: set) 
                          "tolerance_angle", "dimension", "offset", "threshold", "check_axes",
                          "layer", "tilt_angle", "wait_time", "insert_depth", "lift_height",
                          "push_distance", "rotation_angle", "gripper_state"]:
+                    continue
                     continue
                 # entity 参数应该是字符串 UID
                 if isinstance(v, str) and v not in valid_uids and v != "":

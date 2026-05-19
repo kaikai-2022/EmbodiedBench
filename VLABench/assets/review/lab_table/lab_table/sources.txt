@@ -1,0 +1,14 @@
+Model UID: lab_table
+Model Name: lab_table
+
+Source Information:
+============================================================
+Source: Local File
+Original Path: /tmp/lab_table_rebuild/lab_table.glb
+File Name: lab_table.glb
+Keyword/Category: lab_table
+Rotation: 90.0° around X axis
+
+Processing:
+Pipeline: process_local_glb.py
+Steps: GLB->OBJ (trimesh) -> [rotate] -> MJCF (obj2mjcf) -> postprocess -> bottom-align -> validate -> size_fix

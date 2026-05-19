@@ -121,14 +121,46 @@ def _validate_analysis(analysis: Dict) -> tuple:
 
 
 def _infer_task_name(analysis: Dict) -> str:
-    """从 raw_steps 推断 task_name（框架注册标识符）"""
-    task_name_parts = []
-    for step in analysis.get("raw_steps", []):
-        verb = step.get("action", "task").lower()
-        verb = re.sub(r's$', '', verb)
-        verb = re.sub(r'ed$', '', verb)
-        task_name_parts.append(verb)
-    return "_".join(task_name_parts) if task_name_parts else "custom_task"
+    """
+    从 raw_steps 推断 task_name，使用 verb_noun_verb_noun 格式。
+
+    命名规则: verb_noun_verb_noun (例如 pick_rag_lift_rag)
+    - 每个步骤贡献一个 verb_noun 对
+    - verb: 步骤的动作
+    - noun: 该动作的主对象名称
+
+    策略:
+    1. 遍历所有 raw_steps
+    2. 对每一步，将动作和主对象组合成 verb_noun
+    3. 用下划线连接所有 verb_noun 对
+
+    Returns:
+        task_name 字符串，格式为 verb_noun_verb_noun
+    """
+    raw_steps = analysis.get("raw_steps", [])
+
+    if not raw_steps:
+        return "custom_task"
+
+    parts = []
+    for step in raw_steps:
+        # 获取动作并规范化
+        action = step.get("action", "task").lower()
+        action = re.sub(r's$', '', action)  # 移除复数后缀
+        action = re.sub(r'ed$', '', action)  # 移除过去式后缀
+
+        # 获取主对象名称
+        primary_obj = step.get("primary_obj", "")
+        object_name = "object"
+        if primary_obj:
+            # 匹配格式: beaker_1 -> beaker
+            match = re.match(r'^([a-z_]+)_\d+$', primary_obj, re.IGNORECASE)
+            if match:
+                object_name = match.group(1).lower()
+
+        parts.append(f"{action}_{object_name}")
+
+    return "_".join(parts) if parts else "custom_task"
 
 
 def analyzer_node(state: Dict) -> Dict:
