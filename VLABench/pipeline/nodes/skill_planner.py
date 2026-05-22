@@ -34,7 +34,8 @@ SKILL_LIB_DOC = """
 ## 可用原子技能 (Atomic Skills)
 
 - pick(target_uid, prior_eulers=[[-pi, 0, 0]]): 从上方抓取物体。prior_eulers 决定抓取朝向。
-- place(target_container_uid): **将当前抓取的物体放置到目标容器/表面上方**。target_container_uid 必须是可放置的容器（如 table, beaker, shelf），**不是被抓取的物体本身**。
+- place(target_container_uid): **将当前抓取的物体精确放置到目标容器/表面上**。target_container_uid 必须是场景中具体的实体（如 hot_plate_0, beaker_0, shelf_0）。place 会使用目标实体的 place_point 作为放置位置。**当任务要求将物体放到某个特定目标上时，必须使用 place，不要用 drop**。
+- drop(): **将抓取的物体放到桌面上**。仅用于"使用完物品后腾出抓夹"的场景，即物体不需要放到任何特定位置，只需放到桌面即可。**drop 不接受 target 参数**。如果任务要求将物体放到某个特定实体上（如加热板、架子），必须使用 place(target_container_uid)，不要用 drop。
 - pour(): 倾倒动作（假设手里已抓着容器）。仅旋转腕部关节，末端位置会偏移。
 - pour_to_entity(target_uid, tilt_angle=1.8, wait_time=10): 倾倒到指定容器上方。使用 IK 保持末端位置不变，通过逐步倾斜实现稳定倾倒。**pour 操作优先使用此技能**。tilt_angle 默认 1.8 rad (~103°) 足以让液体流出。
 - insert_to_entity(target_uid, insert_depth=0.05): 将抓取的物体插入目标实体的孔位（如试管插入试管架）。自动松开夹爪，无需再添加 open_gripper。
@@ -50,20 +51,23 @@ SKILL_LIB_DOC = """
 - press(target_pos): 按压目标位置。
 - push(target_pos, push_distance=0.1): 推动物体。
 - reset(): 重置环境。
+- wait_for(wait_duration=2.0, entity_name=None, change_type=None, solution=None, color=None): **等待外部状态变化的技能**。用于人机协同场景，机械臂保持不动，等待指定时间后自动应用环境变化。change_type 可选 "add_solution"（添加溶液，需要 solution 参数如 "CuSO4"）、"solution_change_color"（改变溶液颜色，需要 color 参数如 [1, 0, 0, 0.4] 表示红色）、或 "change_color"（通用颜色变化）。
 
 ## Skill Usage Guidelines
 
-- **place**: 用于把物体精确放置到容器/表面上。例如：place("table") 放桌面上，place("beaker_0") 放到烧杯里。
+- **place**: 将物体放置到指定的目标实体上（加热板、容器、架子等）。必须传 target_container_uid 参数。适用场景："put A on B", "place A onto B", "put A in B"。
+- **drop**: 仅用于将物体放到桌面上（无特定目标位置）。适用场景：使用完物品后腾出抓夹，需要抓取下一个物品时。**如果任务指定了放置目标，必须用 place，不能用 drop**。
 - **open_gripper**: 在当前位置直接松开夹爪，物体会掉落。仅用于不需要精确放置的场景。
-- **shake 任务的正确序列**: pick -> lift -> shake(n_shakes=3) -> wait -> place("table") -> open_gripper。先用 place 把物体放到桌面，再松开夹爪。
+- **shake 任务的正确序列**: pick -> lift -> shake(n_shakes=3) -> wait -> drop。用 drop 把物体放到桌面。
 """
 
 # ========== 原子技能白名单 ==========
 VALID_SKILLS = {
-    "pick", "place", "lift", "moveto", "moveto_entity", "pour", "pour_to_entity", "push", "press",
+    "pick", "place", "drop", "lift", "moveto", "moveto_entity", "pour", "pour_to_entity", "push", "press",
     "flip", "wait", "rotate", "open_gripper", "close_gripper",
     "open_door", "close_door", "open_drawer", "open_laptop",
     "move_offset", "reset", "insert_to_entity", "shake", "stir_entity_with_tool",
+    "wait_for",
 }
 
 # ========== 动作 → 技能模式映射 (LLM 参考，非硬编码) ==========
@@ -77,6 +81,7 @@ ACTION_TO_SKILL_HINT = {
     "heat": ["moveto", "pick", "lift", "moveto", "wait"],
     "move": ["moveto", "pick", "lift", "moveto", "open_gripper"],
     "open": ["moveto", "pick", "open_gripper"],
+    "wait_for": ["wait_for"],  # wait_for 是独立的技能
 }
 
 
@@ -237,6 +242,13 @@ For each step, you MUST fill in:
 - After any pour/pour_to_entity operation, you MUST use insert_to_entity to insert the held test tube back into the tube stand.
 - insert_to_entity already includes open_gripper internally, so do NOT add another open_gripper after it.
 - **CRITICAL**: insert_to_entity target_uid MUST be "chemistry_tube_stand" (the tube stand entity), NOT "tube_0" or "tube_1".
+
+## Special Rule for wait_for
+- When a step has action="wait_for", the robot should stay still and wait.
+- Use wait_for skill with appropriate parameters:
+  - wait_for(wait_duration=2.0) - simple waiting
+  - wait_for(wait_duration=3.0, entity_name="beaker_0", change_type="add_solution", solution="CuSO4") - wait and add solution
+- The robot gripper should NOT release the held object during wait_for.
 
 ## Coordinate Reference
 - Franka workspace: X: -0.3~0.3, Y: -0.2~0.3, Z: 0.75~1.5

@@ -32,4 +32,5 @@ name2config = {
     "test_chemistry_beaker_series":["test_chemistry_beaker"],
     "lift_beaker_series":["lift_beaker"],
     "pick_stir_series":["pick_stir"],
+    "wait_for_object_lift_beaker_series":["wait_for_object_lift_beaker"],
 }

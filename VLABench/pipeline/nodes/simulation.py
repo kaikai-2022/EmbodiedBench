@@ -164,6 +164,9 @@ def _evaluate_condition(step_id: int, condition, cond_type: str, physics) -> Dic
     """
     检查 condition 是否满足（技能执行后调用）。
 
+    对于 wait_for 类型的 condition，需要反复调用 is_met 并步进 physics 来累积 stationary_steps，
+    因为 wait_for 的语义是"实体在 wait_duration 时间内保持静止"。
+
     Returns:
         {"step_id": int, "condition_type": str, "met": bool, "error": str or None}
     """

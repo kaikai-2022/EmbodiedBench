@@ -134,7 +134,7 @@ def find_keypoint_and_prepare_grasp(env, entity, prior_euler, std=0, max_retry=1
             keypoint = keypoints[specific_keypoint_id]
         else:
             keypoint = random.choice(keypoints)
-        key_euler = prior_euler[retry % len(prior_euler)]
+        key_euler = np.array(prior_euler[retry % len(prior_euler)], dtype=float)
         key_euler += np.random.normal(0, std, 3)
         key_quat = euler_to_quaternion(*key_euler)
         gripper_pcd, gripper_forward_vector = env.robot.gripper_pcd(keypoint, key_quat)
@@ -156,7 +156,7 @@ def find_keypoint_and_prepare_grasp(env, entity, prior_euler, std=0, max_retry=1
         if retry > max_retry:
             print(f"DEBUG [find_keypoint]: 达到最大尝试次数 {max_retry}，无法找到有效抓取点")
             print("cant find a valid grasp point, take default one")
-            return keypoint, keypoint+np.array([0, -0.1, 0]), euler_to_quaternion(*prior_euler[0])
+            return keypoint, keypoint+np.array([0, -0.1, 0]), euler_to_quaternion(*np.array(prior_euler[0], dtype=float))
         if retry % 10 == 0:
             # increase the search space by increasing the std
             std += np.pi/100

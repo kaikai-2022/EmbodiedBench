@@ -1,0 +1,14 @@
+Model UID: hot_plate
+Model Name: hot_plate
+
+Source Information:
+============================================================
+Source: Local File
+Original Path: /tmp/hot_plate_input/hot_plate.glb
+File Name: hot_plate.glb
+Keyword/Category: hot_plate
+Rotation: 90.0° around X axis
+
+Processing:
+Pipeline: process_local_glb.py
+Steps: GLB->OBJ (trimesh) -> [rotate] -> MJCF (obj2mjcf) -> postprocess -> bottom-align -> validate -> size_fix

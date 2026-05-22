@@ -133,6 +133,13 @@ class Evaluator:
         last_action = None
         i = 0
         robot_frame = env.get_robot_frame_position()
+
+        # 记录条件初始状态（如 WaitForCondition 的初始位置）
+        if hasattr(env.task, 'conditions') and env.task.conditions is not None:
+            for condition in env.task.conditions.conditions:
+                if hasattr(condition, 'record_initial_state'):
+                    condition.record_initial_state(env.physics)
+
         while i < max_episode_length:
             observation = env.get_observation(require_pcd=False)
             observation["instruction"] = env.task.get_instruction()
@@ -153,7 +160,7 @@ class Evaluator:
                 qpos, gripper_state = agent.predict(observation, **kwargs)
                 action = np.concatenate([qpos, gripper_state])
             else:
-                raise NotImplementedError(f"Control mode {agent.control_mode} is not implemented")    
+                raise NotImplementedError(f"Control mode {agent.control_mode} is not implemented")
             for _ in range(self.max_substeps):
                 timestep = env.step(action)
                 if timestep.last():
@@ -163,16 +170,37 @@ class Evaluator:
                 if np.max(current_qpos-np.array(action)[:7]) < self.tolerance \
                     and np.min(current_qpos - np.array(action)[:7]) > -self.tolerance:
                     break
+            # 分步条件检查
+            if not success and hasattr(env.task, 'conditions') and env.task.conditions is not None:
+                if env.task.conditions.is_met(env.physics):
+                    success = True
             if success:
                 break
             i += 1
         intention_score =  env.get_intention_score(threshold=self.intention_score_threshold)
         progress_score = env.get_task_progress()
+
+        # 记录各条件的最终检查结果
+        condition_results = {}
+        if hasattr(env.task, 'conditions') and env.task.conditions is not None:
+            for cond in env.task.conditions.conditions:
+                cond_name = type(cond).__name__
+                cond_result = cond.is_met(env.physics)
+                condition_results[cond_name] = {
+                    "is_met": cond_result,
+                }
+                # 对于 WaitForCondition，额外记录状态变化是否已应用
+                if hasattr(cond, '_change_applied'):
+                    condition_results[cond_name]["change_applied"] = cond._change_applied
+                if hasattr(cond, '_stationary_steps'):
+                    condition_results[cond_name]["stationary_steps"] = cond._stationary_steps
+
         info["task"] = task_name
         info["success"] = success
         info["consumed_step"] = i
         info["intention_score"] = intention_score
         info["progress_score"] = progress_score
+        info["condition_results"] = condition_results
         
         env.close()
         if self.save_dir is not None and self.visulization:

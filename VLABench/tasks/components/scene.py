@@ -6,7 +6,7 @@ from dm_control import composer
 from dm_control import mjcf
 from VLABench.utils.utils import euler_to_quaternion, quaternion_multiply, rotate_point_by_quaternion
 
-FLOOR_TEXTURE = [f"floor{i}" for i in range(13)]
+FLOOR_TEXTURE = [f"floor{i}" for i in range(13)] + ["floor_gray"]
 
 class Scene(composer.Entity):
     def __init__(self, use_default_scene=True, *args, **kwargs):
@@ -66,7 +66,7 @@ class Scene(composer.Entity):
                 new_xpos = rotate_point_by_quaternion(new_xpos, rotate_quat)
                 new_xpos += self.randomness["pos"] * random_state.uniform([-1, -1, -1], [1, 1, 1])
             
-            if self.randomness.get("texture", None) is not None:
+            if self.randomness.get("texture"):
                 # modify the texture of the floor or walls
                 self.set_texture(physics, self.randomness.get("texture"))
         self.set_pose(physics, new_xpos, new_xquat)   
@@ -74,7 +74,10 @@ class Scene(composer.Entity):
     
     def set_texture(self, physics, texture):
         floor = self.mjcf_model.worldbody.find("geom", "floor")
-        new_material = random.choice(self.floor_textures)
+        if texture:
+            new_material = texture
+        else:
+            new_material = random.choice(self.floor_textures)
         materials = self.mjcf_model.find_all("material")
         material_names = [material.name for material in materials]
         if new_material not in material_names:

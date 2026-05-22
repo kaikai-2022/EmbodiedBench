@@ -104,6 +104,10 @@ def _translate_semantic_attributes(semantic_attrs: Dict, raw_type: str, is_physi
     if not is_physical:
         init_params.setdefault("contains_substance", raw_type)
 
+    # 传递 Analyzer 推断的溶液颜色
+    if "solution_color" in semantic_attrs:
+        init_params["solution_rgba"] = semantic_attrs["solution_color"]
+
     return init_params
 
 
@@ -299,6 +303,29 @@ def normalizer_node(state: Dict) -> Dict:
 
     # 保存缓存
     save_cache(cache)
+
+    # ============================================================
+    # 工序 2.5: contains 传播逻辑
+    # 将非物理实体的 solution_rgba 传播到包含它的物理容器
+    # ============================================================
+    for inst in instances:
+        if inst["is_physical"]:
+            init_params = inst.get("init_params", {})
+            contains_raw_id = init_params.get("contains_substance")  # _translate_semantic_attributes 翻译后的字段名
+            if contains_raw_id:
+                # 找到该 raw_id 对应的 instance
+                target_inst = raw_id_to_uid.get(contains_raw_id)
+                if target_inst:
+                    # 找到 target_inst 对应的 instance
+                    for np_inst in instances:
+                        if np_inst["uid"] == target_inst and not np_inst["is_physical"]:
+                            np_init_params = np_inst.get("init_params", {})
+                            if "solution_rgba" in np_init_params and "solution_rgba" not in init_params:
+                                init_params["solution_rgba"] = np_init_params["solution_rgba"]
+                                inst["init_params"] = init_params
+                                logger.info(f"  [contains propagation] {inst['uid']} contains {np_inst['uid']}, "
+                                           f"propagated solution_rgba to container")
+                            break
 
     # 工序 3+4: 处理 raw_steps (UID 映射 + 指令重接地)
     steps = []

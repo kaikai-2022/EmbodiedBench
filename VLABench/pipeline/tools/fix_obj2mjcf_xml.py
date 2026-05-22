@@ -274,7 +274,7 @@ def fix_obj2mjcf_xml(
     # 1. 添加<compiler>标签
     compiler = ET.SubElement(root, 'compiler')
     compiler.set('boundmass', str(mass * 0.75))
-    compiler.set('boundinertia', str(mass * 0.0005))
+    compiler.set('boundinertia', '1e-05')
     compiler.set('angle', 'radian')
 
     # 2. 添加<default>标签

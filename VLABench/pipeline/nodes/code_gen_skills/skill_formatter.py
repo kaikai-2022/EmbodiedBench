@@ -12,15 +12,17 @@ UID 贯穿设计：
 
 import logging
 from typing import Dict, List
+import numpy as np
 
 logger = logging.getLogger(__name__)
 
 # VLABench SkillLib 合法技能白名单
 VALID_SKILLS = {
-    "pick", "place", "lift", "moveto", "moveto_entity", "pour", "pour_to_entity", "push", "press",
+    "pick", "place", "drop", "lift", "moveto", "moveto_entity", "pour", "pour_to_entity", "push", "press",
     "flip", "wait", "rotate", "open_gripper", "close_gripper",
     "open_door", "close_door", "open_drawer", "open_laptop",
     "move_offset", "reset", "shake", "insert_to_entity", "stir_entity_with_tool",
+    "wait_for",
 }
 
 
@@ -101,12 +103,30 @@ def _is_np_expr(s: str) -> bool:
 
 
 def _format_list(v: list) -> str:
+    """
+    将 list 格式化为 Python 列表字符串。
+    处理嵌套列表（如 prior_eulers）中的数值字符串（如 "pi", "-pi", "pi/2"）。
+    """
     items = []
     for item in v:
-        if isinstance(item, str) and _is_np_expr(item):
-            items.append(item)
+        if isinstance(item, list):
+            # 递归处理嵌套列表（如 prior_eulers）
+            items.append(_format_list(item))
         elif isinstance(item, (int, float)):
             items.append(repr(item))
+        elif isinstance(item, str):
+            # 处理数值字符串（如 "pi", "-pi", "pi/2"）
+            # 尝试用 numpy 解析，如 "pi", "-pi", "pi/2", "-pi/4"
+            math_expr = item.strip()
+            try:
+                val = eval(math_expr, {"np": np, "pi": np.pi})
+                if isinstance(val, (int, float)):
+                    items.append(repr(float(val)))
+                else:
+                    items.append(repr(math_expr))
+            except:
+                # 无法解析的字符串用引号包裹
+                items.append(f'"{item}"')
         else:
             items.append(repr(item))
     return "[" + ", ".join(items) + "]"

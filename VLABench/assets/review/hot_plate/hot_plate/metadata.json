@@ -1,0 +1,14 @@
+{
+  "uid": "hot_plate",
+  "name": "hot_plate",
+  "source": "local",
+  "original_path": "/tmp/hot_plate_input/hot_plate.glb",
+  "keyword": "hot_plate",
+  "tags": [],
+  "categories": [],
+  "description": "Local GLB model: hot_plate.glb",
+  "rotation": {
+    "axis": "x",
+    "degrees": 90.0
+  }
+}

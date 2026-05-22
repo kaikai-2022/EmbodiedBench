@@ -90,7 +90,13 @@ Select from these condition types (registered in VLABench/tasks/condition.py):
   Use for: alternative success criteria (advanced, prefer simpler types above)
 
 - **pass**: No physical condition check needed. Step succeeds simply by completing execution.
-  Use for: "shake X", "wait", "move to position without final placement goal", "open gripper"
+  Use for: "shake X", "move to position without final placement goal", "open gripper"
+
+- **wait_for**(entity=<uid>, robot="robot", wait_duration=2.0, change_type="add_solution", solution="CuSO4"):
+  Entity is not being touched/grasped by the robot gripper after the wait period.
+  Use for: "wait for human to add X", "wait for external change", "wait for solution to change color"
+  **IMPORTANT**: Always include `"robot": "robot"` in params. `change_type` options: "add_solution" (needs `solution`), "solution_change_color" (needs `color` as RGBA list like [1, 0, 0, 0.4]), "change_color" (needs `color`).
+  The condition checks that the robot gripper is not touching the entity (i.e., the entity was left alone during the wait).
 
 ## Action → Condition Selection Guide
 
@@ -107,6 +113,7 @@ Use this as reference, but the LLM should use semantic understanding:
 | press | **press_button** | Button pressed |
 | insert | **contain** | Entity inside target |
 | shake | **pass** | No final position/state goal |
+| wait_for | **wait_for** | Entity stillness triggers auto change |
 | wait | **pass** | Just waiting, no state change |
 | move | **on_position** or **pass** | Depends on if position matters |
 
@@ -122,7 +129,7 @@ VALID_CONDITION_TYPES = {
     "contain", "not_contain", "on", "above", "pour", "heated",
     "on_position", "lift", "contact", "is_grasped", "on_orientation",
     "order", "press_button", "joint_in_range", "asyn_sequence", "or",
-    "pass"
+    "pass", "wait_for"
 }
 
 

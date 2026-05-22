@@ -2656,5 +2656,111 @@
         }
       ]
     }
+  },
+  "wait_for_object_lift_beaker_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "small_beaker"
+        ],
+        "unseen_object": [
+          "small_beaker"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "pick_beaker_put_beaker_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "small_beaker",
+          "hot_plate"
+        ],
+        "unseen_object": [
+          "small_beaker",
+          "hot_plate"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "pick_beaker_put_beaker_wait_object_lift_beaker_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "small_beaker",
+          "hot_plate"
+        ],
+        "unseen_object": [
+          "small_beaker",
+          "hot_plate"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "pick_beaker_put_beaker_wait_solution_lift_beaker_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "small_beaker",
+          "hot_plate"
+        ],
+        "unseen_object": [
+          "small_beaker",
+          "hot_plate"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
   }
 }

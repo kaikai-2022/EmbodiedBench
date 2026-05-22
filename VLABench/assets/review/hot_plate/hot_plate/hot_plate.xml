@@ -1,0 +1,68 @@
+<?xml version="1.0" ?>
+<mujoco model="hot_plate">
+  <asset>
+    <texture type="2d" name="material_0" file="material_0.png"/>
+    <material name="material_0" texture="material_0" specular="0.4000000000000001" shininess="0.001"/>
+    <mesh file="hot_plate.obj" scale="0.07495989570619821 0.07495989570619821 0.07495989570619821"/>
+    <mesh file="hot_plate/hot_plate_collision_0.obj" scale="0.07495989570619821 0.07495989570619821 0.07495989570619821"/>
+    <mesh file="hot_plate/hot_plate_collision_1.obj" scale="0.07495989570619821 0.07495989570619821 0.07495989570619821"/>
+    <mesh file="hot_plate/hot_plate_collision_2.obj" scale="0.07495989570619821 0.07495989570619821 0.07495989570619821"/>
+    <mesh file="hot_plate/hot_plate_collision_3.obj" scale="0.07495989570619821 0.07495989570619821 0.07495989570619821"/>
+    <mesh file="hot_plate/hot_plate_collision_4.obj" scale="0.07495989570619821 0.07495989570619821 0.07495989570619821"/>
+    <mesh file="hot_plate/hot_plate_collision_5.obj" scale="0.07495989570619821 0.07495989570619821 0.07495989570619821"/>
+    <mesh file="hot_plate/hot_plate_collision_6.obj" scale="0.07495989570619821 0.07495989570619821 0.07495989570619821"/>
+    <mesh file="hot_plate/hot_plate_collision_7.obj" scale="0.07495989570619821 0.07495989570619821 0.07495989570619821"/>
+    <mesh file="hot_plate/hot_plate_collision_8.obj" scale="0.07495989570619821 0.07495989570619821 0.07495989570619821"/>
+    <mesh file="hot_plate/hot_plate_collision_9.obj" scale="0.07495989570619821 0.07495989570619821 0.07495989570619821"/>
+    <mesh file="hot_plate/hot_plate_collision_10.obj" scale="0.07495989570619821 0.07495989570619821 0.07495989570619821"/>
+    <mesh file="hot_plate/hot_plate_collision_11.obj" scale="0.07495989570619821 0.07495989570619821 0.07495989570619821"/>
+    <mesh file="hot_plate/hot_plate_collision_12.obj" scale="0.07495989570619821 0.07495989570619821 0.07495989570619821"/>
+    <mesh file="hot_plate/hot_plate_collision_13.obj" scale="0.07495989570619821 0.07495989570619821 0.07495989570619821"/>
+    <mesh file="hot_plate/hot_plate_collision_14.obj" scale="0.07495989570619821 0.07495989570619821 0.07495989570619821"/>
+  </asset>
+  <worldbody>
+    <body name="hot_plate">
+      <inertial pos="0 0 0.028540" mass="0.02" diaginertia="0.0008 0.0008 0.0005"/>
+      <geom material="material_0" mesh="hot_plate" class="visual"/>
+      <geom mesh="hot_plate_collision_0" rgba="0.7326648351974515 0.875008323172983 0.12409686965649858 1" class="collision"/>
+      <geom mesh="hot_plate_collision_1" rgba="0.21545815673018243 0.49227435206574854 0.02857385960172132 1" class="collision"/>
+      <geom mesh="hot_plate_collision_2" rgba="0.21609861523375506 0.7337732363793704 0.7144462469761413 1" class="collision"/>
+      <geom mesh="hot_plate_collision_3" rgba="0.6841081810181296 0.138369582915285 0.934049891721958 1" class="collision"/>
+      <geom mesh="hot_plate_collision_4" rgba="0.8735717388005803 0.923044437508811 0.27138588104114136 1" class="collision"/>
+      <geom mesh="hot_plate_collision_5" rgba="0.14621783521476828 0.5863522012418483 0.673274901195012 1" class="collision"/>
+      <geom mesh="hot_plate_collision_6" rgba="0.5859761357455162 0.8175023512785704 0.8685093199426276 1" class="collision"/>
+      <geom mesh="hot_plate_collision_7" rgba="0.5790360521442256 0.5920635601870291 0.4174130055726615 1" class="collision"/>
+      <geom mesh="hot_plate_collision_8" rgba="0.22370095132653078 0.43897222277406767 0.6034862216924916 1" class="collision"/>
+      <geom mesh="hot_plate_collision_9" rgba="0.8005043192322726 0.8367858704213763 0.8489400538386087 1" class="collision"/>
+      <geom mesh="hot_plate_collision_10" rgba="0.6397127685939547 0.37180052148955667 0.20820387180803068 1" class="collision"/>
+      <geom mesh="hot_plate_collision_11" rgba="0.9182886271625871 0.052001143802342664 0.2047889223361885 1" class="collision"/>
+      <geom mesh="hot_plate_collision_12" rgba="0.4347026090889089 0.768474181223114 0.8557841213165294 1" class="collision"/>
+      <geom mesh="hot_plate_collision_13" rgba="0.5980324100076143 0.7928350019659949 0.4072700126701717 1" class="collision"/>
+      <geom mesh="hot_plate_collision_14" rgba="0.0679149413885658 0.2460461759273742 0.828784456913468 1" class="collision"/>
+      <site class="grasppoint" pos="0.0000 0.0000 0.0342"/>
+      <site class="grasppoint" pos="0.0000 0.0000 0.0457"/>
+      <site class="grasppoint" pos="0.0000 0.0000 0.0542"/>
+          <site class="keypoint" pos="-0.6737 -1.0001 0.0000"/>
+      <site class="keypoint" pos="0.6727 1.0010 0.0000"/>
+      <site class="keypoint" pos="-0.6737 1.0010 0.0000"/>
+      <site class="keypoint" pos="0.6727 -1.0001 0.0000"/>
+      <site class="placepoint" pos="-0.0005 0.0005 0.1005"/>
+    <site name="top_site" pos="0 0 0.1" size="0.01" rgba="1 0 0 0"/>
+    <site name="bottom_site" pos="0 0 0.0" size="0.01" rgba="0 1 0 0"/>
+</body>
+  </worldbody>
+  <compiler boundmass="0.015" boundinertia="1e-05" angle="radian"/>
+  <default>
+    <default class="visual">
+      <geom group="2" type="mesh" contype="0" conaffinity="0" density="50"/>
+          <default class="keypoint"><site type="sphere" size="0.01" group="3" rgba="1 0 0 1"/></default>
+      <default class="placepoint"><site type="sphere" size="0.01" group="2" rgba="0 0 1 0"/></default>
+</default>
+    <default class="collision">
+      <geom group="3" type="mesh" density="50" friction="1.5 0.1 0.1" solimp="0.9 0.95 0.001" solref="0.02 1"/>
+    </default>
+    <default class="grasppoint">
+      <site type="sphere" size="0.005" group="4" rgba="0 0 1 1"/>
+    </default>
+  </default>
+</mujoco>

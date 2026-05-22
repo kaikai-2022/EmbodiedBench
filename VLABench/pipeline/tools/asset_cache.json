@@ -73,5 +73,20 @@
     "spec": "rag",
     "source_type": "local",
     "is_physical": true
+  },
+  "hot_plat": {
+    "spec": "hot_plate",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "hot_plate": {
+    "spec": "hot_plate",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "solution": {
+    "spec": "solution",
+    "source_type": "local",
+    "is_physical": false
   }
 }

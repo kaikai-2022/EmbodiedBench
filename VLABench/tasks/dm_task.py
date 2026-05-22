@@ -214,8 +214,10 @@ class LM4ManipBaseTask(composer.Task):
                     continue
                 if k in ["positions", "target_pos_range", "orientations",
                          "duration", "xy_tolerance",  # heated condition 的数值参数，不做 entity 解析
-                         "target_height", "tolerance_distance", "tolerance_angle",  # 其他数值参数
+                         "target_height", "tolerance_distance", "tolerance_angle",  # 其他���值参数
                          "dimension", "offset", "threshold", "check_axes",
+                         "wait_duration", "velocity_threshold",  # wait_for condition 的数值参数
+                         "change_type", "solution", "color",  # wait_for condition 的字符串/列表参数
                          ]: continue
                 if isinstance(entities, str):
                     specific_condition[k] = self.entities.get(entities, None)

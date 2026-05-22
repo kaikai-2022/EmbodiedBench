@@ -132,28 +132,77 @@ class OnCondition(Condition):
     def __init__(self, entities, container):
         self.entities = entities
         self.container = container
-        
+        self._z_tolerance = 0.01  # 1cm 容差，处理浮点精度问题
+
     def is_met(self, physics=None):
-        contacts = physics.data.contact
-        
+        import mujoco as mj
+        raw_m = physics.model._model
+        raw_d = physics.data._data
+
+        # 使用 ncon 正确遍历 contacts
+        ncon = raw_d.ncon
+        contacts = raw_d.contact
+
         container_geoms_id = [physics.bind(geom).element_id for geom in self.container.geoms]
         container_geoms_xpos = [physics.bind(geom).xpos for geom in self.container.geoms]
         max_xpos_z = max([xpos[-1] for xpos in container_geoms_xpos])
+
+        print(f"DEBUG [OnCondition]: === 开始条件判断 ===")
+        print(f"DEBUG [OnCondition]: 容器 geom 数量: {len(container_geoms_id)}")
+        print(f"DEBUG [OnCondition]: 容器 geom IDs: {container_geoms_id}")
+        print(f"DEBUG [OnCondition]: 容器 max_xpos_z: {max_xpos_z:.4f}")
+
+        # 打印容器所有 geom 的名称
+        for geom in self.container.geoms:
+            gid = physics.bind(geom).element_id
+            gname = mj.mj_id2name(raw_m, mj.mjtObj.mjOBJ_GEOM, gid) or '(unnamed)'
+            gpos = physics.bind(geom).xpos
+            print(f"DEBUG [OnCondition]:   容器 geom[{gid}] name={gname} pos=({gpos[0]:.4f},{gpos[1]:.4f},{gpos[2]:.4f})")
+
+        # 打印所有 contact
+        print(f"DEBUG [OnCondition]: === MuJoCo contacts 总数: {ncon} ===")
+        for i in range(ncon):
+            # MuJoCo contact 是 C 数组，直接用下标访问
+            c = contacts[i]
+            g1name = mj.mj_id2name(raw_m, mj.mjtObj.mjOBJ_GEOM, c.geom1) or '(unnamed)'
+            g2name = mj.mj_id2name(raw_m, mj.mjtObj.mjOBJ_GEOM, c.geom2) or '(unnamed)'
+            print(f"DEBUG [OnCondition]:   contact[{i}]: geom1={c.geom1}({g1name}) <-> geom2={c.geom2}({g2name})")
+
         for entity in self.entities:
-            is_contacted = False
             entity_geom_ids = [physics.bind(geom).element_id for geom in entity.geoms]
             entity_xpos = physics.bind(entity.mjcf_model.worldbody).xpos
-            # z position detection
-            if entity_xpos[-1] <= max_xpos_z:
-                return False
-            # on contact detection
-            for contact in contacts:
-                if (contact.geom1 in container_geoms_id and contact.geom2 in entity_geom_ids) or \
-                    (contact.geom2 in entity_geom_ids and contact.geom1 in container_geoms_id):
+            print(f"DEBUG [OnCondition]: 实体: {entity.name if hasattr(entity, 'name') else 'unknown'}")
+            print(f"DEBUG [OnCondition]: 实体 worldbody xpos: ({entity_xpos[0]:.4f}, {entity_xpos[1]:.4f}, {entity_xpos[2]:.4f})")
+            print(f"DEBUG [OnCondition]: 实体 geom IDs: {entity_geom_ids}")
+
+            # 先检查接触 - 使用索引方式访问 contacts
+            is_contacted = False
+            contact_count = 0
+            for i in range(ncon):
+                c = contacts[i]
+                g1, g2 = c.geom1, c.geom2
+                if (g1 in container_geoms_id and g2 in entity_geom_ids) or \
+                    (g2 in container_geoms_id and g1 in entity_geom_ids):
+                    g1name = mj.mj_id2name(raw_m, mj.mjtObj.mjOBJ_GEOM, g1) or '(unnamed)'
+                    g2name = mj.mj_id2name(raw_m, mj.mjtObj.mjOBJ_GEOM, g2) or '(unnamed)'
+                    print(f"DEBUG [OnCondition]:   找到匹配接触: {g1}({g1name}) <-> {g2}({g2name})")
                     is_contacted = True
-                    break
-            if is_contacted is False:
+                    contact_count += 1
+            print(f"DEBUG [OnCondition]: 接触点数: {contact_count}, is_contacted={is_contacted}")
+
+            if not is_contacted:
+                print(f"DEBUG [OnCondition]: ✗ 接触检查失败 (物体未接触到容器)")
                 return False
+
+            # 再检查 Z 轴位置
+            z_check = entity_xpos[-1] >= max_xpos_z - self._z_tolerance
+            print(f"DEBUG [OnCondition]: Z 轴检查: entity_z={entity_xpos[-1]:.4f} >= max_xpos_z-{self._z_tolerance}={max_xpos_z - self._z_tolerance:.4f} → {z_check}")
+
+            if not z_check:
+                print(f"DEBUG [OnCondition]: ✗ Z 轴检查失败 (物体高度低于容器)")
+                return False
+
+        print(f"DEBUG [OnCondition]: ✓ 所有检查通过")
         return True
 
 @register.add_condition("above")
@@ -323,6 +372,57 @@ class LiftCondition(Condition):
                 if entity_xpos[-1] < self.target_height - self._tolerance:
                     return False
         return True
+
+@register.add_condition("wait_for")
+class WaitForCondition(Condition):
+    """
+    等待外部条件满足。检查机械臂抓夹未接触目标实体，表示实体在等待期间未被触碰。
+    用于人机协同评测场景，如"等待人工添加液体"、"等待溶液变色"。
+
+    成功条件：目标实体当前未被机械臂抓夹接触（即未被抓住）。
+
+    params:
+        entity: 要监控的实体
+        robot: 机器人
+        wait_duration: 等待时间（秒），默认 2.0（由 skill 使用）
+        change_type: "add_solution" | "solution_change_color" | None
+        solution: 溶液名称（如 "CuSO4"）
+        color: RGBA 颜色列表（如 [1, 0, 0, 0.4]）
+    """
+    def __init__(self, entity, robot=None, wait_duration=2.0, change_type=None,
+                 solution=None, color=None):
+        self.entity = entity
+        self.robot = robot
+        self.wait_duration = wait_duration
+        self.change_type = change_type
+        self.solution = solution
+        self.color = color
+        self._change_applied = False
+
+    def record_initial_state(self, physics=None):
+        self._change_applied = False
+
+    def is_met(self, physics=None):
+        if self._change_applied:
+            return True
+
+        # 检查机械臂是否未接触目标实体
+        if self.robot is not None and self.entity is not None:
+            if hasattr(self.entity, 'is_grasped') and self.entity.is_grasped(physics, self.robot):
+                return False
+
+        # 实体未被抓住，条件满足，应用环境变化
+        self._apply_change(physics)
+        self._change_applied = True
+        return True
+
+    def _apply_change(self, physics):
+        if self.change_type == "add_solution" and self.solution:
+            if hasattr(self.entity, 'set_solution_rgba'):
+                self.entity.set_solution_rgba(physics, self.solution)
+        elif self.change_type == "solution_change_color" and self.color:
+            if hasattr(self.entity, 'set_solution_rgba'):
+                self.entity.set_solution_rgba(physics, target_rgba=self.color)
 
 class ConditionSet:
     """

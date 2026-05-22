@@ -20,3 +20,4 @@ from VLABench.tasks.hierarchical_tasks.primitive.shake_tube_series import *
 from VLABench.tasks.hierarchical_tasks.primitive.lift_petri_dish_series import *
 from VLABench.tasks.hierarchical_tasks.primitive.pour_liquid_from_test_tube_into_beaker_series import *
 from VLABench.tasks.hierarchical_tasks.primitive.pick_stir_series import *
+from VLABench.tasks.hierarchical_tasks.primitive.wait_for_object_lift_beaker_series import *

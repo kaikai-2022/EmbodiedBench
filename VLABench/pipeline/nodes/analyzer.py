@@ -99,8 +99,17 @@ def _validate_analysis(analysis: Dict) -> tuple:
     # 校验所有 primary_obj 和 secondary_obj 都是 raw_entities 中的 raw_id
     raw_ids = {e["raw_id"] for e in analysis["raw_entities"]}
     for i, step in enumerate(analysis["raw_steps"]):
-        if step["primary_obj"] not in raw_ids:
-            return False, f"raw_steps[{i}] primary_obj '{step['primary_obj']}' not in raw_entities"
+        action = step.get("action", "")
+        primary_obj = step.get("primary_obj")
+        # wait_for 类型的步骤允许 primary_obj 为 null
+        if action == "wait_for":
+            # wait_for 允许 primary_obj 为 null 或在 raw_ids 中
+            if primary_obj is not None and str(primary_obj).lower() not in ("null", "none") and primary_obj not in raw_ids:
+                return False, f"raw_steps[{i}] primary_obj '{primary_obj}' not in raw_entities"
+        else:
+            # 其他步骤的 primary_obj 必须在 raw_ids 中
+            if primary_obj not in raw_ids:
+                return False, f"raw_steps[{i}] primary_obj '{primary_obj}' not in raw_entities"
         # 防御性处理：过滤掉 None 和字符串 "null"/"None"
         sec_obj = step.get("secondary_obj")
         if sec_obj is not None and str(sec_obj).lower() not in ("null", "none"):
@@ -109,13 +118,21 @@ def _validate_analysis(analysis: Dict) -> tuple:
 
     # 校验 grounded_instruction 中使用了尖括号包裹的 raw_id
     for i, step in enumerate(analysis["raw_steps"]):
-        instruction = step["grounded_instruction"]
+        action = step.get("action", "")
+        instruction = step.get("grounded_instruction", "")
         mentioned_ids = set(re.findall(r'<([^>]+)>', instruction))
-        if not mentioned_ids:
-            return False, f"raw_steps[{i}] grounded_instruction 中没有尖括号包裹的 <raw_id>"
-        for raw_id in mentioned_ids:
-            if raw_id not in raw_ids:
-                return False, f"raw_steps[{i}] grounded_instruction 中的 <{raw_id}> 不在 raw_entities 中"
+        # wait_for 步骤不需要 grounded_instruction 中有尖括号（它可能只是描述）
+        if action != "wait_for":
+            if not mentioned_ids:
+                return False, f"raw_steps[{i}] grounded_instruction 中没有尖括号包裹的 <raw_id>"
+            for raw_id in mentioned_ids:
+                if raw_id not in raw_ids:
+                    return False, f"raw_steps[{i}] grounded_instruction 中的 <{raw_id}> 不在 raw_entities 中"
+        elif mentioned_ids:
+            # wait_for 步骤如果提到了 raw_id，也需要校验
+            for raw_id in mentioned_ids:
+                if raw_id not in raw_ids:
+                    return False, f"raw_steps[{i}] grounded_instruction 中的 <{raw_id}> 不在 raw_entities 中"
 
     return True, ""
 
@@ -204,8 +221,14 @@ Extract the core raw verb for each step (prefer infinitive form), fill into the 
 3. **Do NOT classify intent**: Do NOT classify verbs into pick/lift/pour operation types. Output raw verbs directly.
 4. **Strict JSON**: Output must be valid JSON parseable by json.loads().
 5. **Physical Entities Include Non-Rigids**: You MUST explicitly extract liquids, powders, gases, or chemicals (e.g., "liquids", "water", "powder") as independent entities in `raw_entities`. Do not ignore them.
-6. **Capture Quantities**: If the text specifies an amount, volume, or weight (e.g., "5 mg", "10 ml"), you MUST capture it in the `semantic_attributes` of that entity (e.g., {{"amount": "5 mg"}}). 
+6. **Capture Quantities**: If the text specifies an amount, volume, or weight (e.g., "5 mg", "10 ml"), you MUST capture it in the `semantic_attributes` of that entity (e.g., {{"amount": "5 mg"}}).
 7. **Ignore the Actor**: Do NOT extract "the robot" or "the robotic arm" as an entity unless it is being explicitly manipulated by another agent. Focus only on the objects, tools, and materials being handled.
+8. **Wait for External Action**: If the instruction contains "wait for" (e.g., "wait for human to add liquid", "wait for external process"), extract it as a special step with action="wait_for". Record what the external agent should do in `semantic_attributes`.
+9. **Solution Color Inference**: For any liquid/chemical/solution entity, you MUST infer its **INITIAL** visual color and include it in `semantic_attributes` as `"solution_color": [r, g, b, a]` where values are 0.0-1.0. Use common chemistry knowledge (e.g., CuSO4 solution → blue [0, 0.45, 1, 0.4], FeCl3 solution → yellow-brown [0.65, 0.57, 0.02, 0.4], KMnO4 solution → purple [0.5, 0, 0.5, 0.4]). **IMPORTANT**: Always put the substance's OWN natural color, NOT a target color from a color-change instruction. For example, CuSO4 is always blue `[0, 0.45, 1, 0.4]` even if the instruction says "solution turns red". The target color of a color change will be handled by downstream nodes.
+10. **Container Contains Relationship**: For any container entity (beaker, tube, flask, etc.) that contains a non-physical entity (solution, chemical, liquid), you MUST include `"contains": "<non_physical_raw_id>"` in the container's `semantic_attributes`. Example: if the instruction says "beaker which contains CuSO4", then:
+    - beaker entity: raw_id="beaker_1", raw_type="beaker", semantic_attributes={{"contains": "CuSO4_1"}}
+    - CuSO4 entity: raw_id="CuSO4_1", raw_type="CuSO4", semantic_attributes={{"solution_color": [0, 0.45, 1, 0.4]}}
+    Note: The `contains` value should be the `raw_id` of the contained non-physical entity.
 
 ## Input
 "{user_instruction}"
@@ -306,6 +329,38 @@ Output:
             "primary_obj": "beaker_1",
             "secondary_obj": "beaker_2",
             "grounded_instruction": "Pour the liquid into the <beaker_2>."
+        }}
+    ]
+}}
+
+Input: "Move the beaker to position A, wait for human to add solution, then move to position B"
+
+Output:
+{{
+    "raw_entities": [
+        {{"raw_id": "beaker_1", "raw_type": "beaker", "semantic_attributes": {{}}}}
+    ],
+    "raw_steps": [
+        {{
+            "step_id": 0,
+            "action": "move",
+            "primary_obj": "beaker_1",
+            "secondary_obj": null,
+            "grounded_instruction": "Move the <beaker_1> to position A."
+        }},
+        {{
+            "step_id": 1,
+            "action": "wait_for",
+            "primary_obj": null,
+            "secondary_obj": null,
+            "grounded_instruction": "Wait for human to add solution to <beaker_1>."
+        }},
+        {{
+            "step_id": 2,
+            "action": "move",
+            "primary_obj": "beaker_1",
+            "secondary_obj": null,
+            "grounded_instruction": "Then move <beaker_1> to position B."
         }}
     ]
 }}"""

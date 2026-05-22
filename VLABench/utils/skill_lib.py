@@ -1,6 +1,7 @@
 """
 Skill Library for data generation.
 """
+import logging
 import numpy as np
 import random
 import time as _time
@@ -8,6 +9,8 @@ import mujoco
 from VLABench.utils.utils import find_keypoint_and_prepare_grasp, distance, quaternion_to_euler, euler_to_quaternion, quaternion_from_axis_angle, quaternion_multiply
 from VLABench.algorithms.motion_planning.rrt import rrt_motion_planning
 from VLABench.algorithms.utils import interpolate_path, qauternion_slerp
+
+logger = logging.getLogger(__name__)
 
 
 # ========== Grasp Lock: Quaternion Helpers (shared with dm_env.py) ==========
@@ -382,22 +385,29 @@ class SkillLib:
         return observations, waypoints, stage_success, False
     
     @staticmethod
-    def place(env, 
-              target_container_name, 
-              target_pos=None, 
+    def place(env,
+              target_container_name,
+              target_pos=None,
               target_quat=None,
               motion_planning_kwargs=dict()):
         """
-        general place function for data generation
+        将抓取的物体精确放置到目标容器内部。
+
+        与 drop() 的区别：
+        - place() 用于精确放置到容器内部（如烧杯、盒子），使用容器的 place_point
+        - place() 不使用 ee_offset，只做物体高度补偿
+        - drop() 用于放到桌面，使用 ee_offset 补偿夹爪几何
+
         param:
             env: LM4manipEnv object
-            target_entity_name: str, target entity name
-            target_pos: np.array, target position. If None, will propose a target position automatically
-            target_quat: np.array, target quaternion. If None, will propose a target quaternion automatically
-        return: 
+            target_container_name: str, 目标容器名称
+            target_pos: np.array, 目标位置。如果为 None，使用容器的 place_point。
+            target_quat: np.array, 目标姿态。如果为 None，使用当前姿态。
+        return:
             observations: list of obs
             waypoints: list of actions
-            key_frame: list of key action such as move to prepare point, grasp
+            stage_success: bool, 技能是否成功
+            task_success: bool, 任务是否完成
         """
         target_container = env.task.entities[target_container_name]
         start_pos, start_quat = env.robot.get_end_effector_pos(env.physics), env.robot.get_end_effector_quat(env.physics)
@@ -408,38 +418,44 @@ class SkillLib:
                 return None
             if isinstance(place_points, list):
                 place_point = random.choice(place_points)
-            target_pos = place_point    
+            target_pos = place_point
         if target_quat is None:
-            # if no target_quat is provided, use the default quat
             target_quat = env.robot.get_end_effector_quat(env.physics)
-        
-        
+
+        print(f"DEBUG [place]: === 开始 place 技能 ===")
+        print(f"DEBUG [place]: 目标容器: {target_container_name}")
+        print(f"DEBUG [place]: 目标 place_point (世界坐标): ({target_pos[0]:.4f}, {target_pos[1]:.4f}, {target_pos[2]:.4f})")
+        print(f"DEBUG [place]: 容器 xpos: {np.array(target_container.get_xpos(env.physics))}")
+        print(f"DEBUG [place]: 机械臂起始位置 EE: ({start_pos[0]:.4f}, {start_pos[1]:.4f}, {start_pos[2]:.4f})")
+
         obstacle_pcd = np.asarray(env.get_obstacle_pcd().points)
         # np.save("obstacle_pcd.npy", obstacle_pcd)
         
         start_pos, start_quat, target_pos, target_quat = np.array(start_pos), np.array(start_quat), np.array(target_pos), np.array(target_quat)
-        #FIXME if can not find a path, consider change another algorithm
-        #FIXME optimize the path with min margin to obstacles for safer moving
-        init2target_path = rrt_motion_planning(tuple(start_pos), 
-                                                tuple(target_pos), 
-                                                obstacle_pcd,
-                                                **motion_planning_kwargs)
-        offset = env.robot.ee_offset(env.physics) # for avoid the collision
-        if init2target_path is None:
-            print("can not find a path to target position, use default lift")
-            # default solution is lifting
-            if start_pos[2] <= target_pos[2]:
-                mid_point = np.array([start_pos[0], start_pos[1], target_pos[2]])
-            else:
-                mid_point = np.array([target_pos[0], target_pos[1], start_pos[2]])
-        
-            init2target_path = [start_pos, mid_point, target_pos]
-        path = np.array(init2target_path)
-        path += offset
+
+        # 两阶段路径规划：先到目标正上方，再垂直下降
+        # 这样可以避免从侧面碰撞容器
+        safe_height = max(start_pos[2], target_pos[2] + 0.1)  # 至少比目标高 10cm
+        above_target = np.array([target_pos[0], target_pos[1], safe_height])
+
+        # 阶段1：从当前位置到目标正上方（RRT 避障）
+        init2above_path = rrt_motion_planning(tuple(start_pos),
+                                               tuple(above_target),
+                                               obstacle_pcd,
+                                               **motion_planning_kwargs)
+        if init2above_path is None:
+            print("can not find a path to above target, use default")
+            init2above_path = [start_pos, above_target]
+
+        # 阶段2：从正上方垂直下降到目标位置
+        init2above_path.append(tuple(target_pos))
+        path = np.array(init2above_path)
+        print(f"DEBUG [place]: RRT 路径点: {len(path)} 个")
+        print(f"DEBUG [place]: RRT 路径首尾点: 起点({path[0][0]:.4f}, {path[0][1]:.4f}, {path[0][2]:.4f}) -> 终点({path[-1][0]:.4f}, {path[-1][1]:.4f}, {path[-1][2]:.4f})")
 
         # 补偿被抓取物体的高度：
-        # path += offset 后，end_effector_move 会到达 target_pos（桌面高度）
-        # 但物体底部可能在 end_effector_move 下方（被夹爪夹在中上部）
+        # place() 用于精确放置到容器内部，使用容器的 place_point 作为目标
+        # 物体底部可能在 end_effector_move 下方（被夹爪夹在中上部）
         # 需要把路径抬高，让物体底部刚好在 target_pos Z 高度
         grasped_names, grasped_entities = env.get_grasped_entity()
         if grasped_entities:
@@ -448,13 +464,18 @@ class SkillLib:
             ee_move_site = env.robot._mjcf_model.find("site", "end_effector_move")
             ee_move_z = env.physics.bind(ee_move_site).xpos[2]
             z_offset = obj_bottom_z - ee_move_z
+            print(f"DEBUG [place]: === 高度补偿计算 ===")
+            print(f"DEBUG [place]: 物体位置 (xpos): ({obj_bottom_z:.4f})")
+            print(f"DEBUG [place]: ee_move_site Z: {ee_move_z:.4f}")
+            print(f"DEBUG [place]: z_offset = obj_bottom_z - ee_move_z = {z_offset:.4f}")
             if z_offset < 0:
                 path[:, 2] += (-z_offset)
-            print(f"DEBUG [place]: 物体高度补偿")
-            print(f"  物体底部 Z: {obj_bottom_z:.4f}, ee_move Z: {ee_move_z:.4f}")
-            print(f"  z_offset: {z_offset:.4f}m, 抬高量: {max(0, -z_offset):.4f}m")
+                print(f"DEBUG [place]: 抬高路径 {max(0, -z_offset):.4f}m")
+            else:
+                print(f"DEBUG [place]: 无需抬高 (z_offset >= 0)")
+            print(f"DEBUG [place]: 补偿后路径终点 Z: {path[-1][2]:.4f}")
 
-        path_point_len = len(init2target_path)
+        path_point_len = len(path)
         quats = [start_quat for _ in range(path_point_len)]
         quats[-1] = target_quat
         interplate_path, interplate_quat = interpolate_path(path, quats)   
@@ -472,20 +493,134 @@ class SkillLib:
             observations.pop(-1)
             assert len(observations) == len(waypoints), f"observations and waypoints should have the same length, {len(observations)} and {len(waypoints)}"
             return observations, waypoints, True, task_success
-        # grasp
+        # 松开夹爪
         new_obs, new_waypoints, _, task_success = SkillLib.open_gripper(env)
         observations.extend(new_obs)
         waypoints.extend(new_waypoints)
-        
-        observations.pop(-1)   
+
+        # 松开后向上抬升，避免碰撞刚放下的物体
+        new_obs, new_waypoints, _, _ = SkillLib.lift(env, lift_height=0.05, gripper_state=np.ones(2) * 0.04)
+        observations.extend(new_obs)
+        waypoints.extend(new_waypoints)
+
+        observations.pop(-1)
         assert len(observations) == len(waypoints), f"observations and waypoints should have the same length, {len(observations)} and {len(waypoints)}"
         for entity in env.task.entities.values():
             if hasattr(entity, "is_grasped") and entity.is_grasped(env.physics, env.robot):
                 stage_success = False
         return observations, waypoints, stage_success, task_success
-    
+
     @staticmethod
-    def open_door(env, 
+    def drop(env,
+             target_surface_pos=None,
+             target_quat=None,
+             drop_height=0.05,
+             motion_planning_kwargs=dict()):
+        """
+        将抓取的物体安全地放到桌面上。
+
+        与 place() 的区别：
+        - drop() 使用 ee_offset 来补偿夹爪几何，确保物体不会与桌面碰撞
+        - drop() 适用于放到桌面/平台等平坦表面
+        - place() 用于精确放置到容器内部（不需要 ee_offset）
+
+        param:
+            env: LM4manipEnv object
+            target_surface_pos: np.array, 目标表面位置。如果为 None，使用当前位置正下方的桌面位置。
+            target_quat: np.array, 目标姿态。如果为 None，使用当前姿态。
+            drop_height: float, 物体底部距离表面的高度（m），默认 0.05m。
+            motion_planning_kwargs: dict, 运动规划参数。
+        return:
+            observations: list of obs
+            waypoints: list of actions
+            stage_success: bool, 技能是否成功
+            task_success: bool, 任务是否完成
+        """
+        start_pos, start_quat = env.robot.get_end_effector_pos(env.physics), env.robot.get_end_effector_quat(env.physics)
+
+        if target_surface_pos is None:
+            # 默认：物体正下方的桌面位置
+            grasped_names, grasped_entities = env.get_grasped_entity()
+            if grasped_entities:
+                obj_pos = np.array(grasped_entities[0].get_xpos(env.physics))
+                target_surface_pos = np.array([obj_pos[0], obj_pos[1], obj_pos[2] - drop_height])
+            else:
+                target_surface_pos = np.array([start_pos[0], start_pos[1], start_pos[2] - 0.1])
+
+        if target_quat is None:
+            target_quat = start_quat
+
+        obstacle_pcd = np.asarray(env.get_obstacle_pcd().points)
+        start_pos, start_quat, target_surface_pos, target_quat = np.array(start_pos), np.array(start_quat), np.array(target_surface_pos), np.array(target_quat)
+
+        # 运动规划
+        init2target_path = rrt_motion_planning(tuple(start_pos),
+                                               tuple(target_surface_pos),
+                                               obstacle_pcd,
+                                               **motion_planning_kwargs)
+        offset = env.robot.ee_offset(env.physics)  # 夹爪几何补偿，防止物体撞桌面
+        if init2target_path is None:
+            print("can not find a path to target position, use default lift")
+            if start_pos[2] <= target_surface_pos[2]:
+                mid_point = np.array([start_pos[0], start_pos[1], target_surface_pos[2]])
+            else:
+                mid_point = np.array([target_surface_pos[0], target_surface_pos[1], start_pos[2]])
+            init2target_path = [start_pos, mid_point, target_surface_pos]
+
+        path = np.array(init2target_path)
+        path += offset  # ee_offset 补偿，确保物体底部距离桌面有足够间隙
+
+        # 额外高度补偿：如果物体底部会低于目标位置，抬高路径
+        grasped_names, grasped_entities = env.get_grasped_entity()
+        if grasped_entities:
+            grasped_entity = grasped_entities[0]
+            obj_bottom_z = np.array(grasped_entity.get_xpos(env.physics))[2]
+            ee_move_site = env.robot._mjcf_model.find("site", "end_effector_move")
+            ee_move_z = env.physics.bind(ee_move_site).xpos[2]
+            z_offset = obj_bottom_z - ee_move_z
+            if z_offset < 0:
+                path[:, 2] += (-z_offset)
+            print(f"DEBUG [drop]: 物体高度补偿")
+            print(f"  物体底部 Z: {obj_bottom_z:.4f}, ee_move Z: {ee_move_z:.4f}")
+            print(f"  z_offset: {z_offset:.4f}m, 抬高量: {max(0, -z_offset):.4f}m")
+
+        path_point_len = len(init2target_path)
+        quats = [start_quat for _ in range(path_point_len)]
+        quats[-1] = target_quat
+        interplate_path, interplate_quat = interpolate_path(path, quats)
+
+        observations = [env.get_observation()]
+        waypoints = []
+        stage_success = True
+        task_success = False
+
+        new_obs, new_waypoints, _, task_success = SkillLib.step_trajectory(
+            env, interplate_path, interplate_quat, SkillLib._get_gripper_state(env)
+        )
+        observations.extend(new_obs)
+        waypoints.extend(new_waypoints)
+
+        if task_success:
+            observations.pop(-1)
+            assert len(observations) == len(waypoints)
+            return observations, waypoints, True, task_success
+
+        # 释放夹爪
+        new_obs, new_waypoints, _, task_success = SkillLib.open_gripper(env)
+        observations.extend(new_obs)
+        waypoints.extend(new_waypoints)
+
+        observations.pop(-1)
+        assert len(observations) == len(waypoints)
+
+        # 检查是否仍有物体被抓取
+        for entity in env.task.entities.values():
+            if hasattr(entity, "is_grasped") and entity.is_grasped(env.physics, env.robot):
+                stage_success = False
+        return observations, waypoints, stage_success, task_success
+
+    @staticmethod
+    def open_door(env,
                   target_container_name):
         """
         Open the door of the target container
@@ -1200,6 +1335,84 @@ class SkillLib:
         observations.pop(-1)
         assert len(observations) == len(waypoints), f"observations and waypoints should have the same length, {len(observations)} and {len(waypoints)}"
         return observations, waypoints, True, task_success
+
+    @staticmethod
+    def wait_for(env,
+                 wait_duration=2.0,
+                 entity_name=None,
+                 change_type=None,
+                 solution=None,
+                 color=None,
+                 gripper_state=None):
+        """
+        等待外部状态变化的技能。
+
+        机械臂保持不动，等待指定时间后自动应用环境变化。
+        用于人机协同场景，如"等待人工添加液体"。
+
+        Args:
+            wait_duration: 等待时间（秒），默认 2.0 秒
+            entity_name: 要改变的实体名称，如 "beaker_0"
+            change_type: 变化类型：
+                - "add_solution": 添加溶液（需要 solution 参数）
+                - "change_color": 改变颜色（需要 color 参数）
+            solution: 溶液名称，如 "CuSO4", "FeCl3", "KMnO4" 等
+            color: RGBA 颜色值，如 [1, 0, 0, 1] 表示红色
+            gripper_state: 夹爪状态，默认保持当前状态
+
+        Returns:
+            (observations, waypoints, stage_success, task_success)
+        """
+        logger.info(f"wait_for: 等待 {wait_duration}s, change_type={change_type}, entity={entity_name}")
+
+        current_qpos = np.array(env.robot.get_qpos(env.physics)).reshape(-1)
+        if gripper_state is None:
+            gripper_state = SkillLib._get_gripper_state(env)
+
+        # 机械臂保持不动，等待一段时间
+        observations = [env.get_observation()]
+        waypoints = []
+
+        # 计算需要等待的步数（假设 10 fps）
+        steps_per_second = 10
+        wait_steps = int(wait_duration * steps_per_second)
+
+        for _ in range(wait_steps):
+            action = np.concatenate([current_qpos, gripper_state])
+            timestep = env.step(action)
+            obs = env.get_observation()
+            observations.append(obs)
+            waypoints.append(np.concatenate([
+                env.robot.get_end_effector_pos(env.physics),
+                quaternion_to_euler(env.robot.get_end_effector_quat(env.physics)),
+                gripper_state
+            ]))
+
+        # 应用环境变化
+        if entity_name and change_type:
+            try:
+                entity = env.task.entities.get(entity_name)
+                if entity is None:
+                    logger.warning(f"wait_for: 实体 {entity_name} 不存在，可用实体: {list(env.task.entities.keys())}")
+                elif change_type == "add_solution" and solution:
+                    if hasattr(entity, 'set_solution_rgba'):
+                        entity.set_solution_rgba(env.physics, solution)
+                        logger.info(f"wait_for: 已添加溶液 {solution} 到 {entity_name}")
+                    else:
+                        logger.warning(f"wait_for: 实体 {entity_name} 不支持 set_solution_rgba")
+                elif change_type in ("change_color", "solution_change_color") and color:
+                    if hasattr(entity, 'set_solution_rgba'):
+                        entity.set_solution_rgba(env.physics, target_rgba=color)
+                        logger.info(f"wait_for: 已设置 {entity_name} 溶液颜色为 {color}")
+                    elif hasattr(entity, 'mjcf_model'):
+                        for geom in entity.mjcf_model.find_all('geom'):
+                            env.physics.bind(geom).rgba = color
+                        logger.info(f"wait_for: 已设置 {entity_name} 颜色为 {color}")
+            except Exception as e:
+                logger.warning(f"wait_for: 应用状态变化失败 - {e}")
+
+        observations.pop(-1)
+        return observations, waypoints, True, False  # Don't return task_success, let loop continue
 
     @staticmethod
     def shake(env, n_shakes=3, shake_angle=0.5, steps_per_swing=5, gripper_state=None):

@@ -36,29 +36,32 @@ class SolutionMixin:
 
     _solution_geom_name = "solution"
 
-    def __init__(self, solution=None, **kwargs):
+    def __init__(self, solution=None, solution_rgba=None, **kwargs):
         self.solution = solution
+        self.solution_rgba = solution_rgba
         super().__init__(**kwargs)
 
-    def set_solution_rgba(self, physics, solution_name=None):
+    def set_solution_rgba(self, physics, solution_name=None, target_rgba=None):
         """
-        Set the rgba color of the solution geom based on solvent name.
-        Subclasses can override `_solution_geom_name` to target a different geom.
+        Set the rgba color of the solution geom.
 
-        Args:
-            physics: MuJoCo physics instance
-            solution_name: solvent name. If None, uses self.solution.
+        Priority: target_rgba > solution_name > self.solution_rgba > self.solution
         """
-        target = solution_name if solution_name is not None else self.solution
         geom = self.mjcf_model.worldbody.find("geom", self._solution_geom_name)
         if geom is None:
             return
-        if target is None:
-            # No solution: make the liquid geom fully transparent
+        if target_rgba is not None:
+            physics.bind(geom).rgba = target_rgba
+        elif solution_name is not None:
+            rgba = self.solution2rgba.get(solution_name, [1, 1, 1, 0.3])
+            physics.bind(geom).rgba = rgba
+        elif self.solution_rgba is not None:
+            physics.bind(geom).rgba = self.solution_rgba
+        elif self.solution is not None:
+            rgba = self.solution2rgba.get(self.solution, [1, 1, 1, 0.3])
+            physics.bind(geom).rgba = rgba
+        else:
             physics.bind(geom).rgba = [1, 1, 1, 0]
-            return
-        rgba = self.solution2rgba.get(target, [1, 1, 1, 0.3])
-        physics.bind(geom).rgba = rgba
 
     def get_solution(self):
         """Return the current solvent name."""

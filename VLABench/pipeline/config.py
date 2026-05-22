@@ -36,11 +36,11 @@ class AgentConfig:
 
     # API Key (已配置)
     # ANTHROPIC_API_KEY: str = "sk-NdKNGm3YPJK9GSWA808f2c87Cb9e422c86858610972cE265"
-    ANTHROPIC_API_KEY: str = "sk-cp-Bx3AFb_WXemE1JWAcP2ITS3mumPrjJni2Kmc_wtqIVM"
+    ANTHROPIC_API_KEY: str = "sk-bUVu80wi6nD0lMhBK7xYO2ZsJMFbHcZOGIOX9KuM8woHC3oM"
 
     # 自定义 API 端点 (去掉 /v1 后缀,库会自动添加)
     # BASE_URL: str = "http://apifs.shubiaobiao.cn"
-    BASE_URL: str = "https://ai.irobotx.org"
+    BASE_URL: str = "https://vip.aipro.love"
 
     # ==================== 其他配置 ====================
 

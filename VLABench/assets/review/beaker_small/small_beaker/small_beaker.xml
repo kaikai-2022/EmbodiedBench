@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <mujoco model="small_beaker">
-  <compiler boundmass="0.015" boundinertia="1e-03" angle="radian"/>
+  <compiler boundmass="0.015" boundinertia="1e-05" angle="radian"/>
   <default>
     <default class="visual">
       <geom group="2" type="mesh" contype="0" conaffinity="0" density="50"/>
@@ -76,7 +76,7 @@
       <geom mesh="small_beaker_collision_21" class="collision"/>
       <geom mesh="small_beaker_collision_22" class="collision"/>
       <site class="grasppoint" pos="0.0000 0.0000 0.0650"/>
-      <geom name="solution" type="cylinder" size="0.0269 0.0268" pos="0 0 0.0446" material="CaSO4" class="visual"/>
+      <geom name="solution" type="cylinder" size="0.0269 0.0268" pos="0 0 0.0446" rgba="1 1 1 0" class="visual"/>
       <site name="top_site" pos="0 0 0.0892" size="0.01" rgba="1 0 0 0"/>
       <site name="bottom_site" pos="0 0 0.000000" size="0.01" rgba="0 1 0 0"/>
     </body>

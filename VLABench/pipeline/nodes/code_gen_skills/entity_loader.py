@@ -272,39 +272,74 @@ def _code_plain(plan: EntityLoadPlan, flags: Dict) -> List[str]:
 
 
 def _code_liquid(plan: EntityLoadPlan, flags: Dict) -> List[str]:
+    solution_rgba = plan.properties.get("solution_rgba")
     solution = plan.properties.get("solution", plan.uid)
     pos_range = ENTITY_POSITION_RANGES[plan.position_index % len(ENTITY_POSITION_RANGES)]
-    return [
-        f'        obj_config = dict(',
-        f'            name="{plan.uid}",',
-        f'            xml_path=name2class_xml["{plan.spec}"][-1],',
-        f'            position=[random.uniform({pos_range[0][0]}, {pos_range[0][1]}), random.uniform({pos_range[1][0]}, {pos_range[1][1]}), 0.8],',
-        f'            solution="{solution}",',
-        f'        )',
-        f'        obj_config["class"] = "{plan.class_name}"',
-        f'        obj_config["randomness"] = dict(pos=[0.02, 0.02, 0], quat=[0, 0, 0.05])',
-        f'        self.config["task"]["components"].append(obj_config)',
-        "",
-    ]
+    if solution_rgba:
+        return [
+            f'        obj_config = dict(',
+            f'            name="{plan.uid}",',
+            f'            xml_path=name2class_xml["{plan.spec}"][-1],',
+            f'            position=[random.uniform({pos_range[0][0]}, {pos_range[0][1]}), random.uniform({pos_range[1][0]}, {pos_range[1][1]}), 0.8],',
+            f'            solution_rgba={solution_rgba},',
+            f'        )',
+            f'        obj_config["class"] = "{plan.class_name}"',
+            f'        obj_config["randomness"] = dict(pos=[0.02, 0.02, 0], quat=[0, 0, 0.05])',
+            f'        self.config["task"]["components"].append(obj_config)',
+            "",
+        ]
+    else:
+        return [
+            f'        obj_config = dict(',
+            f'            name="{plan.uid}",',
+            f'            xml_path=name2class_xml["{plan.spec}"][-1],',
+            f'            position=[random.uniform({pos_range[0][0]}, {pos_range[0][1]}), random.uniform({pos_range[1][0]}, {pos_range[1][1]}), 0.8],',
+            f'            solution="{solution}",',
+            f'        )',
+            f'        obj_config["class"] = "{plan.class_name}"',
+            f'        obj_config["randomness"] = dict(pos=[0.02, 0.02, 0], quat=[0, 0, 0.05])',
+            f'        self.config["task"]["components"].append(obj_config)',
+            "",
+        ]
 
 
 def _code_subentity(plan: EntityLoadPlan, flags: Dict) -> List[str]:
+    solution_rgba = plan.properties.get("solution_rgba")
     solution = plan.properties.get("solution", plan.uid)
     flags["needs_tube_constants"] = True
-    return [
-        "        col_pos = random.choice(relative_col_pos)",
-        "        row_pos = random.choice(relative_row_pos)",
-        "        pos = [col_pos, row_pos, 0.05]",
-        '        init_container_config = self.config["task"]["components"][-1]',
-        '        if "subentities" not in init_container_config:',
-        '            init_container_config["subentities"] = []',
-        f'        obj_config = dict(',
-        f'            name="{plan.uid}",',
-        f'            solution="{solution}",',
-        f'            xml_path=name2class_xml["tube"][-1],',
-        f'            position=pos,',
-        f'        )',
-        f'        obj_config["class"] = "{plan.class_name}"',
-        '        init_container_config["subentities"].append(obj_config)',
-        "",
-    ]
+    if solution_rgba:
+        return [
+            "        col_pos = random.choice(relative_col_pos)",
+            "        row_pos = random.choice(relative_row_pos)",
+            "        pos = [col_pos, row_pos, 0.05]",
+            '        init_container_config = self.config["task"]["components"][-1]',
+            '        if "subentities" not in init_container_config:',
+            '            init_container_config["subentities"] = []',
+            f'        obj_config = dict(',
+            f'            name="{plan.uid}",',
+            f'            solution_rgba={solution_rgba},',
+            f'            xml_path=name2class_xml["tube"][-1],',
+            f'            position=pos,',
+            f'        )',
+            f'        obj_config["class"] = "{plan.class_name}"',
+            '        init_container_config["subentities"].append(obj_config)',
+            "",
+        ]
+    else:
+        return [
+            "        col_pos = random.choice(relative_col_pos)",
+            "        row_pos = random.choice(relative_row_pos)",
+            "        pos = [col_pos, row_pos, 0.05]",
+            '        init_container_config = self.config["task"]["components"][-1]',
+            '        if "subentities" not in init_container_config:',
+            '            init_container_config["subentities"] = []',
+            f'        obj_config = dict(',
+            f'            name="{plan.uid}",',
+            f'            solution="{solution}",',
+            f'            xml_path=name2class_xml["tube"][-1],',
+            f'            position=pos,',
+            f'        )',
+            f'        obj_config["class"] = "{plan.class_name}"',
+            '        init_container_config["subentities"].append(obj_config)',
+            "",
+        ]
