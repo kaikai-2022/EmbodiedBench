@@ -53,11 +53,11 @@ class PickBeakerPutBeakerWaitSolutionLiftBeakerTask(PrimitiveTask):
     def get_expert_skill_sequence(self, physics):
         skill_sequence = [
             partial(SkillLib.pick, target_entity_name="small_beaker_0", prior_eulers=[[-3.141592653589793, 0, 0]]),
-            partial(SkillLib.moveto_entity, target_entity_name="hot_plate_0", offset=np.array([0, 0, 0.2]), gripper_state=[0, 0]),
+            partial(SkillLib.moveto_entity, target_entity_name="hot_plate_0"),
             partial(SkillLib.place, target_container_name="hot_plate_0"),
             partial(SkillLib.wait_for, wait_duration=2.0, entity_name="small_beaker_0", change_type="solution_change_color", color=[1, 0, 0, 0.4]),
-            partial(SkillLib.moveto_entity, target_entity_name="small_beaker_0", offset=np.array([0, 0, 0.2]), gripper_state=[0, 0]),
+            partial(SkillLib.moveto_entity, target_entity_name="small_beaker_0"),
             partial(SkillLib.pick, target_entity_name="small_beaker_0", prior_eulers=[[-3.141592653589793, 0, 0]]),
-            partial(SkillLib.lift, lift_height=0.15, gripper_state=[0, 0]),
+            partial(SkillLib.lift, lift_height=0.15),
         ]
         return skill_sequence

@@ -68,6 +68,7 @@ class OpenPiPolicy:
             state= np.concatenate([pos, ee_euler, np.array(gripper_state).reshape(-1)])
             policy_input = {
                 "observation/image": front,
+                "observation/second_image": right,
                 "observation/wrist_image":image_wrist,
                 "observation/state": state,
                 "prompt": observation["instruction"],

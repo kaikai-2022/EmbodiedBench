@@ -8,6 +8,7 @@
 
 1. [场景与机器人位置不匹配导致物体距离过远](#1-场景与机器人位置不匹配导致物体距离过远)
 2. [OBJ模型几何中心偏移导致视觉与物理不匹配](#2-obj模型几何中心偏移导致视觉与物理不匹配)
+3. [LiftCondition 在 record_initial_state 未调用时误判为已满足](#3-liftcondition-在-record_initial_state-未调用时误判为已满足)
 
 ---
 
@@ -763,5 +764,234 @@ else:
 
 ---
 
-**最后更新**: 2026-03-12
+## 3. LiftCondition 在 record_initial_state 未调用时误判为已满足
+
+**日期**: 2026-05-25
+**影响组件**: `VLABench/tasks/condition.py` — `LiftCondition`
+**影响任务**: 所有使用 `lift_height` 参数的 `LiftCondition`（如 `lift_beaker`）
+**严重程度**: 🔴 高（导致 `load_env` 无限死循环，评测完全卡死）
+
+### 问题表现
+
+1. **评测脚本卡死**
+   - 调用 `load_env('lift_beaker')` 后无任何输出，进程永久挂起
+   - 无报错信息，无法通过日志定位
+
+2. **调试定位**
+   ```
+   [DEBUG] load_env 开始
+   [DEBUG] load_env 完成
+   [DEBUG] run_episode 开始
+   [DEBUG] env.reset() 完成
+   # ← 之后永久卡住
+   ```
+
+3. **最终表现**
+   - `load_env` 内部调用 `env.reset()`
+   - `env.reset()` 调用 `super().reset()` 后执行 `step()` 循环来稳定场景
+   - 第一个 `step()` 中 `should_terminate_episode()` 返回 True
+   - 设置 `_reset_next_step = True`
+   - 下一个 `step()` 触发 `self.reset()` → 再次进入 `step()` 循环 → 再次 terminate → 无限递归
+
+### 根本原因
+
+#### 1. LiftCondition.is_met() 的逻辑缺陷
+
+原始代码（修复前）：
+
+```python
+def is_met(self, physics=None):
+    for entity in self.entities:
+        entity_xpos = physics.bind(entity.mjcf_model.worldbody).xpos
+        name = entity.name if hasattr(entity, 'name') else str(id(entity))
+
+        if self.lift_height is not None and self._initial_z:  # ← 关键
+            initial_z = self._initial_z.get(name, entity_xpos[-1])
+            target_z = initial_z + self.lift_height - self._tolerance
+            if entity_xpos[-1] < target_z:
+                return False
+        elif self.target_height is not None:
+            if entity_xpos[-1] < self.target_height - self._tolerance:
+                return False
+    return True  # ← 当两个分支都不进入时，直接返回 True
+```
+
+当 `lift_height` 不为 None 但 `_initial_z` 为空字典 `{}` 时：
+- `self._initial_z` 为 falsy → 跳过第一个 if 分支
+- `self.target_height` 为 None → 跳过 elif 分支
+- 循环体没有 `return False` → 最终 `return True`
+
+**结果**：条件在环境刚初始化、还没记录初始高度时就返回 True。
+
+#### 2. 死循环链条
+
+```
+load_env()
+  → env.reset()                    # LM4ManipDMEnv.reset()
+    → super().reset()               # composer.Environment.reset() ✅
+    → cancel_gravity_and_improve_fluid()  ✅
+    → for i in range(10): step()    # step 1
+      → should_terminate_episode()  # → LiftCondition.is_met() = True ❌
+      → _reset_next_step = True
+    → step()                        # step 2
+      → _reset_next_step == True
+      → return self.reset()         # ← 递归！
+        → super().reset()           ✅
+        → step() 循环...            # 同样的 terminate → reset 循环
+```
+
+#### 3. 为什么 record_initial_state 没有被调用
+
+`record_initial_state` 在评测脚本中是在 `env.reset()` 之后手动调用的：
+
+```python
+env.reset()  # ← 这里就卡死了，下面的代码不会执行
+for condition in env.task.conditions.conditions:
+    condition.record_initial_state(env.physics)
+```
+
+而 `env.reset()` 内部的 `step()` 循环在 `record_initial_state` 被调用之前就已经检查了 `is_met()`。
+
+### 解决方案
+
+**在 `is_met()` 中增加初始态检查**：当 `lift_height` 模式下 `_initial_z` 为空时，返回 `False`。
+
+文件：`VLABench/tasks/condition.py`
+
+```python
+def is_met(self, physics=None):
+    for entity in self.entities:
+        entity_xpos = physics.bind(entity.mjcf_model.worldbody).xpos
+        name = entity.name if hasattr(entity, 'name') else str(id(entity))
+
+        if self.lift_height is not None:
+            if not self._initial_z:      # ← 新增：初始态未记录，条件不满足
+                return False
+            initial_z = self._initial_z.get(name, entity_xpos[-1])
+            target_z = initial_z + self.lift_height - self._tolerance
+            if entity_xpos[-1] < target_z:
+                return False
+        elif self.target_height is not None:
+            if entity_xpos[-1] < self.target_height - self._tolerance:
+                return False
+    return True
+```
+
+同时让 `LiftCondition.__init__` 调用 `super().__init__()`，`record_initial_state` 调用 `super().record_initial_state()`。
+
+### 预防措施
+
+#### ✅ DO — 添加新 Condition 时的检查清单
+
+1. **依赖初始态的条件，必须在 is_met 中检查初始态是否已记录**
+   - 如果条件需要"前态-终态对比"（如举起高度、移动距离），确保 `_initial_z` / `_initial_pos` 等非空时才进行判断
+   - 未记录初始态时应返回 `False`
+
+2. **子类 __init__ 必须调用 super().__init__()**
+   ```python
+   class MyCondition(Condition):
+       def __init__(self, ...):
+           super().__init__()   # ← 必须
+           self._my_state = {}
+   ```
+
+3. **子类 record_initial_state 必须调用 super().record_initial_state()**
+   ```python
+   def record_initial_state(self, physics=None):
+       super().record_initial_state(physics)  # ← 必须
+       ...
+   ```
+
+4. **验证环境能正常加载**：新任务创建后，先测试 `load_env` 能否在 10 秒内完成
+
+#### ❌ DON'T
+
+1. **不要让 is_met 在缺少前置数据时默认返回 True**
+2. **不要假设 record_initial_state 一定在 is_met 之前被调用**
+
+### 调试方法
+
+#### 1. 快速验证条件初始判定
+
+```python
+from VLABench.robots import *
+from VLABench.tasks import *
+from VLABench.envs import load_env
+import numpy as np, random
+
+np.random.seed(42)
+random.seed(42)
+task = register.load_task('your_task')(...)
+env = LM4ManipDMEnv(task=task, time_limit=float('inf'), reset_wait_step=0)
+
+env._reset_attempt()  # 只做基础 reset
+# 此时 record_initial_state 尚未被调用
+
+if hasattr(task, 'conditions') and task.conditions:
+    for c in task.conditions.conditions:
+        result = c.is_met(env.physics)
+        print(f'{type(c).__name__}: is_met={result}  ← 应为 False')
+env.close()
+```
+
+如果任何条件在此时返回 True，说明存在同类 bug。
+
+#### 2. 定位 load_env 卡死
+
+```python
+import signal, sys
+
+def timeout(signum, frame):
+    print('TIMEOUT!'); sys.exit(1)
+
+signal.signal(signal.SIGALRM, timeout)
+signal.alarm(60)  # 60秒超时
+
+env = load_env('your_task', random_init=True, eval=False, run_mode='eval')
+signal.alarm(0)
+print('load_env succeeded')
+```
+
+如果超时，逐步拆解 `load_env` 内部调用来定位卡住的位置。
+
+#### 3. 检查 _reset_next_step 死循环
+
+在 `dm_env.py` 的 `step()` 方法中添加临时 debug：
+
+```python
+if self._reset_next_step:
+    print(f'[WARN] _reset_next_step=True, calling reset() (timestep={self.timestep})')
+    self._reset_next_step = False
+    return self.reset()
+```
+
+如果看到大量重复输出，说明存在 terminate → reset 的死循环。
+
+### 其他 Condition 类的风险评估
+
+| 条件类 | 依赖初始态 | 同类风险 | 说明 |
+|--------|-----------|---------|------|
+| `LiftCondition` | `_initial_z` | **已修复** | lift_height 模式需初始高度 |
+| `WaitForCondition` | `_change_applied` | 低 | 逻辑不同，首次调用时 is_met 行为正确 |
+| `OrderCondition` | 无 | 无 | 纯位置检查 |
+| `ContainCondition` | 无 | 无 | 容器包含检测 |
+| `OnCondition` | 无 | 无 | 接触+Z 轴检测 |
+| `HeatedCondition` | `accumulated_time` | 无 | 初始为 0，需要累积才能满足 |
+| 其他条件 | 无 | 无 | 均为即时状态检查 |
+
+### 相关文件
+
+- `VLABench/tasks/condition.py` — 条件定义
+- `VLABench/envs/dm_env.py` — `reset()` 和 `step()` 中的终止检查
+- `VLABench/tasks/dm_task.py` — `should_terminate_episode()` 调用 `conditions.is_met()`
+
+### 关键经验
+
+> **原则**：任何依赖"初始状态记录"的 Condition，在初始态未记录时，`is_met()` 必须返回 `False`，绝不能默认返回 `True`。
+
+> **教训**：Python 中空字典 `{}` 是 falsy，放在 `if` 条件中会导致分支被跳过。对于需要记录初始态的条件，应显式检查"是否已记录"，而非依赖容器的 truthiness。
+
+---
+
+**最后更新**: 2026-05-25
 **维护者**: VLABench Team

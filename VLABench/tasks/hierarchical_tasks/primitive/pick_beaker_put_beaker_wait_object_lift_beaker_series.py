@@ -19,7 +19,7 @@ class PickBeakerPutBeakerWaitObjectLiftBeakerConfigManager(BenchTaskConfigManage
             name="small_beaker_0",
             xml_path=name2class_xml["small_beaker"][-1],
             position=[random.uniform(0.05, 0.15), random.uniform(-0.15, -0.05), 0.8],
-            solution_rgba=[0.0, 0.45, 1.0, 0.4],
+            solution_rgba=[0.35, 0.55, 0.75, 0.4],
         )
         obj_config["class"] = "ChemistryBeaker"
         obj_config["randomness"] = dict(pos=[0.02, 0.02, 0], quat=[0, 0, 0.05])
@@ -35,7 +35,7 @@ class PickBeakerPutBeakerWaitObjectLiftBeakerConfigManager(BenchTaskConfigManage
         self.config["task"]["components"].append(obj_config)
 
     def get_instruction(self, target_entity, **kwargs):
-        self.config["task"]["instructions"] = ["pick the <small_beaker_0> which contains <CuSO4_0>"]
+        self.config["task"]["instructions"] = ["pick the <small_beaker_0> which contains <CuCl2_0>"]
 
     def get_condition_config(self, target_entity, **kwargs):
         # 执行完即成功
@@ -53,10 +53,11 @@ class PickBeakerPutBeakerWaitObjectLiftBeakerTask(PrimitiveTask):
     def get_expert_skill_sequence(self, physics):
         skill_sequence = [
             partial(SkillLib.pick, target_entity_name="small_beaker_0", prior_eulers=[[-3.141592653589793, 0, 0]]),
+            partial(SkillLib.moveto_entity, target_entity_name="hot_plate_0", offset=np.array([0, 0, 0.2])),
             partial(SkillLib.place, target_container_name="hot_plate_0"),
-            partial(SkillLib.wait_for, wait_duration=2.0, entity_name="small_beaker_0", change_type="solution_change_color", color=[1, 0, 0, 0.4]),
-            partial(SkillLib.moveto_entity, target_entity_name="small_beaker_0", offset=np.array([0, 0, 0.2]), gripper_state=[0, 0]),
+            partial(SkillLib.wait, wait_time=50),
+            partial(SkillLib.moveto_entity, target_entity_name="small_beaker_0", offset=np.array([0, 0, 0.2])),
             partial(SkillLib.pick, target_entity_name="small_beaker_0", prior_eulers=[[-3.141592653589793, 0, 0]]),
-            partial(SkillLib.lift, lift_height=0.15, gripper_state=[0, 0]),
+            partial(SkillLib.lift, lift_height=0.15),
         ]
         return skill_sequence

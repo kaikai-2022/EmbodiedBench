@@ -233,9 +233,9 @@ For each step, you MUST fill in:
 - pre_state_assertion: Describe robot gripper state and object positions BEFORE this step.
 - atomic_sequence: Autonomously decide skills based on action type. Reference hints:
   - pour -> pick -> lift -> pour_to_entity -> insert_to_entity (insert_to_entity already includes open_gripper, do NOT add another open_gripper after it)
-  - remove -> moveto -> pick -> open_gripper
-  - lift -> moveto -> pick -> lift
-  - place -> moveto -> place
+  - remove -> pick -> open_gripper
+  - lift -> pick -> lift
+  - place -> place
 - post_state_assertion: Describe robot gripper state and object position changes AFTER this step.
 
 ## Special Rule for Test Tubes

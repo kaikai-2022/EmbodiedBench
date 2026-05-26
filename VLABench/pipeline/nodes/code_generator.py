@@ -50,12 +50,7 @@ class {class_prefix}ConfigManager(BenchTaskConfigManager):
     def get_instruction(self, target_entity, {extra_params}**kwargs):
         self.config["task"]["instructions"] = [{instruction}]
 
-    def get_condition_config(self, target_entity, {extra_params}**kwargs):
-        # 执行完即成功
-        pass
-
-    def get_target_entity(self):
-        return "{target_entity_uid}"
+{condition_config_method}
 """
 
 TASK_CLASS_TEMPLATE = """\
@@ -77,6 +72,74 @@ class {class_prefix}Task(PrimitiveTask):
 def _to_class_prefix(task_name: str) -> str:
     """将 task_name 转为 CamelCase 类名前缀"""
     return "".join(word.capitalize() for word in task_name.split("_"))
+
+
+def _build_condition_config_code(condition_plan, extra_params: str = "") -> str:
+    """
+    从 condition_plan 生成 get_condition_config 方法体。
+
+    condition_plan 格式:
+    [{"step_id": 0, "condition_type": "lift", "params": {"entities": ["beaker_0"], "lift_height": 0.15}, ...}]
+
+    只取最后一个非 pass 条件（最终成功状态），生成单一 conditions_config dict。
+    """
+    if not condition_plan:
+        return (
+            "    def get_condition_config(self, target_entity, "
+            + extra_params
+            + "**kwargs):\n"
+            + "        # 执行完即成功\n"
+            + "        pass\n"
+        )
+
+    # 过滤出非 pass 条件，取最后一个作为最终成功判定
+    non_pass = [cp for cp in condition_plan if cp.get("condition_type") != "pass"]
+    if not non_pass:
+        return (
+            "    def get_condition_config(self, target_entity, "
+            + extra_params
+            + "**kwargs):\n"
+            + "        # 执行完即成功\n"
+            + "        pass\n"
+        )
+
+    last = non_pass[-1]
+    cond_type = last["condition_type"]
+    params = last.get("params", {})
+
+    # 将 params dict 格式化为 Python dict 字面量
+    params_str = _format_params(params, indent=12)
+
+    lines = [
+        "    def get_condition_config(self, target_entity, " + extra_params + "**kwargs):",
+        "        conditions_config = dict(",
+        f"            {cond_type}={params_str}",
+        "        )",
+        '        self.config["task"]["conditions"] = conditions_config',
+    ]
+    return "\n".join(lines)
+
+
+def _format_params(params: Dict, indent: int = 12) -> str:
+    """将 params dict 格式化为紧凑的 Python dict 字面量"""
+    if not params:
+        return "dict()"
+
+    items = []
+    for k, v in params.items():
+        items.append(f"{k}={repr(v)}")
+
+    # 尝试放在一行
+    one_line = "dict(" + ", ".join(items) + ")"
+    if len(one_line) < 80:
+        return one_line
+
+    # 多行
+    ind = " " * indent
+    lines = []
+    for k, v in params.items():
+        lines.append(f"{ind}{k}={repr(v)},")
+    return "dict(\n" + "\n".join(lines) + f"\n{' ' * (indent - 4)})"
 
 
 def _build_instruction(normalized_context: Dict, skill_plan: Dict) -> str:
@@ -172,15 +235,6 @@ def code_generator_node(state: Dict) -> Dict:
     # ── Step 3: 组装完整文件 ────────────────────────────────────────
     instruction = _build_instruction(normalized_context, skill_plan)
 
-    # target_entity: 第一个 load_objects 计划的 uid
-    target_entity_uid = ""
-    for p in plans:
-        if p.method_name == "load_objects":
-            target_entity_uid = p.uid
-            break
-    if not target_entity_uid and plans:
-        target_entity_uid = plans[0].uid
-
     # extra_params: 只有 init_container（试管架）时加参数
     has_init = any(p.method_name == "load_init_containers" for p in plans)
     extra_params = ""
@@ -195,6 +249,10 @@ def code_generator_node(state: Dict) -> Dict:
     # 组装 constants
     constants_str = (extra_constants + "\n") if extra_constants else ""
 
+    # ── Step 2.5: 生成 condition_config 方法 ─────────────────────────
+    condition_config_method = _build_condition_config_code(condition_plan, extra_params)
+    logger.info(f"[Code Generator] condition_config 方法:\n{condition_config_method}")
+
     # 组装 ConfigManager
     config_code = CONFIG_MANAGER_TEMPLATE.format(
         task_name=task_name,
@@ -202,7 +260,7 @@ def code_generator_node(state: Dict) -> Dict:
         load_methods=load_methods_code,
         extra_params=extra_params,
         instruction=instruction,
-        target_entity_uid=target_entity_uid,
+        condition_config_method=condition_config_method,
     )
 
     # 组装 Task class

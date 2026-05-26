@@ -8,15 +8,15 @@ from VLABench.tasks.config_manager import BenchTaskConfigManager
 from VLABench.utils.register import register
 from VLABench.configs.constant import name2class_xml
 
-@register.add_config_manager("lift_beaker")
-class LiftBeakerConfigManager(BenchTaskConfigManager):
+@register.add_config_manager("pick_up_small_beaker")
+class PickUpSmallBeakerConfigManager(BenchTaskConfigManager):
     def __init__(self, task_name, num_objects=[1, 1], **kwargs):
         super().__init__(task_name, num_objects, **kwargs)
         self.config["task"]["n_distractor"] = 0
 
     def load_objects(self, target_entity):
         obj_config = dict(
-            name="small_beaker_0",
+            name=target_entity,
             xml_path=name2class_xml["small_beaker"][-1],
             position=[random.uniform(0.05, 0.15), random.uniform(-0.15, -0.05), 0.8],
         )
@@ -24,27 +24,25 @@ class LiftBeakerConfigManager(BenchTaskConfigManager):
         obj_config["randomness"] = dict(pos=[0.02, 0.02, 0], quat=[0, 0, 0.05])
         self.config["task"]["components"].append(obj_config)
 
-        self.target_entity = "small_beaker_0"
-
     def get_instruction(self, target_entity, **kwargs):
-        self.config["task"]["instructions"] = ["lift the small <small_beaker_0>"]
+        self.config["task"]["instructions"] = [f"pick up the <{target_entity}>"]
 
     def get_condition_config(self, target_entity, **kwargs):
+        # 抓取目标物体即可成功
         conditions_config = dict(
-            lift=dict(entities=["small_beaker_0"], lift_height=0.1)
+            lift=dict(entities=[target_entity], lift_height=0.1)
         )
         self.config["task"]["conditions"] = conditions_config
 
 
-@register.add_task("lift_beaker")
-class LiftBeakerTask(PrimitiveTask):
+@register.add_task("pick_up_small_beaker")
+class PickUpSmallBeakerTask(PrimitiveTask):
     def __init__(self, task_name, robot, **kwargs):
         super().__init__(task_name, robot=robot, **kwargs)
 
     def get_expert_skill_sequence(self, physics):
         skill_sequence = [
-            partial(SkillLib.moveto_entity, target_entity_name="small_beaker_0"),
-            partial(SkillLib.pick, target_entity_name="small_beaker_0", prior_eulers=[[-3.141592653589793, 0, 0]]),
+            partial(SkillLib.pick, target_entity_name=self.target_entity, prior_eulers=[[-3.141592653589793, 0, 0]]),
             partial(SkillLib.lift, lift_height=0.15),
         ]
         return skill_sequence

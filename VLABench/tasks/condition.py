@@ -5,11 +5,11 @@ from VLABench.tasks.components.entity import Entity
 
 class Condition:
     def __init__(self):
-        pass
+        self._initial_state_recorded = False
 
     def record_initial_state(self, physics=None):
         """在技能执行前调用，记录初始状态。子类可重写以支持前态-终态对比。"""
-        pass
+        self._initial_state_recorded = True
 
     def is_met(self, physics=None):
         raise NotImplementedError()
@@ -345,6 +345,7 @@ class LiftCondition(Condition):
         lift_height: the height to lift relative to initial position (in meters)
     """
     def __init__(self, entities, target_height=None, lift_height=None):
+        super().__init__()
         self.entities = entities
         self.target_height = target_height
         self.lift_height = lift_height
@@ -353,6 +354,7 @@ class LiftCondition(Condition):
 
     def record_initial_state(self, physics=None):
         """技能执行前记录物体高度"""
+        super().record_initial_state(physics)
         for entity in self.entities:
             name = entity.name if hasattr(entity, 'name') else str(id(entity))
             xpos = physics.bind(entity.mjcf_model.worldbody).xpos
@@ -363,7 +365,9 @@ class LiftCondition(Condition):
             entity_xpos = physics.bind(entity.mjcf_model.worldbody).xpos
             name = entity.name if hasattr(entity, 'name') else str(id(entity))
 
-            if self.lift_height is not None and self._initial_z:
+            if self.lift_height is not None:
+                if not self._initial_z:
+                    return False
                 initial_z = self._initial_z.get(name, entity_xpos[-1])
                 target_z = initial_z + self.lift_height - self._tolerance
                 if entity_xpos[-1] < target_z:
@@ -391,6 +395,7 @@ class WaitForCondition(Condition):
     """
     def __init__(self, entity, robot=None, wait_duration=2.0, change_type=None,
                  solution=None, color=None):
+        super().__init__()
         self.entity = entity
         self.robot = robot
         self.wait_duration = wait_duration
@@ -400,6 +405,7 @@ class WaitForCondition(Condition):
         self._change_applied = False
 
     def record_initial_state(self, physics=None):
+        super().record_initial_state(physics)
         self._change_applied = False
 
     def is_met(self, physics=None):

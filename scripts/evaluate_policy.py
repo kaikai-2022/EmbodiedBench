@@ -61,8 +61,13 @@ def evaluate(args):
         policy = RandomPolicy(None)
 
     result = evaluator.evaluate(policy)
-    os.makedirs(os.path.join(args.save_dir, args.policy, args.eval_track), exist_ok=True)
-    with open(os.path.join(args.save_dir, args.policy, args.eval_track, "evaluation_result.json"), "w") as f:
+    if args.eval_track:
+        os.makedirs(os.path.join(args.save_dir, args.policy, args.eval_track), exist_ok=True)
+        result_path = os.path.join(args.save_dir, args.policy, args.eval_track, "evaluation_result.json")
+    else:
+        os.makedirs(os.path.join(args.save_dir, args.policy), exist_ok=True)
+        result_path = os.path.join(args.save_dir, args.policy, "evaluation_result.json")
+    with open(result_path, "w") as f:
         json.dump(result, f)
 
 if __name__ == "__main__":

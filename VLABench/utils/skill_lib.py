@@ -295,38 +295,12 @@ class SkillLib:
         observations = [env.get_observation()]
         # move along the interplated path
         gripper_state = np.ones(2) * 0.04
+
         new_obs, new_waypoints, _, task_success = SkillLib.step_trajectory(env,
                                                                    interplate_path,
                                                                    interplate_quat,
                                                                    gripper_state,
                                                                    **kwargs)
-
-        print(f"DEBUG [pick]: step_trajectory 完成")
-        print(f"  执行了 {len(new_waypoints)} 个路径点")
-        print(f"  当前末端位置: {env.robot.get_end_effector_pos(env.physics)}")
-        print(f"  目标位置: {key_pos}")
-        print(f"  XY误差: {np.linalg.norm(env.robot.get_end_effector_pos(env.physics)[:2] - key_pos[:2])}")
-        print(f"  Z误差: {abs(env.robot.get_end_effector_pos(env.physics)[2] - key_pos[2])}")
-        # DEBUG: 打印 step_trajectory 完成后手指中点和烧杯中心
-        import mujoco as mj
-        raw_m = env.physics.model._model
-        raw_d = env.physics.data._data
-        gripper_geoms = env.robot.gripper_geoms
-        pad_positions = []
-        for geom in gripper_geoms:
-            eid = env.physics.bind(geom).element_id
-            gname = mj.mj_id2name(raw_m, mj.mjtObj.mjOBJ_GEOM, eid) or ''
-            if 'pad' in gname.lower():
-                pad_positions.append(raw_d.geom_xpos[eid])
-        if len(pad_positions) >= 2:
-            finger_mid = sum(pad_positions) / len(pad_positions)
-            beaker_pos = np.array(target_entity.get_xpos(env.physics))
-            print(f"DEBUG [pick]: === AFTER STEP_TRAJECTORY ===")
-            print(f"  finger1: ({pad_positions[0][0]:.4f}, {pad_positions[0][1]:.4f}, {pad_positions[0][2]:.4f})")
-            print(f"  finger2: ({pad_positions[1][0]:.4f}, {pad_positions[1][1]:.4f}, {pad_positions[1][2]:.4f})")
-            print(f"  finger_mid: ({finger_mid[0]:.4f}, {finger_mid[1]:.4f}, {finger_mid[2]:.4f})")
-            print(f"  beaker:     ({beaker_pos[0]:.4f}, {beaker_pos[1]:.4f}, {beaker_pos[2]:.4f})")
-            print(f"  XY_diff_mm: ({abs(finger_mid[0]-beaker_pos[0])*1000:.1f}, {abs(finger_mid[1]-beaker_pos[1])*1000:.1f})")
         observations.extend(new_obs)
         waypoints.extend(new_waypoints)
         # 无论 step_trajectory 返回什么，都要执行 close_gripper 完成抓取

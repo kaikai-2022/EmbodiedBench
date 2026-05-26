@@ -252,6 +252,13 @@ def _gen_objects(plans: List[EntityLoadPlan], flags: Dict) -> str:
         else:
             lines += _code_plain(plan, flags)
 
+    # 覆盖 target_entity 为第一个 load_objects 计划的 uid，
+    # 确保 self.target_entity 与 self.entities 中的 key 一致
+    first_uid = next((p.uid for p in plans), None)
+    if first_uid:
+        lines.append(f'        self.target_entity = "{first_uid}"')
+        lines.append("")
+
     flags["needs_name2class_xml"] = True
     return "\n".join(lines), flags
 
