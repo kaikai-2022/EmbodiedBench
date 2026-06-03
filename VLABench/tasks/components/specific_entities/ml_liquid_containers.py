@@ -3,6 +3,7 @@ Liquid container entities with solution rendering support.
 Provides a unified `solution` parameter interface for chemistry containers
 (e.g., beaker, flask, petri dish) to display colored liquid in MuJoCo rendering.
 """
+import numpy as np
 from VLABench.tasks.components.entity import CommonGraspedEntity
 from VLABench.tasks.components.container import ContainerMiXin
 from VLABench.utils.register import register
@@ -97,3 +98,31 @@ class ChemistryBeaker(SolutionMixin, ContainerMiXin, CommonGraspedEntity):
             return place_points
         # Fallback: use worldbody position with small offset
         return [self.get_xpos(physics) + [0, 0, 0.05]]
+
+    def contain(self, point, physics):
+        """
+        Judge whether the target point is inside the beaker.
+        Uses key_sites to determine the bounding box of the beaker interior.
+        """
+        try:
+            keysites = self.key_sites(physics)
+            if not keysites:
+                raise AttributeError("No key_sites found")
+            keypoints = np.array([physics.bind(kp).xpos for kp in keysites])
+            if keypoints.ndim != 2 or keypoints.shape[1] != 3:
+                raise ValueError(f"Unexpected keypoints shape: {keypoints.shape}")
+            minX, maxX, minY, maxY, minZ, maxZ = (
+                keypoints[:, 0].min(), keypoints[:, 0].max(),
+                keypoints[:, 1].min(), keypoints[:, 1].max(),
+                keypoints[:, 2].min(), keypoints[:, 2].max()
+            )
+            return (minX <= point[0] <= maxX and
+                    minY <= point[1] <= maxY and
+                    minZ <= point[2] <= maxZ)
+        except (AttributeError, TypeError, ValueError):
+            # Fallback: use beaker center and approximate dimensions
+            center = self.get_xpos(physics)
+            radius = 0.05  # approximate beaker radius
+            in_cylinder = ((point[0] - center[0])**2 + (point[1] - center[1])**2) < radius**2
+            in_height = center[2] <= point[2] <= center[2] + 0.15
+            return in_cylinder and in_height

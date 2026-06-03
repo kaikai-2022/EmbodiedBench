@@ -53,6 +53,10 @@ class LM4ManipDMEnv(composer.Environment):
         self._grasped_entity_info = None  # {"name": str, "rel_pos_local": np, "rel_quat_local": np}
         self._grasp_lock_hand_body_id = None  # cached hand body id
 
+        # 技能执行模式开关：True 时 should_terminate() 触发 LAST 但不 reset 环境
+        # 让技能（如 place）在检测到条件满足后仍能继续执行后续动作（open_gripper、lift）
+        self._skill_execution_mode = False
+
     def reset(self):
         self.timestep = 0
         self._grasped_entity_info = None  # 清除 grasp lock 状态
@@ -136,6 +140,9 @@ class LM4ManipDMEnv(composer.Environment):
         if not terminating:
             return dm_env_lib.TimeStep(dm_env_lib.StepType.MID, reward, discount, obs)
         else:
+            if self._skill_execution_mode:
+                # 技能执行期间：不终止，不 reset，继续返回 MID
+                return dm_env_lib.TimeStep(dm_env_lib.StepType.MID, reward, discount, obs)
             self._reset_next_step = True
             return dm_env_lib.TimeStep(dm_env_lib.StepType.LAST, reward, discount, obs)
     

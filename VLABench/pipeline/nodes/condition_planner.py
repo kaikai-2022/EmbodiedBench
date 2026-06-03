@@ -89,8 +89,13 @@ Select from these condition types (registered in VLABench/tasks/condition.py):
 - **or**(condition_sets=[...]): Any one condition in the set is met.
   Use for: alternative success criteria (advanced, prefer simpler types above)
 
+- **shake**(entities=[<uid>], robot="robot", min_direction_changes=3, min_angle_threshold=0.1, check_axis=1):
+  Target entity has been shaken: it must be grasped and its orientation has oscillated back and forth at least min_direction_changes times.
+  Use for: "shake X", "oscillate X"
+  **IMPORTANT**: Always include `"robot": "robot"` in params. `check_axis` defaults to 1 (Y-axis pitch). `min_angle_threshold` filters out small vibrations.
+
 - **pass**: No physical condition check needed. Step succeeds simply by completing execution.
-  Use for: "shake X", "move to position without final placement goal", "open gripper"
+  Use for: "move to position without final placement goal", "open gripper"
 
 - **wait_for**(entity=<uid>, robot="robot", wait_duration=2.0, change_type="add_solution", solution="CuSO4"):
   Entity is not being touched/grasped by the robot gripper after the wait period.
@@ -104,7 +109,7 @@ Use this as reference, but the LLM should use semantic understanding:
 
 | Action | Typical Condition | Reasoning |
 |--------|-------------------|-----------|
-| pour | **pour** (source tilted) or **contain** (content in dest) | Source tilted OR content transferred |
+| pour | **pour** (source tilted) | Check if source container is tilted (top_site below bottom_site) |
 | place (in/into) | **contain** | Entity inside container |
 | place (on) | **on** | Entity resting on surface |
 | remove (from) | **not_contain** | Entity no longer inside |
@@ -112,16 +117,17 @@ Use this as reference, but the LLM should use semantic understanding:
 | heat | **heated** | Accumulated heating time |
 | press | **press_button** | Button pressed |
 | insert | **contain** | Entity inside target |
-| shake | **pass** | No final position/state goal |
+| shake | **shake** | Object grasped and orientation oscillated |
 | wait_for | **wait_for** | Entity stillness triggers auto change |
 | wait | **pass** | Just waiting, no state change |
 | move | **on_position** or **pass** | Depends on if position matters |
 
 ## Parameter Notes
 
-- All entity parameters use UIDs from the asset inventory (e.g., "tube_0", "beaker_0")
+- All entity parameters MUST use UIDs from the Physical Asset Inventory (e.g., "tube_0", "beaker_0"). Do NOT use substance/solution names (e.g., "CuSO4_0", "NaCl_1") as entity parameters — they are not physical objects in the simulation.
 - Numeric parameters (duration, tolerance, target_height, etc.) use reasonable defaults unless the instruction specifies exact values
 - Some conditions accept additional kwargs (e.g., contain accepts "layer" for multi-layer containers)
+- **pour action**: Always use the **pour** condition (checks if source container is tilted). Do NOT use contain for pour actions, since liquids are not simulated as physical entities.
 """
 
 # ========== 合法 Condition 类型集合 ==========
@@ -129,7 +135,7 @@ VALID_CONDITION_TYPES = {
     "contain", "not_contain", "on", "above", "pour", "heated",
     "on_position", "lift", "contact", "is_grasped", "on_orientation",
     "order", "press_button", "joint_in_range", "asyn_sequence", "or",
-    "pass", "wait_for"
+    "pass", "wait_for", "shake"
 }
 
 
@@ -205,7 +211,8 @@ def _validate_condition_plan(plan: List[Dict], num_steps: int, valid_uids: set) 
                          "duration", "xy_tolerance", "target_height", "tolerance_distance",
                          "tolerance_angle", "dimension", "offset", "threshold", "check_axes",
                          "layer", "tilt_angle", "wait_time", "insert_depth", "lift_height",
-                         "push_distance", "rotation_angle", "gripper_state"]:
+                         "push_distance", "rotation_angle", "gripper_state",
+                         "min_direction_changes", "min_angle_threshold", "check_axis"]:
                     continue
                     continue
                 # entity 参数应该是字符串 UID

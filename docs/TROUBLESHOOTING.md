@@ -9,6 +9,7 @@
 1. [场景与机器人位置不匹配导致物体距离过远](#1-场景与机器人位置不匹配导致物体距离过远)
 2. [OBJ模型几何中心偏移导致视觉与物理不匹配](#2-obj模型几何中心偏移导致视觉与物理不匹配)
 3. [LiftCondition 在 record_initial_state 未调用时误判为已满足](#3-liftcondition-在-record_initial_state-未调用时误判为已满足)
+4. [place/drop 技能被 should_terminate 提前终止导致仿真中断](#4-placedrop-技能被-should_terminate-提前终止导致仿真中断)
 
 ---
 
@@ -993,5 +994,220 @@ if self._reset_next_step:
 
 ---
 
-**最后更新**: 2026-05-25
+## 4. place/drop 技能被 should_terminate 提前终止导致仿真中断
+
+**日期**: 2026-05-27
+**影响任务**: 所有包含 `place` 或 `drop` 技能的任务（如 `pick_small_beaker_place_small_beaker`）
+**严重程度**: 🔴 高（任务提前终止，open_gripper 不执行，condition 不评估，误报成功）
+
+### 问题表现
+
+1. **仿真提前终止**
+   - 运行 `pick the small_beaker and place it on the electronic_scale` 时，place 技能在烧杯刚接触电子秤表面就停止了
+   - 视频显示机械臂带着烧杯接触电子秤后立即停止，没有松开夹爪，没有抬升
+
+2. **condition 未被评估**
+   - `step_condition_results` 只有 step 0（`is_grasped`）的结果
+   - step 1（`on` condition）从未被检查
+
+3. **任务误报成功**
+   - `simulation_success: true`，但实际上烧杯还在夹爪里，没有被放下
+
+### 根本原因
+
+#### 1. 事件链
+
+```
+place() 执行:
+  step_trajectory() 沿路径移动机械臂
+    → 烧杯接触电子秤表面
+    → OnCondition.is_met() = True（检测到接触 + Z 轴高度满足）
+    → should_terminate_episode() = True
+    → dm_env.step() 返回 LAST
+    → step_trajectory 检测到 timestep.last() → break → 返回 task_success=True
+
+  place() 检测到 task_success=True → return（直接退出）
+    → open_gripper() 未执行 ← 烧杯还在夹爪里
+    → lift() 未执行
+```
+
+#### 2. 两层提前退出
+
+| 层级 | 代码位置 | 行为 |
+|------|---------|------|
+| `step_trajectory` | `skill_lib.py:87-89` | `timestep.last()` → `task_success=True` → `break` |
+| `place()` | `skill_lib.py:466-469` | `if task_success: return` → 跳过 `open_gripper` |
+| `simulation_node` | `simulation.py:371-373` | `if skill_task_success: break` → 跳出技能循环 |
+
+#### 3. 为什么 pour 没有这个问题
+
+`pour` 技能的条件（容器底部高于顶部）只在倾斜过程中满足，且 `pour` 用 `break`（跳出循环继续执行后续阶段）而非 `return`（直接退出函数）。`place` 用了 `return`，导致后续动作被跳过。
+
+#### 4. 核心矛盾
+
+- `should_terminate_episode()` 的设计意图是为**强化学习训练循环**服务的：条件满足 → 返回 LAST → 下一帧 reset → 新 episode
+- 但 VLABench 的 pipeline 中，一个技能结束后还有后续动作（open_gripper、lift），不能立刻 reset
+- 在技能执行期间，`step()` 不应该因为 `should_terminate()` 而返回 LAST
+
+### 解决方案
+
+在 `dm_env.py` 中添加 `_skill_execution_mode` 开关，当开关打开时 `step()` 不返回 LAST，始终返回 MID。
+
+#### 改动1：`dm_env.py` — 添加开关
+
+**文件**: `VLABench/envs/dm_env.py`
+
+在 `__init__` 中添加开关变量：
+
+```python
+self._skill_execution_mode = False  # True 时 step() 不返回 LAST
+```
+
+修改 `step()` 方法，开关打开时跳过终止逻辑：
+
+```python
+# 修改前:
+if not terminating:
+    return dm_env_lib.TimeStep(dm_env_lib.StepType.MID, reward, discount, obs)
+else:
+    self._reset_next_step = True
+    return dm_env_lib.TimeStep(dm_env_lib.StepType.LAST, reward, discount, obs)
+
+# 修改后:
+if not terminating:
+    return dm_env_lib.TimeStep(dm_env_lib.StepType.MID, reward, discount, obs)
+else:
+    if self._skill_execution_mode:
+        # 技能执行期间：不终止，不 reset，继续返回 MID
+        return dm_env_lib.TimeStep(dm_env_lib.StepType.MID, reward, discount, obs)
+    self._reset_next_step = True
+    return dm_env_lib.TimeStep(dm_env_lib.StepType.LAST, reward, discount, obs)
+```
+
+#### 改动2：`simulation.py` — 控制开关
+
+**文件**: `VLABench/pipeline/nodes/simulation.py`
+
+在技能循环前打开开关，循环结束后关闭：
+
+```python
+# 技能循环前
+env._skill_execution_mode = True
+
+try:
+    for skill_idx, skill in enumerate(skill_seq):
+        ...
+
+except SkillTimeoutError:
+    ...
+finally:
+    signal.alarm(0)
+    signal.signal(signal.SIGALRM, old_handler)
+    env._skill_execution_mode = False  # 恢复
+```
+
+#### 改动3：`skill_lib.py` — 无需修改
+
+`place()` 和 `drop()` 的 `if task_success: return` 逻辑保持原样不变。因为 `step()` 不再返回 LAST，`timestep.last()` 不会触发，`task_success` 不会被设为 True，`if task_success` 分支不会进入。
+
+### 修改后的执行流程
+
+```
+simulation_node:
+  env._skill_execution_mode = True     ← 打开开关
+
+  skill_idx=0: pick()
+    step_trajectory:
+      env.step() → should_terminate()=False → 返回 MID → 正常移动
+    返回 task_success=False → simulation_node 继续
+
+  skill_idx=1: place()
+    step_trajectory:
+      env.step() → should_terminate()=True → _skill_execution_mode=True
+        → 返回 MID（不终止）→ 继续移动
+      ...路径走完或到达位置误差容限...
+    返回 task_success=False
+
+    open_gripper():
+      env.step() → 返回 MID → 正常执行 ✓
+      夹爪打开，烧杯释放 ✓
+
+    lift():
+      env.step() → 返回 MID → 正常执行 ✓
+      机械臂抬升 ✓
+
+    返回 stage_success, task_success=False
+
+  step 1 condition 评估 ✓ → OnCondition 检查烧杯是否在电子秤上
+
+  env._skill_execution_mode = False    ← 关闭开关
+```
+
+### 预防措施
+
+#### ✅ DO
+
+1. **新增技能时，检查是否在 `should_terminate()` 触发后有后续动作**
+   - 如果有（如 open_gripper、lift），确保 `_skill_execution_mode` 在技能执行期间为 True
+   - 如果没有（如 pour 的倾斜阶段），行为不受影响
+
+2. **`_skill_execution_mode` 只在 `simulation_node` 中控制**
+   - 不要在其他地方修改此开关
+   - `simulation_node` 的 `finally` 块确保开关一定会被关闭
+
+#### ❌ DON'T
+
+1. **不要在 `skill_lib.py` 中修改 `_skill_execution_mode`**
+   - 技能函数应该是纯函数式的，不应依赖环境内部状态
+
+2. **不要删除 `place()` / `drop()` 的 `if task_success: return` 逻辑**
+   - 这个逻辑在非 pipeline 场景（如强化学习训练）中是正确的
+   - 通过 `_skill_execution_mode` 让它在 pipeline 中不触发
+
+### 调试方法
+
+#### 1. 检查 step_condition_results 是否完整
+
+```bash
+# 在 pipeline log 中搜索 condition 结果
+grep -A5 "step_condition_results" pipeline_*.log
+```
+
+如果只有 step 0 没有 step 1，说明仿真提前终止了。
+
+#### 2. 检查 _skill_execution_mode 是否生效
+
+在 `dm_env.py` 的 `step()` 中添加临时 debug：
+
+```python
+if self._skill_execution_mode and terminating:
+    print(f"[DEBUG] _skill_execution_mode=True, skipping LAST (terminating={terminating})")
+    return dm_env_lib.TimeStep(dm_env_lib.StepType.MID, reward, discount, obs)
+```
+
+如果在技能执行期间看到此输出，说明开关生效。
+
+#### 3. 对比 pour 和 place 的行为
+
+`pour` 的条件只在过程中满足（容器倾斜时），结束后恢复。`place` 的条件一旦满足就持续满足。如果新技能的条件也有"持续满足"的特性，需要注意此问题。
+
+### 相关文件
+
+- `VLABench/envs/dm_env.py` — `step()` 方法，`_skill_execution_mode` 开关
+- `VLABench/pipeline/nodes/simulation.py` — 技能循环控制开关
+- `VLABench/utils/skill_lib.py` — `place()`, `drop()`, `step_trajectory()`
+- `VLABench/tasks/condition.py` — `OnCondition.is_met()`
+- `VLABench/tasks/dm_task.py` — `should_terminate_episode()`
+
+### 关键经验
+
+> **原则**：技能执行期间，`should_terminate_episode()` 不应该导致 `step()` 返回 LAST。条件检查应该只作为"成功判定"使用，而不是"执行控制"。
+
+> **教训**：`should_terminate_episode()` 是为强化学习训练循环设计的（条件满足 → episode 结束 → reset），但在 skill-based pipeline 中，技能需要完整执行所有动作后才能终止。这两个场景的需求是矛盾的，需要通过开关机制来区分。
+
+> **设计选择**：将开关放在 `dm_env.py` 而非 `skill_lib.py`，是因为技能函数不应该关心环境内部状态。`simulation_node` 作为调用方负责控制环境行为。
+
+---
+
+**最后更新**: 2026-05-27
 **维护者**: VLABench Team

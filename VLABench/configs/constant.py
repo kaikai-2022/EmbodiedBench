@@ -304,6 +304,7 @@ name2class_xml = {
     "petri_dish": [components.CommonGraspedEntity, "obj/meshes/lab_equipment/petri_dish/petri_dish.xml"],
     "beaker": [components.ChemistryBeaker, "obj/meshes/lab_equipment/beaker/chemistry_beaker/chemistry_beaker.xml"],
     "chemistry_beaker": [components.ChemistryBeaker, "obj/meshes/lab_equipment/beaker/chemistry_beaker/chemistry_beaker.xml"],
+    "big_beaker": [components.ChemistryBeaker, "obj/meshes/lab_equipment/beaker/chemistry_beaker/chemistry_beaker.xml"],
     "bunsen_burner": [components.CommonGraspedEntity, "review/bunsen_burner/7532be8f501d435194e3feec33a3addf/7532be8f501d435194e3feec33a3addf.xml"],
 # 本地 GLB 处理后的资产（通过 process_local_glb.py）
     "pipettes_stand": [components.CommonGraspedEntity, "review/pipettes_stand/pipettes_stand-ver-/pipettes_stand-ver-.xml"],
@@ -319,10 +320,12 @@ name2class_xml = {
 
     "funnel": [components.CommonGraspedEntity, "review/funnel/funnel/funnel.xml"],
     "hot_plate": [components.FlatContainer, "review/hot_plate/hot_plate/hot_plate.xml"],
+    "electronic_scale": [components.FlatContainer, "review/electronic_scale/electronic_scale/electronic_scale.xml"],
     "magnetic_stir_plate": [components.FlatContainer, "review/magnetic_stir_plate/magnetic_stir_plate/magnetic_stir_plate.xml"],
     "rag": [components.CommonGraspedEntity, "review/rag/rag/rag.xml"],
-    "water_bath": [components.CommonContainer, "review/water_bath/water_bath/water_bath.xml"],    "lab_table": [components.CommonGraspedEntity, "review/lab_table/lab_table/lab_table.xml"],
-
+    "water_bath": [components.CommonContainer, "review/water_bath/water_bath/water_bath.xml"],
+    "lab_table": [components.CommonGraspedEntity, "review/lab_table/lab_table/lab_table.xml"],
+    "chemistry_lab_table": [components.FlatContainer, "review/chemistry_lab_table/chemistry_lab_table/chemistry_lab_table.xml"],
 }
 
 additional_dict = {}

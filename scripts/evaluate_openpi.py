@@ -20,6 +20,16 @@ from VLABench.tasks import *
 from VLABench.envs import load_env
 from VLABench.configs import name2config
 from VLABench.utils.utils import euler_to_quaternion, quaternion_to_euler, find_key_by_value
+
+# 触发 autogen_tasks 下所有已生成任务的 @register 装饰器注册
+import glob, importlib.util
+_autogen_dir = os.path.join(os.environ.get("VLABENCH_ROOT", _VLABENCH_ROOT), "tasks", "autogen_tasks")
+for _path in glob.glob(os.path.join(_autogen_dir, "*_series.py")):
+    _name = os.path.splitext(os.path.basename(_path))[0]
+    _spec = importlib.util.spec_from_file_location(_name, _path)
+    _mod = importlib.util.module_from_spec(_spec)
+    _spec.loader.exec_module(_mod)
+print("[DEBUG] autogen_tasks 模块导入成功", flush=True)
 print("[DEBUG] 所有模块导入成功", flush=True)
 
 logger = logging.getLogger(__name__)
@@ -90,6 +100,14 @@ def run_episode(env, agent, max_episode_length=200, save_video=False):
     robot_frame = env.get_robot_frame_position()
     frames_to_save = []
 
+    # 关掉 env 层的 episode 自动 reset（与 simulation 节点行为对齐）
+    env._skill_execution_mode = True
+
+    # 重置顺序条件锁：每个 episode 都从第一个条件开始顺序检查
+    if hasattr(env.task, 'conditions') and env.task.conditions is not None:
+        if hasattr(env.task.conditions, 'reset_locks'):
+            env.task.conditions.reset_locks()
+
     # 记录条件初始状态
     if hasattr(env.task, 'conditions') and env.task.conditions is not None:
         for condition in env.task.conditions.conditions:
@@ -119,11 +137,10 @@ def run_episode(env, agent, max_episode_length=200, save_video=False):
             success = True
             break
 
-        # 检查条件是否满足
+        # 顺序条件：调用 is_met() 推进 SequentialConditionSet 内部锁状态
+        # 不基于 is_met 提前 break，跑满 max_episode_length 后在末尾统一统计每个 condition
         if hasattr(env.task, 'conditions') and env.task.conditions is not None:
-            if env.task.conditions.is_met(env.physics):
-                success = True
-                break
+            env.task.conditions.is_met(env.physics)
 
     # 收集各条件的最终结果
     condition_results = {}

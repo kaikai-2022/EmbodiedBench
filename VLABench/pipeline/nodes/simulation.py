@@ -164,13 +164,14 @@ def _evaluate_condition(step_id: int, condition, cond_type: str, physics) -> Dic
     """
     检查 condition 是否满足（技能执行后调用）。
 
-    对于 wait_for 类型的 condition，需要反复调用 is_met 并步进 physics 来累积 stationary_steps，
-    因为 wait_for 的语义是"实体在 wait_duration 时间内保持静止"。
-
     Returns:
         {"step_id": int, "condition_type": str, "met": bool, "error": str or None}
     """
     if condition is None:
+        return {"step_id": step_id, "condition_type": cond_type, "met": True, "error": None}
+
+    # 如果 callback 在执行期间已经设置了 _met 标志，说明条件已满足
+    if hasattr(condition, '_met') and condition._met:
         return {"step_id": step_id, "condition_type": cond_type, "met": True, "error": None}
 
     try:
@@ -221,7 +222,7 @@ def simulation_node(state: Dict) -> Dict:
         # 1. 加载环境（需要先导入 robots 和 tasks 以触发 @register 装饰器注册）
         import importlib
         importlib.import_module("VLABench.robots")  # 触发 @register.add_robot
-        importlib.import_module("VLABench.tasks.hierarchical_tasks.primitive")  # 触发 @register.add_task
+        importlib.import_module("VLABench.tasks.autogen_tasks")  # 触发 @register.add_task
         importlib.import_module("VLABench.tasks.hierarchical_tasks.composite")
         from VLABench.envs import load_env
 
@@ -229,7 +230,7 @@ def simulation_node(state: Dict) -> Dict:
         vlabench_root = os.environ.get("VLABENCH_ROOT", "/ssd/mkqin/workspace/VLABench/VLABench")
         series_path = os.path.join(
             os.path.dirname(vlabench_root),
-            "VLABench", "tasks", "hierarchical_tasks", "primitive",
+            "VLABench", "tasks", "autogen_tasks",
             f"{task_name}_series.py"
         )
         if os.path.exists(series_path):
@@ -315,16 +316,22 @@ def simulation_node(state: Dict) -> Dict:
         logger.info(f"[Simulation]   共有 {len(global_skill_plan)} 个 steps, {len(skill_seq)} 个 skills")
         logger.info(f"[Simulation]   Step skill counts: {step_skill_counts}, starts: {step_skill_starts}, ends: {step_skill_ends}")
 
-        # 设置整体仿真超时
+        # 设置整体仿真超���
         old_handler = signal.signal(signal.SIGALRM, _timeout_handler)
         signal.alarm(SIMULATION_TIMEOUT)
 
+        # 技能执行期间禁用自动 reset，让技能能完整执行完所有动作
+        env._skill_execution_mode = True
+
         try:
             current_atomic_timestamps = []
+            # 当前 step 挂载的 condition callback（用于逐帧调用 is_met）
+            active_condition_callback = None
+
             for skill_idx, skill in enumerate(skill_seq):
                 skill_name = skill.func.__name__
 
-                # step 开始前：创建 condition 实例并记录初始状态
+                # step 开始前：创建 condition 实例并记录初始状态，挂载逐帧 callback
                 for step_idx, start_idx in enumerate(step_skill_starts):
                     if skill_idx == start_idx:
                         step_condition_entry = None
@@ -339,6 +346,12 @@ def simulation_node(state: Dict) -> Dict:
                                 env.task.entities, env.robot, env.physics
                             )
                             step_conditions[step_idx] = (cond_instance, cond_type)
+                            # 挂载逐帧 callback，让 condition.is_met 在每个 physics step 被调用
+                            if cond_instance is not None:
+                                if not hasattr(env.task, '_per_step_condition_callbacks'):
+                                    env.task._per_step_condition_callbacks = []
+                                active_condition_callback = cond_instance.is_met
+                                env.task._per_step_condition_callbacks.append(active_condition_callback)
                         break
 
                 logger.info(f"[Simulation]   执行技能 {skill_idx + 1}/{len(skill_seq)}: {skill_name}")
@@ -369,9 +382,14 @@ def simulation_node(state: Dict) -> Dict:
                     task_success = True
                     break
 
-                # step 结束后：评估 condition
+                # step 结束后：卸载逐帧 callback，评估 condition
                 for step_idx, end_idx in enumerate(step_skill_ends):
                     if skill_idx == end_idx - 1:
+                        # 卸载逐帧 callback
+                        if active_condition_callback is not None:
+                            env.task._per_step_condition_callbacks.remove(active_condition_callback)
+                            active_condition_callback = None
+
                         step_end = time.time() - video_start_time
                         step_timestamps.append({
                             "step_id": step_idx,
@@ -397,6 +415,13 @@ def simulation_node(state: Dict) -> Dict:
         finally:
             signal.alarm(0)  # 取消超时
             signal.signal(signal.SIGALRM, old_handler)  # 恢复原处理器
+            env._skill_execution_mode = False  # 恢复自动 reset
+            # 确保 condition callback 被清理
+            if active_condition_callback is not None and hasattr(env.task, '_per_step_condition_callbacks'):
+                try:
+                    env.task._per_step_condition_callbacks.remove(active_condition_callback)
+                except ValueError:
+                    pass
 
         # 6. Per-step condition 检查结果汇总
         # 如果有 condition_plan，检查是否所有 conditions 都满足
@@ -433,7 +458,7 @@ def simulation_node(state: Dict) -> Dict:
         # 8. 保存数据
         vlabench_root = os.environ.get("VLABENCH_ROOT")
         project_root = Path(vlabench_root).parent if vlabench_root else Path(".")
-        task_dir = project_root / "dataset" / "training_data" / task_name
+        task_dir = project_root / "dataset" / "autogen_tasks" / task_name
 
         # 保存视频（无论成功或失败都保存）
         video_path = _save_video(observations, task_dir, task_success)
@@ -521,7 +546,7 @@ def simulation_node(state: Dict) -> Dict:
             if observations:
                 vlabench_root = os.environ.get("VLABENCH_ROOT")
                 project_root = Path(vlabench_root).parent if vlabench_root else Path(".")
-                task_dir = project_root / "dataset" / "training_data" / task_name
+                task_dir = project_root / "dataset" / "autogen_tasks" / task_name
                 video_path = _save_video(observations, task_dir, False)
         except Exception:
             pass

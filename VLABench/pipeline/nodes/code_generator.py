@@ -34,7 +34,7 @@ import numpy as np
 from functools import partial
 
 from VLABench.tasks.dm_task import *
-from VLABench.tasks.hierarchical_tasks.primitive.base import PrimitiveTask
+from VLABench.tasks.autogen_tasks.base import PrimitiveTask
 from VLABench.tasks.config_manager import BenchTaskConfigManager
 from VLABench.utils.register import register
 """
@@ -79,9 +79,13 @@ def _build_condition_config_code(condition_plan, extra_params: str = "") -> str:
     从 condition_plan 生成 get_condition_config 方法体。
 
     condition_plan 格式:
-    [{"step_id": 0, "condition_type": "lift", "params": {"entities": ["beaker_0"], "lift_height": 0.15}, ...}]
+    [{"step_id": 0, "condition_type": "is_grasped", "params": {"entities": ["beaker_0"], "robot": "robot"}, ...},
+     {"step_id": 1, "condition_type": "shake", "params": {...}, ...}]
 
-    只取最后一个非 pass 条件（最终成功状态），生成单一 conditions_config dict。
+    生成 list 形式的 conditions_config，每个元素是一个 dict(condition_type=params)。
+    list 顺序与 step_id 顺序一致，由 SequentialConditionSet 做顺序检查。
+
+    只取全部非 pass 条件；pass 条件不参与评测。
     """
     if not condition_plan:
         return (
@@ -92,7 +96,7 @@ def _build_condition_config_code(condition_plan, extra_params: str = "") -> str:
             + "        pass\n"
         )
 
-    # 过滤出非 pass 条件，取最后一个作为最终成功判定
+    # 过滤出非 pass 条件
     non_pass = [cp for cp in condition_plan if cp.get("condition_type") != "pass"]
     if not non_pass:
         return (
@@ -103,18 +107,24 @@ def _build_condition_config_code(condition_plan, extra_params: str = "") -> str:
             + "        pass\n"
         )
 
-    last = non_pass[-1]
-    cond_type = last["condition_type"]
-    params = last.get("params", {})
+    # 按 step_id 排序，保证条件顺序与 step 顺序一致
+    non_pass = sorted(non_pass, key=lambda cp: cp.get("step_id", 0))
 
-    # 将 params dict 格式化为 Python dict 字面量
-    params_str = _format_params(params, indent=12)
+    # 构造 list 字面量，每个 entry 形如 dict(is_grasped=dict(...))
+    entries = []
+    for cp in non_pass:
+        cond_type = cp["condition_type"]
+        params = cp.get("params", {})
+        params_str = _format_params(params, indent=12)
+        entries.append(f"            dict({cond_type}={params_str}),")
+
+    entries_str = "\n".join(entries)
 
     lines = [
         "    def get_condition_config(self, target_entity, " + extra_params + "**kwargs):",
-        "        conditions_config = dict(",
-        f"            {cond_type}={params_str}",
-        "        )",
+        "        conditions_config = [",
+        entries_str,
+        "        ]",
         '        self.config["task"]["conditions"] = conditions_config',
     ]
     return "\n".join(lines)
@@ -293,8 +303,7 @@ def code_generator_node(state: Dict) -> Dict:
     task_file = (
         Path(vlabench_root)
         / "tasks"
-        / "hierarchical_tasks"
-        / "primitive"
+        / "autogen_tasks"
         / f"{task_name}_series.py"
     )
     task_file.parent.mkdir(parents=True, exist_ok=True)

@@ -58,7 +58,9 @@ SKILL_LIB_DOC = """
 - **place**: 将物体放置到指定的目标实体上（加热板、容器、架子等）。必须传 target_container_uid 参数。适用场景："put A on B", "place A onto B", "put A in B"。
 - **drop**: 仅用于将物体放到桌面上（无特定目标位置）。适用场景：使用完物品后腾出抓夹，需要抓取下一个物品时。**如果任务指定了放置目标，必须用 place，不能用 drop**。
 - **open_gripper**: 在当前位置直接松开夹爪，物体会掉落。仅用于不需要精确放置的场景。
-- **shake 任务的正确序列**: pick -> lift -> shake(n_shakes=3) -> wait -> drop。用 drop 把物体放到桌面。
+- **shake 任务的正确序列**:
+  - 试管类物体 (ChemistryTube): pick -> lift -> shake(n_shakes=3) -> insert_to_entity(target_uid=chemistry_tube_stand)。insert_to_entity 已包含松开夹爪，不需要额外 open_gripper。
+  - 其他物体 (烧杯等): pick -> lift -> shake(n_shakes=3) -> drop。用 drop 把物体放到桌面。
 """
 
 # ========== 原子技能白名单 ==========
@@ -238,8 +240,9 @@ For each step, you MUST fill in:
   - place -> place
 - post_state_assertion: Describe robot gripper state and object position changes AFTER this step.
 
-## Special Rule for Test Tubes
+## Special Rule for Test Tubes (ChemistryTube)
 - After any pour/pour_to_entity operation, you MUST use insert_to_entity to insert the held test tube back into the tube stand.
+- After any shake operation on a test tube, you MUST use insert_to_entity to insert the held test tube back into the tube stand.
 - insert_to_entity already includes open_gripper internally, so do NOT add another open_gripper after it.
 - **CRITICAL**: insert_to_entity target_uid MUST be "chemistry_tube_stand" (the tube stand entity), NOT "tube_0" or "tube_1".
 

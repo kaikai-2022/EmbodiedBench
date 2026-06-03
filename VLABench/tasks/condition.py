@@ -1,15 +1,17 @@
 import numpy as np
 from VLABench.utils.register import register
-from VLABench.utils.utils import distance
+from VLABench.utils.utils import distance, quaternion_to_euler, matrix_to_quaternion
 from VLABench.tasks.components.entity import Entity
 
 class Condition:
     def __init__(self):
         self._initial_state_recorded = False
+        self._met = False  # 条件已满足的标志
 
     def record_initial_state(self, physics=None):
         """在技能执行前调用，记录初始状态。子类可重写以支持前态-终态对比。"""
         self._initial_state_recorded = True
+        self._met = False  # 重置条件满足标志
 
     def is_met(self, physics=None):
         raise NotImplementedError()
@@ -436,27 +438,79 @@ class ConditionSet:
     """
     def __init__(self, conditions):
         self.conditions = conditions
-    
+
     def __len__(self):
         return len(self.conditions)
-    
+
     def is_met(self, physics=None):
         conditions_are_met = [condition.is_met(physics) for condition in self.conditions]
         return all(conditions_are_met)
-    
+
     def add(self, condition):
         self.conditions.append(condition)
-    
+
     def met_progress(self, physics=None):
         """
-        compute the progress of the condition set. 
+        compute the progress of the condition set.
         Return the ratio of the conditions that are met and those conditions are met.
         """
         conditions_are_met = [condition.is_met(physics) for condition in self.conditions]
         met_conditions = []
         for condition, met in zip(self.conditions, conditions_are_met):
             if met: met_conditions.append(condition)
-        return sum(conditions_are_met) / len(conditions_are_met), met_conditions 
+        return sum(conditions_are_met) / len(conditions_are_met), met_conditions
+
+
+class SequentialConditionSet:
+    """
+    顺序条件集合：只有上一个条件满足以后，下一个条件才参与判定。
+    一旦条件被满足就被"锁住"，后续 is_met() 调用时跳过已锁住的条件；
+    下一个尚未锁住的条件失败时，is_met() 返回 False，且不锁住该条件。
+
+    is_met() 只有在所有条件都已被锁住时才返回 True。
+    顺序由 conditions 列表的顺序决定（与 condition_plan 中 step_id 顺序一致）。
+    """
+    def __init__(self, conditions):
+        self.conditions = conditions
+        self._locked = [False] * len(conditions)
+
+    def __len__(self):
+        return len(self.conditions)
+
+    def is_sequential(self):
+        return True
+
+    def is_met(self, physics=None):
+        for i, cond in enumerate(self.conditions):
+            if self._locked[i]:
+                continue
+            if not cond.is_met(physics):
+                return False
+            self._locked[i] = True
+        return True
+
+    def add(self, condition):
+        self.conditions.append(condition)
+        self._locked.append(False)
+
+    def reset_locks(self):
+        self._locked = [False] * len(self.conditions)
+
+    def per_condition_met(self, physics=None):
+        """逐个强制重新检查每个条件，返回每个条件当前的 met 状态（不修改 lock）。"""
+        return [cond.is_met(physics) for cond in self.conditions]
+
+    def met_progress(self, physics=None):
+        n_locked = sum(self._locked)
+        for i, cond in enumerate(self.conditions):
+            if self._locked[i]:
+                continue
+            if not cond.is_met(physics):
+                return n_locked / len(self.conditions), []
+            self._locked[i] = True
+            n_locked += 1
+        return 1.0, list(self.conditions)
+
 
 @register.add_condition("asyn_sequence")
 class AsynSequenceCondition(Condition):
@@ -640,3 +694,93 @@ class OnOrientationCondition(Condition):
             if not orientation_matched:
                 return False
         return True
+
+@register.add_condition("shake")
+class ShakeCondition(Condition):
+    """
+    摇晃成功判定：物体被握住后，偏角方向反复切换达到一定次数。
+
+    判定流程（每个 simulation step 调用一次 is_met）：
+    1. 检查物体是否被握住，未被握住则直接失败
+    2. 获取当前 Euler 角，减去初始 Euler 角得到相对偏角
+    3. 判断偏角方向（正/负），如果方向翻转且偏角超过阈值则计数 +1
+    4. 方向变化次数 >= min_direction_changes 时条件达成
+
+    params:
+        entities: 要检查的物体列表
+        robot: 机器人对象（用于检查抓取状态）
+        min_direction_changes: 最小方向变化次数，默认 3
+        min_angle_threshold: 有效偏角阈值（弧度），默认 0.1
+        check_axis: 检查的旋转轴索引 (0=X, 1=Y, 2=Z)，默认 1 (Y轴)
+    """
+    def __init__(self, entities, robot, min_direction_changes=3,
+                 min_angle_threshold=0.1, check_axis=1):
+        super().__init__()
+        self.entities = entities
+        self.robot = robot
+        self.min_direction_changes = min_direction_changes
+        self.min_angle_threshold = min_angle_threshold
+        self.check_axis = check_axis
+
+        self._initial_euler = {}
+        self._last_direction = {}
+        self._direction_changes = {}
+
+    def record_initial_state(self, physics):
+        super().record_initial_state(physics)
+        self._initial_euler = {}
+        self._last_direction = {}
+        self._direction_changes = {}
+
+        for entity in self.entities:
+            name = entity.name if hasattr(entity, 'name') else str(id(entity))
+            quat = self._get_entity_quat(entity, physics)
+            euler = quaternion_to_euler(quat)
+            self._initial_euler[name] = euler.copy()
+            self._last_direction[name] = 0
+            self._direction_changes[name] = 0
+
+    @staticmethod
+    def _get_entity_quat(entity, physics):
+        """获取实体的世界坐标系四元数。subentity 的 worldbody 姿态在抓取后可能不更新，优先用 geom。"""
+        geoms = entity.mjcf_model.find_all('geom')
+        if geoms:
+            return matrix_to_quaternion(physics.bind(geoms[0]).xmat)
+        return physics.bind(entity.mjcf_model.worldbody).xquat.copy()
+
+    def is_met(self, physics):
+        for entity in self.entities:
+            name = entity.name if hasattr(entity, 'name') else str(id(entity))
+
+            if not entity.is_grasped(physics, self.robot):
+                return False
+
+            quat = self._get_entity_quat(entity, physics)
+            current_euler = quaternion_to_euler(quat)
+            initial_euler = self._initial_euler.get(name, current_euler)
+            relative_angle = current_euler[self.check_axis] - initial_euler[self.check_axis]
+
+            # 归一化到 [-pi, pi]
+            relative_angle = (relative_angle + np.pi) % (2 * np.pi) - np.pi
+
+            if abs(relative_angle) < self.min_angle_threshold:
+                continue
+
+            current_direction = 1 if relative_angle > 0 else -1
+            last_dir = self._last_direction.get(name, 0)
+
+            if last_dir != 0 and current_direction != last_dir:
+                self._direction_changes[name] = self._direction_changes.get(name, 0) + 1
+
+            self._last_direction[name] = current_direction
+
+        total_changes = sum(self._direction_changes.values())
+        met = total_changes >= self.min_direction_changes
+        if met:
+            self._met = True
+        return met
+
+    def met_progress(self, physics):
+        total_changes = sum(self._direction_changes.values())
+        progress = min(total_changes / self.min_direction_changes, 1.0) if self.min_direction_changes > 0 else 1.0
+        return progress, []

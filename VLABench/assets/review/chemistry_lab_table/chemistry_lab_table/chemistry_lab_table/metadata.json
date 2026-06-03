@@ -1,0 +1,14 @@
+{
+  "uid": "chemistry_lab_table",
+  "name": "chemistry_lab_table",
+  "source": "local",
+  "original_path": "/ssd/mkqin/download/lab_table_input/chemistry_lab_table.glb",
+  "keyword": "chemistry_lab_table",
+  "tags": [],
+  "categories": [],
+  "description": "Local GLB model: chemistry_lab_table.glb",
+  "rotation": {
+    "axis": "x",
+    "degrees": 90.0
+  }
+}

@@ -10,7 +10,7 @@ import copy
 from functools import partial
 from dm_control import composer
 from VLABench.utils.register import register
-from VLABench.tasks.condition import ConditionSet, OrCondition
+from VLABench.tasks.condition import ConditionSet, SequentialConditionSet, OrCondition
 from VLABench.utils.utils import grid_sample, distance
 from VLABench.tasks.components.scene import Scene
 from VLABench.configs.constant import name2class_xml
@@ -150,6 +150,8 @@ class LM4ManipBaseTask(composer.Task):
         if self.run_mode == "eval":
             self.update_intention_distance(physics)
             self.update_task_progress(physics)
+        for callback in getattr(self, '_per_step_condition_callbacks', []):
+            callback(physics)
     
     def after_substep(self, physics, random_state):
         pass
@@ -205,27 +207,47 @@ class LM4ManipBaseTask(composer.Task):
         else: # no condition configs, return False. Task build default conditions
             self.conditions = None
             return False
+
+        NUMERIC_PARAM_KEYS = {"positions", "target_pos_range", "orientations",
+                              "duration", "xy_tolerance",
+                              "target_height", "tolerance_distance", "tolerance_angle",
+                              "dimension", "offset", "threshold", "check_axes",
+                              "wait_duration", "velocity_threshold",
+                              "change_type", "solution", "color",
+                              "min_direction_changes", "min_angle_threshold", "check_axis"}
+
+        # 支持两种格式：
+        #   新格式 (list): [{"is_grasped": {...}}, {"shake": {...}}]
+        #   旧格式 (dict): {"is_grasped": {...}}  (单 condition，向后兼容)
+        if isinstance(condition_config, list):
+            condition_entries = condition_config
+        elif isinstance(condition_config, dict):
+            condition_entries = [{k: v} for k, v in condition_config.items()]
+        else:
+            self.conditions = None
+            return False
+
         conditions = list()
-        for condition_key, specific_condition in condition_config.items():
+        for entry in condition_entries:
+            if not isinstance(entry, dict) or len(entry) != 1:
+                continue
+            condition_key, specific_condition = next(iter(entry.items()))
             condition_cls = register.load_condition(condition_key)
             for k, entities in specific_condition.items():
                 if k in ["robot"]:
                     specific_condition[k] = self.robot
                     continue
-                if k in ["positions", "target_pos_range", "orientations",
-                         "duration", "xy_tolerance",  # heated condition 的数值参数，不做 entity 解析
-                         "target_height", "tolerance_distance", "tolerance_angle",  # 其他���值参数
-                         "dimension", "offset", "threshold", "check_axes",
-                         "wait_duration", "velocity_threshold",  # wait_for condition 的数值参数
-                         "change_type", "solution", "color",  # wait_for condition 的字符串/列表参数
-                         ]: continue
+                if k in NUMERIC_PARAM_KEYS:
+                    continue
                 if isinstance(entities, str):
                     specific_condition[k] = self.entities.get(entities, None)
                 elif isinstance(entities, list):
                     specific_condition[k] = [self.entities.get(entity, None) for entity in entities]
             condition = condition_cls(**specific_condition)
             conditions.append(condition)
-        self.conditions = ConditionSet(conditions)
+
+        # 优先使用 SequentialConditionSet 启用顺序检查（latching 语义）
+        self.conditions = SequentialConditionSet(conditions)
         return True
     
     def set_engine_config(self, config):

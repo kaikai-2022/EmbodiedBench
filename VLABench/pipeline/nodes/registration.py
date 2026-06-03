@@ -39,7 +39,7 @@ def registration_node(state: Dict) -> Dict:
     task_module_path = state.get("task_module_path")
     task_name = task_analysis.get("task_name", "custom_task").replace(" ", "_")
     series_name = f"{task_name}_series"
-    module_name = f"VLABench.tasks.hierarchical_tasks.primitive.{task_name}_series"
+    module_name = f"VLABench.tasks.autogen_tasks.{task_name}_series"
 
     if not task_module_path:
         logger.error("[Registration] ✗ 缺少 task_module_path")

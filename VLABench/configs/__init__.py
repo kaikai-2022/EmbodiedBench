@@ -32,7 +32,13 @@ name2config = {
     "test_chemistry_beaker_series":["test_chemistry_beaker"],
     "lift_beaker_series":["lift_beaker"],
     "lift_flask_series":["lift_flask"],
+    "lift_small_beaker_series":["lift_small_beaker"],
     "pick_stir_series":["pick_stir"],
     "wait_for_object_lift_beaker_series":["wait_for_object_lift_beaker"],
     "pick_up_small_beaker_series":["pick_up_small_beaker"],
-}
+    "pick_tube_lift_tube_series":["pick_tube_lift_tube"],
+    "pick_glass_stirring_rod_insert_glass_stirring_rod_series":["pick_glass_stirring_rod_insert_glass_stirring_rod"],
+    "pick_tube_shake_tube_series":["pick_tube_shake_tube"],
+    "pick_small_beaker_shake_small_beaker_series":["pick_small_beaker_shake_small_beaker"],
+    "pick_small_beaker_place_small_beaker_series":["pick_small_beaker_place_small_beaker"],
+}   
