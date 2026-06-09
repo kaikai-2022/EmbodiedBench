@@ -12,8 +12,8 @@
       <geom material="Diffuse" mesh="aspirin_pill_bottle_body" class="visual"/>
       <geom type="cylinder" size="0.0432 0.075" pos="0 0 0.075" class="collision" contype="1" conaffinity="1"/>
       <geom name="neck_collision" type="cylinder" size="0.0288 0.025" pos="0 0 0.13" class="collision" contype="2" conaffinity="2"/>
-      <site class="grasppoint" pos="0.0000 0.0000 0.0900"/>
-      <site class="grasppoint" pos="0.0000 0.0000 0.1200"/>
+      <!-- <site class="grasppoint" pos="0.0000 0.0000 0.0900"/> -->
+      <!-- <site class="grasppoint" pos="0.0000 0.0000 0.1200"/> -->
       <site class="keypoint" pos="0.0432 -0.0432 0.0000"/>
       <site class="keypoint" pos="-0.0432 0.0432 0.0000"/>
       <site class="keypoint" pos="0.0432 0.0432 0.0000"/>
@@ -43,7 +43,7 @@
       <site type="sphere" size="0.01" group="2" rgba="0 0 1 0"/>
     </default>
     <default class="collision">
-      <geom group="3" type="mesh" density="50" friction="1 1 0.001" solimp="0.998 0.998 0.001" solref="0.02 1"/>
+      <geom group="3" type="mesh" density="50" friction="1 1 0.1" solimp="0.998 0.998 0.001" solref="0.02 1"/>
     </default>
     <default class="grasppoint">
       <site type="sphere" size="0.005" group="4" rgba="0 0 1 1"/>

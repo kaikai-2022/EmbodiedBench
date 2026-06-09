@@ -28,7 +28,7 @@ class UnscrewAspirinPillBottleConfigManager(BenchTaskConfigManager):
         self.target_entity = "aspirin_pill_bottle_0"
 
     def get_instruction(self, target_entity, **kwargs):
-        self.config["task"]["instructions"] = ["Unscrew the <aspirin_pill_bottle_0>."]
+        self.config["task"]["instructions"] = ["unscrew the <aspirin_pill_bottle_0>."]
 
     def get_condition_config(self, target_entity, **kwargs):
         conditions_config = [

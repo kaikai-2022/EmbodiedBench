@@ -48,7 +48,7 @@ SKILL_LIB_DOC = """
 - shake(n_shakes=3, shake_angle=0.7, steps_per_swing=5): **独立的摇晃技能**。通过四元数球面插值（slerp）生成正负角度的平滑摇摆轨迹。n_shakes=3 表示完整往返 3 次，shake_angle=0.7 表示每次摆动 ±0.7 rad。
 - stir_entity_with_tool(target_uid, stir_radius=0.02, stir_duration=5, insert_ratio=2/3): **使用搅拌工具搅动容器内液体**。假设当前夹爪已抓取搅拌工具。步骤：①获取容器的 place_point；②移动到 place_point 正上方 25cm；③下降到插入位置（深度 = 容器高度 × insert_ratio）；④以 place_point XY 为圆心做圆周运动。stir_radius=0.02 表示半径 2cm，stir_duration=5 表示持续 5 秒。
 - rotate(rotation_angle=pi/2): 旋转腕部关节实现物体翻转或小幅摇晃。适合单次大幅旋转。
-- unscrew_cap(target_uid, rotation_angle=4*pi, target_q_velocity=pi/40, max_n_substep=30, tolerance=0.01, lift_height=0.02): **拧开带盖容器（如 pill_bottle）的瓶盖**。内部已封装 pick + 旋转腕关节 + 自动松夹，模拟人手拧开瓶盖动作。target_uid 是带盖容器的 uid（如 pill_bottle_0）。**任务要求拧开/打开瓶盖时，必须使用此技能，不要拆解为 pick+rotate+open_gripper**。rotation_angle 默认 4π。
+- unscrew_cap(target_uid, rotation_angle=-4*np.pi, target_q_velocity=pi/40, max_n_substep=30, tolerance=0.01, lift_height=0.03): **拧开带盖容器（如 pill_bottle）的瓶盖**。内部已封装 pick + 旋转腕关节 + 自动松夹，模拟人手拧开瓶盖动作。target_uid 是带盖容器的 uid（如 pill_bottle_0）。**任务要求拧开/打开瓶盖时，必须使用此技能，不要拆解为 pick+rotate+open_gripper**。rotation_angle 默认 4π。
 - press(target_pos): 按压目标位置。
 - push(target_pos, push_distance=0.1): 推动物体。
 - reset(): 重置环境。

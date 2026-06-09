@@ -815,7 +815,7 @@ class CapOpenCondition(Condition):
         open_threshold: minimum hinge rotation DELTA from initial (radians) to consider cap open
         lift_threshold: minimum slide displacement DELTA from initial (meters) to consider cap open
     """
-    def __init__(self, entities, open_threshold=4*np.pi, lift_threshold=0.003):
+    def __init__(self, entities, open_threshold=0.5*np.pi, lift_threshold=0.002):
         super().__init__()
         self.entities = entities
         self.open_threshold = open_threshold
@@ -839,7 +839,7 @@ class CapOpenCondition(Condition):
             return False
         for entity in self.entities:
             name = entity.mjcf_model.model
-            # 条件 1: door (hinge) 累计旋转量 >= open_threshold (默认 4π)
+            # 条件 1: door (hinge) 累计旋转量 >= open_threshold (默认 0.5π)
             if entity.cap_joint is not None and name in self._initial_joint_pos:
                 qpos = physics.bind(entity.cap_joint).qpos
                 current_door = float(qpos.item() if hasattr(qpos, 'item') else qpos)

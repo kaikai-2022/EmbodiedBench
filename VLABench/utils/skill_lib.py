@@ -1664,9 +1664,9 @@ class SkillLib:
         return observations, waypoints, True, False
 
     @staticmethod
-    def unscrew_cap(env, target_entity_name, rotation_angle=-2*np.pi,
+    def unscrew_cap(env, target_entity_name, rotation_angle=-4*np.pi,
                     target_q_velocity=np.pi/40, max_n_substep=30, tolerance=0.01,
-                    lift_height=0.02):
+                    lift_height=0.03):
         """
         拧开瓶盖技能：抓取瓶盖 → 旋转腕关节 → 释放
 
