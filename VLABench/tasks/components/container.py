@@ -225,10 +225,10 @@ class ContainerWithDrawer(CommonContainer):
     
     def get_drawer_open_trajectory(self, physics, drawer_id):
         handle_init_pos = self.get_drawer_handle_pos(physics, drawer_id)
-        init_joint_qpos = physics.bind(self.joints[drawer_id]).qpos
+        init_joint_qpos = float(physics.bind(self.joints[drawer_id]).qpos)
         range = physics.bind(self.joints[drawer_id]).range
         axis = physics.bind(self.joints[drawer_id]).xaxis
-        max_distance = range[1] if abs(range[1]) > abs(range[0]) else range[0]
+        max_distance = float(range[1]) if abs(float(range[1])) > abs(float(range[0])) else float(range[0])
         trajectory = []
         step = -0.05 if max_distance < init_joint_qpos else 0.05
         for distance in np.arange(0.05, max_distance - init_joint_qpos, step):

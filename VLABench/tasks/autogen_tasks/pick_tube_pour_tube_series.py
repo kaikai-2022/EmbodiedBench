@@ -36,7 +36,7 @@ class PickTubePourTubeConfigManager(BenchTaskConfigManager):
             init_container_config["subentities"] = []
         obj_config = dict(
             name="tube_0",
-            solution_rgba=[0, 0.45, 1, 0.4],
+            solution_rgba=[0.0, 0.45, 1.0, 0.4],
             xml_path=name2class_xml["tube"][-1],
             position=pos,
         )
@@ -58,9 +58,10 @@ class PickTubePourTubeConfigManager(BenchTaskConfigManager):
         self.config["task"]["instructions"] = ["Pick the <tube_0> which contains <CuSO4_0>."]
 
     def get_condition_config(self, target_entity, init_container, **kwargs):
-        conditions_config = dict(
-            pour=dict(target_entity='tube_0', threshold=0)
-        )
+        conditions_config = [
+            dict(is_grasped=dict(entities=['tube_0'], robot='robot')),
+            dict(pour=dict(target_entity='tube_0', threshold=0)),
+        ]
         self.config["task"]["conditions"] = conditions_config
 
 

@@ -1209,6 +1209,53 @@
       }
     }
   },
+  "open_drawer": {
+    "robot": {
+      "position": [
+        0,
+        -0.7,
+        0.7
+      ]
+    },
+    "task": {
+      "ngrid": [
+        3,
+        3
+      ],
+      "workspace": [
+        -0.2,
+        0.2,
+        -0.45,
+        -0.3,
+        0.8,
+        1.5
+      ],
+      "random_ignored_entities": [
+        "table"
+      ],
+      "asset": {
+        "seen_init_container": [
+          "cabinet_seen"
+        ],
+        "unseen_init_container": [
+          "cabinet_unseen"
+        ]
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ],
+      "scene": {
+        "name": "store_0"
+      }
+    }
+  },
   "cool_drink_series": {
     "task": {
       "ngrid": [
@@ -3210,6 +3257,258 @@
         "unseen_object": [
           "flask",
           "electronic_scale"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "pick_small_beaker_pour_small_beaker_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "small_beaker",
+          "large_beaker"
+        ],
+        "unseen_object": [
+          "small_beaker",
+          "large_beaker"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "pick_pill_bottle_lift_pill_bottle_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "pill_bottle"
+        ],
+        "unseen_object": [
+          "pill_bottle"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "unscrew_pill_bottle_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "pill_bottle"
+        ],
+        "unseen_object": [
+          "pill_bottle"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "unscrew_object_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "pill_bottle"
+        ],
+        "unseen_object": [
+          "pill_bottle"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "unscrew_bottle_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "pill_bottle"
+        ],
+        "unseen_object": [
+          "pill_bottle"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "pick_pill_bottle_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "pill_bottle"
+        ],
+        "unseen_object": [
+          "pill_bottle"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "pick_bottle_lift_bottle_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "pill_bottle"
+        ],
+        "unseen_object": [
+          "pill_bottle"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "pick_asprin_pill_bottle_lift_asprin_pill_bottle_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "aspirin_pill_bottle"
+        ],
+        "unseen_object": [
+          "aspirin_pill_bottle"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "unscrew_asprin_pill_bottle_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "aspirin_pill_bottle"
+        ],
+        "unseen_object": [
+          "aspirin_pill_bottle"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "unscrew_aspirin_pill_bottle_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "aspirin_pill_bottle"
+        ],
+        "unseen_object": [
+          "aspirin_pill_bottle"
         ]
       },
       "scene": {

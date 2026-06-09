@@ -132,7 +132,15 @@ class LM4ManipBaseTask(composer.Task):
             for key, point in zip(entities_to_random, sampled_points):
                 entity = self.entities[key]
                 entity.init_pos[:2] = point
-        return super().initialize_episode(physics, random_state)
+        result = super().initialize_episode(physics, random_state)
+        # Record initial door qpos for ContainerWithCap entities (screw cap unlock logic)
+        for entity in list(self.entities.values()):
+            if hasattr(entity, 'record_initial_door_qpos'):
+                try:
+                    entity.record_initial_door_qpos(physics)
+                except Exception:
+                    pass
+        return result
     
     def get_reward(self, physics):
         return 0
@@ -150,6 +158,13 @@ class LM4ManipBaseTask(composer.Task):
         if self.run_mode == "eval":
             self.update_intention_distance(physics)
             self.update_task_progress(physics)
+        # Auto-unlock cap_slide for ContainerWithCap entities when door has rotated enough
+        for entity in list(self.entities.values()):
+            if hasattr(entity, 'check_and_unlock_slide'):
+                try:
+                    entity.check_and_unlock_slide(physics)
+                except Exception:
+                    pass
         for callback in getattr(self, '_per_step_condition_callbacks', []):
             callback(physics)
     
@@ -291,6 +306,9 @@ class LM4ManipBaseTask(composer.Task):
             self.random_ignored_entities.append(config["name"])
         entity = entity_cls(**config)
         self.add_free_entity(entity)
+        if config.get("attach_to_arena", False):
+            entity.detach()
+            self._arena.attach(entity)
         if entity.subentities is not None:
             for subentity_config in entity.subentities:
                 self.load_entity_from_config(subentity_config, parent_node=entity)

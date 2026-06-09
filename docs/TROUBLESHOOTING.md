@@ -10,6 +10,7 @@
 2. [OBJ模型几何中心偏移导致视觉与物理不匹配](#2-obj模型几何中心偏移导致视觉与物理不匹配)
 3. [LiftCondition 在 record_initial_state 未调用时误判为已满足](#3-liftcondition-在-record_initial_state-未调用时误判为已满足)
 4. [place/drop 技能被 should_terminate 提前终止导致仿真中断](#4-placedrop-技能被-should_terminate-提前终止导致仿真中断)
+5. [CapOpenCondition 静平衡形变误触导致 load_env 无限 reset 死循环](#5-capopencondition-静平衡形变误触导致-load_env-无限-reset-死循环)
 
 ---
 
@@ -1209,5 +1210,263 @@ if self._skill_execution_mode and terminating:
 
 ---
 
-**最后更新**: 2026-05-27
+## 5. CapOpenCondition 静平衡形变误触导致 load_env 无限 reset 死循环
+
+**日期**: 2026-06-05
+**影响任务**: `unscrew_pill_bottle`（使用 `ContainerWithCap` + `arena.attach()` 固定瓶身时触发）
+**影响组件**: `VLABench/tasks/condition.py` — `CapOpenCondition`，`VLABench/tasks/components/specific_entities/interactive_containers.py` — `ContainerWithCap.is_cap_open`
+**严重程度**: 🔴 高（`load_env` 无限死循环，任何使用带关节实体 + attach 固定的任务都会触发）
+
+### 问题表现
+
+1. **`load_env` 无限卡死，无任何输出**
+   - 调用 `load_env('unscrew_pill_bottle')` 后进程永久挂起
+   - 无报错，无日志，只能通过 `kill` 或 timeout 终止
+
+2. **只在 attach 后出现**
+   - **Baseline**（无 `build_from_config` 重写）能跑通
+   - **加了 `entity.detach() + self._arena.attach(entity)` 后卡死**
+   - 同样的 attach 范式在 `select_chemistry_tube`（试管架）等任务上正常
+
+3. **诊断日志特征**
+   ```
+   reset #1 entered
+     initialize_episode called
+     CapOpenCondition.is_met returned: True    ← 刚初始化就判定"瓶盖已拧开"！
+   step #1 returned type=2 reward=0            ← LAST，触发 reset
+   step #2 entered
+     reset #2 entered                           ← 再次进入 reset
+       initialize_episode called
+       CapOpenCondition.is_met returned: True   ← 又是 True
+     ...
+   # 无限循环
+   ```
+
+### 根本原因
+
+#### 1. 完整因果链
+
+```
+pill_bottle.xml 定义了两个关节:
+  <joint name="door" type="hinge" range="-6.28 6.28" axis="0 0 1"/>   ← 瓶盖绕 z 轴旋转
+  <joint name="cap_slide" type="slide" range="0 0.02" axis="0 0 1"/>  ← 瓶盖 z 方向上升
+
+build_from_config 中 attach 后:
+  entity.detach()          ← 删除 freejoint
+  self._arena.attach(entity) ← 瓶身焊死到 arena（无 freejoint，不动）
+
+env.reset() 调用 composer.Environment.reset():
+  → initialize_episode()   ← 设置实体位置
+  → mj_forward()           ← 物理求解器做静平衡
+  → slide joint 在约束松弛下被压到 qpos=0.0109 m
+
+env.reset() 继续执行 dm_env.py:67-68:
+  → for i in range(reset_wait_step): self.step()  ← 第 1 次 step
+    → should_terminate_episode()
+      → CapOpenCondition.is_met()
+        → slide_qpos=0.0109 > lift_threshold=0.01  ← 超过阈值！
+        → return True                               ← 误判"瓶盖已拧开"
+    → terminating=True
+    → _reset_next_step=True
+    → return LAST
+
+  → 第 2 次 step
+    → _reset_next_step=True
+    → return self.reset()     ← 再次进入 reset
+      → 同样的 slide_qpos=0.0109 → 同样 True → 无限循环
+```
+
+#### 2. 为什么 tube_stand 不触发
+
+`tube_stand.xml` 没有任何 joint（纯静态 mesh），attach 后不存在静平衡形变问题。
+`pill_bottle.xml` 有 hinge + slide 两个关节，slide 的 `range="0 0.02"` 在物理编译时
+被求解器从 qpos=0 推到 0.0109（约束松弛），恰好超过 `lift_threshold=0.01`。
+
+#### 3. 为什么 baseline（不 attach）不触发
+
+Baseline 时瓶身有 freejoint（6DOF 自由体），下落过程中物理系统整体运动，
+slide joint 的形变更小（约 0.001），低于 0.01 阈值。
+attach 后瓶身被固定，所有物理扰动集中在 hinge/slide 关节上，形变被放大。
+
+#### 4. 本质：两个设计缺陷叠加
+
+| 缺陷 | ��置 | 描述 |
+|------|------|------|
+| **绝对 qpos 判断** | `CapOpenCondition.is_met()` | 用 `abs(slide_qpos) > threshold` 而非 `abs(slide_qpos - initial) > threshold` |
+| **无初始态门控** | `CapOpenCondition.is_met()` | `record_initial_state` 未被调用时，`is_met` 仍能返回 True |
+
+第一个缺陷导致静平衡的微小形变（0.0109 m）被误判为"被拧开"。
+第二个缺陷导致 reset 阶段（`record_initial_state` 尚未被调用）也能返回 True。
+
+### 解决方案
+
+**两处改动**，均在 `condition.py`：
+
+#### 改动 1：`is_met` 改用相对位移 + 初始态门控
+
+```python
+@register.add_condition("cap_open")
+class CapOpenCondition(Condition):
+    def __init__(self, entities, open_threshold=3*np.pi/2, lift_threshold=0.01):
+        super().__init__()
+        self.entities = entities
+        self.open_threshold = open_threshold
+        self.lift_threshold = lift_threshold
+        self._initial_joint_pos = {}   # entity_name -> hinge qpos at record time
+        self._initial_slide_pos = {}   # entity_name -> slide qpos at record time
+
+    def record_initial_state(self, physics):
+        super().record_initial_state(physics)
+        for entity in self.entities:
+            name = entity.mjcf_model.model
+            if entity.cap_joint is not None:
+                self._initial_joint_pos[name] = physics.bind(entity.cap_joint).qpos.copy()
+            if entity.slide_joint is not None:
+                self._initial_slide_pos[name] = physics.bind(entity.slide_joint).qpos.copy()
+
+    def is_met(self, physics=None):
+        # 门控：record_initial_state 未调用时无法判断相对位移，返回 False
+        if not self._initial_state_recorded:
+            return False
+        for entity in self.entities:
+            name = entity.mjcf_model.model
+            hinge_open = False
+            slide_open = False
+            if entity.cap_joint is not None:
+                current = physics.bind(entity.cap_joint).qpos
+                initial = self._initial_joint_pos.get(name, 0.0)
+                hinge_open = abs(current - initial) > self.open_threshold
+            if entity.slide_joint is not None:
+                current = physics.bind(entity.slide_joint).qpos
+                initial = self._initial_slide_pos.get(name, 0.0)
+                slide_open = abs(current - initial) > self.lift_threshold
+            if not (hinge_open or slide_open):
+                return False
+        return True
+```
+
+#### 改动 2（同步）：`ContainerWithCap.is_cap_open` 加初始态参数
+
+`interactive_containers.py` 中的 `is_cap_open` / `is_cap_closed` 方法也使用绝对 qpos 判断，
+改为接受可选的 `initial_joint_qpos` / `initial_slide_qpos` 参数：
+
+```python
+def is_cap_open(self, physics, initial_joint_qpos=None, initial_slide_qpos=None):
+    if self.cap_joint is None:
+        return False
+    initial_j = initial_joint_qpos if initial_joint_qpos is not None else 0.0
+    if abs(physics.bind(self.cap_joint).qpos - initial_j) > self.open_threshold:
+        return True
+    if self.slide_joint is not None and initial_slide_qpos is not None:
+        if abs(physics.bind(self.slide_joint).qpos - initial_slide_qpos) > 0.01:
+            return True
+    return False
+```
+
+### 与条目 3（LiftCondition）的关联
+
+这是**同一种 bug 模式的第二次出现**：
+
+| 条目 | 条件类 | 判断方式 | 静平衡触发源 | 修复方式 |
+|------|--------|---------|------------|---------|
+| #3 | `LiftCondition` | 绝对高度 + 空字典门控 | 物体初始 z 不为 0 | 加 `_initial_z` 空检查 |
+| **#5** | `CapOpenCondition` | **绝对 qpos + 无门控** | **slide joint 静平衡形变** | **相对位移 + `_initial_state_recorded` 门控** |
+
+**共同模式**：任何依赖"前后状态对比"的条件（高度变化、关节位移、姿态变化），
+在 `record_initial_state` 未被调用时，`is_met()` **必须返回 False**。
+绝对值判断在物理仿真中不可靠——静平衡、数值漂移、约束松弛都会导致初始值偏离理论值。
+
+### 预防措施
+
+#### ✅ DO — 新增带关节实体 + attach 固定时的检查清单
+
+1. **新 Condition 必须实现 `record_initial_state`**
+   ```python
+   def record_initial_state(self, physics):
+       super().record_initial_state(physics)  # ← 必须，设置 _initial_state_recorded=True
+       # 记录初始 qpos / xpos / euler 等
+   ```
+
+2. **`is_met` 必须检查 `_initial_state_recorded`**
+   ```python
+   def is_met(self, physics=None):
+       if not self._initial_state_recorded:
+           return False  # ← 未记录初态，无法判断变化量
+   ```
+
+3. **用相对位移而非绝对值判断"状态变化"**
+   ```python
+   # ✅ 正确：相对初态的位移
+   abs(current - initial) > threshold
+   # ❌ 错误：绝对值（会被静平衡形变误触）
+   abs(current) > threshold
+   ```
+
+4. **带关节实体 attach 后验证 `load_env` 不卡**
+   - 有 freejoint 的实体（baseline）：物理运动吸收了关节形变
+   - attach 后无 freejoint：关节形变被放大，可能触发条件误判
+   - **必须在 attach 后单独测试**
+
+#### ❌ DON'T
+
+1. **不要用绝对 qpos / xpos 判断"某物被操作过"** —— 物理仿真的初始值不是理论值
+2. **不要假设 `record_initial_state` 一定在 `is_met` 之前被调用** —— `env.reset()` 内部的 `step()` 循环就会调用 `should_terminate_episode()`
+
+### 调试方法
+
+#### 1. 诊断 load_env 卡死
+
+```python
+import signal, sys
+def timeout(signum, frame):
+    print('TIMEOUT after 60s!'); sys.exit(1)
+signal.signal(signal.SIGALRM, timeout)
+signal.alarm(60)
+env = load_env('your_task')
+signal.alarm(0)
+print('load_env succeeded')
+```
+
+#### 2. 追踪 reset 循环
+
+在 `dm_env.py` 的 `step()` 中临时添加：
+
+```python
+if self._reset_next_step:
+    print(f'[WARN] _reset_next_step at timestep={self.timestep}')
+```
+
+如果看到连续输出，说明存在 terminate → reset 死循环。
+
+#### 3. 检查条件初值
+
+```python
+env = load_env('your_task')
+# reset() 刚完成，record_initial_state 尚未被 pipeline 调用
+for c in env.task.conditions.conditions:
+    result = c.is_met(env.physics)
+    print(f'{type(c).__name__}: is_met={result}  ← 必须为 False')
+env.close()
+```
+
+如果任何条件返回 True，存在同类 bug。
+
+### 相关文件
+
+- `VLABench/tasks/condition.py` — `CapOpenCondition` 修复
+- `VLABench/tasks/components/specific_entities/interactive_containers.py` — `ContainerWithCap.is_cap_open` 修复
+- `VLABench/tasks/autogen_tasks/unscrew_pill_bottle_series.py` — `build_from_config` 中的 attach 逻辑
+- `VLABench/assets/review/pill_bottle/pill_bottle/pill_bottle/pill_bottle.xml` — pill_bottle XML（hinge + slide joint 定义）
+
+### 关键经验
+
+> **原则**：物理仿真中关节的初始 qpos 不是理论值 0。静平衡、约束松弛、数值漂移都会导致初始值偏离。任何"检测是否被操作过"的条件，必须用相对位移（当前值 - 初态值），不能用绝对值。
+
+> **教训**：这是 `LiftCondition`（条目 #3）同一 bug 模式的重复出现。当新增 Condition 类时，必须对照条目 #3 的检查清单：实现 `record_initial_state`、`is_met` 中检查 `_initial_state_recorded`、使用相对位移判断。
+
+> **attach 放大了问题**：有 freejoint 的实体下落时物理系统整体运动，关节形变小。attach 后实体被固定，所有扰动集中在关节上，形变被放大到超过阈值。这是为什么"baseline 能跑、attach 卡死"的原因。
+
+---
+
+**最后更新**: 2026-06-05
 **维护者**: VLABench Team

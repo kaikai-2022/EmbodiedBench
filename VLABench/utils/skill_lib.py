@@ -1663,3 +1663,113 @@ class SkillLib:
         observations.pop(-1)
         return observations, waypoints, True, False
 
+    @staticmethod
+    def unscrew_cap(env, target_entity_name, rotation_angle=-2*np.pi,
+                    target_q_velocity=np.pi/40, max_n_substep=30, tolerance=0.01,
+                    lift_height=0.02):
+        """
+        拧开瓶盖技能：抓取瓶盖 → 旋转腕关节 → 释放
+
+        核心思路：参考 SkillLib.rotate 的实现。
+        不再用 IK 规划末端在空间中的姿态变化（会导致手腕奇异位姿）。
+        而是直接修改腕关节 qpos[-1] 旋转指定角度，瓶盖 hinge joint 会被动跟随。
+        slide joint 上升则由物理仿真器在瓶盖与瓶身脱离约束时自动产生。
+
+        Args:
+            target_entity_name: 目标容器实体名（如 pill_bottle_0）
+            rotation_angle: 总旋转角度（弧度），默认 4π（两圈，逆时针为正）
+            target_q_velocity: 角速度（弧度/步），默认 π/40
+            max_n_substep: 每步最大子步数
+            tolerance: qpos 容差
+            lift_height: 拧完后末端额外上提距离（m），让 slide joint 上升
+        """
+        target_entity = env.task.entities[target_entity_name]
+
+        # 0. 记录初始 slide 关节位置（用于拧开后的位移判定）
+        if hasattr(target_entity, 'slide_joint') and target_entity.slide_joint is not None:
+            target_entity._unscrew_initial_slide = float(env.physics.bind(target_entity.slide_joint).qpos)
+            print(f"[unscrew_cap] initial slide qpos: {target_entity._unscrew_initial_slide:.6f}")
+        print(f"[unscrew_cap] rotation_angle={rotation_angle:.4f} ({rotation_angle/np.pi:.2f}*pi)")
+
+        # 1. 抓取瓶盖
+        observations = [env.get_observation()]
+        waypoints = []
+        task_success = False
+
+        new_obs, new_waypoints, pick_success, _ = SkillLib.pick(
+            env, target_entity_name,
+            prior_eulers=[[np.pi, 0, 0]])
+        observations.extend(new_obs)
+        waypoints.extend(new_waypoints)
+
+        if not pick_success:
+            print("[unscrew_cap] pick failed, aborting")
+            observations.pop(-1)
+            return observations, waypoints, False, False
+
+        # 2. 旋转腕关节 qpos[-1]，带动瓶盖 hinge joint
+        gripper_state = SkillLib._get_gripper_state(env)
+        qpos = np.array(env.robot.get_qpos(env.physics)).reshape(-1)
+        timesteps = int(abs(rotation_angle) / target_q_velocity)
+        rot_sign = 1 if rotation_angle > 0 else -1
+
+        for i in range(timesteps):
+            action = np.array(qpos).copy()
+            action[-1] += target_q_velocity * (i + 1) * rot_sign
+            action = np.concatenate([action, gripper_state])
+
+            for _ in range(max_n_substep):
+                timestep = env.step(action)
+                if timestep.last():
+                    task_success = True
+                    break
+                current_qpos = np.array(env.task.robot.get_qpos(env.physics)).reshape(-1)
+                if np.max(current_qpos - np.array(action[:7])) < tolerance \
+                    and np.min(current_qpos - np.array(action[:7])) > -tolerance:
+                    break
+
+            if task_success:
+                break
+
+            waypoint = np.concatenate([env.robot.get_end_effector_pos(env.physics),
+                                       quaternion_to_euler(env.robot.get_end_effector_quat(env.physics)),
+                                       gripper_state])
+            obs = env.get_observation()
+            observations.append(obs)
+            waypoints.append(waypoint)
+
+        # 3. 拧完后向上提一下，让 slide joint 上升。
+        # 不用 SkillLib.lift：它会检查抓取 entity 是否被提起，
+        # 但本任务中瓶身被 attach 固定，body 永远不会动，会一直返回失败。
+        if lift_height > 0:
+            start_pos = env.robot.get_end_effector_pos(env.physics)
+            start_quat = env.robot.get_end_effector_quat(env.physics)
+            target_pos = np.array(start_pos) + np.array([0, 0, lift_height])
+            interplate_path, interplate_quat = interpolate_path(
+                [start_pos, target_pos],
+                [np.array(start_quat), np.array(start_quat)])
+            obs, wp, _, _ = SkillLib.step_trajectory(
+                env, interplate_path, interplate_quat, gripper_state)
+            observations.extend(obs)
+            waypoints.extend(wp)
+
+        # 4. 释放瓶盖
+        new_obs, new_waypoints, _, task_success = SkillLib.open_gripper(env)
+        observations.extend(new_obs)
+        waypoints.extend(new_waypoints)
+
+        observations.pop(-1)
+        assert len(observations) == len(waypoints), \
+            f"observations and waypoints should have the same length, {len(observations)} and {len(waypoints)}"
+
+        # 用 slide 关节相对位移判定拧开成功。
+        # 不用 is_cap_separated：物理接触力始终把 cap 压在 body 上，slide 关节
+        # 物理上无法真正离开 body，contact-based 判定不可靠。
+        stage_success = False
+        if hasattr(target_entity, 'slide_joint') and target_entity.slide_joint is not None:
+            current_slide = float(env.physics.bind(target_entity.slide_joint).qpos)
+            initial_slide = float(getattr(target_entity, '_unscrew_initial_slide', 0.0))
+            stage_success = (current_slide - initial_slide) > 0.003
+            print(f"[unscrew_cap] final slide qpos: {current_slide:.6f}, delta: {current_slide - initial_slide:.6f}, stage_success: {stage_success}")
+        return observations, waypoints, stage_success, task_success
+

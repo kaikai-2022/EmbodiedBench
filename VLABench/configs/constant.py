@@ -321,6 +321,8 @@ name2class_xml = {
     "funnel": [components.CommonGraspedEntity, "review/funnel/funnel/funnel.xml"],
     "hot_plate": [components.FlatContainer, "review/hot_plate/hot_plate/hot_plate.xml"],
     "electronic_scale": [components.FlatContainer, "review/electronic_scale/electronic_scale/electronic_scale.xml"],
+    "aspirin_pill_bottle": [components.ContainerWithCap, "review/aspirin_pill_bottle/aspirin_pill_bottle/aspirin_pill_bottle/aspirin_pill_bottle.xml"],
+    "pill_bottle": [components.ContainerWithCap, "review/pill_bottle/pill_bottle/pill_bottle/pill_bottle.xml"],
     "magnetic_stir_plate": [components.FlatContainer, "review/magnetic_stir_plate/magnetic_stir_plate/magnetic_stir_plate.xml"],
     "rag": [components.CommonGraspedEntity, "review/rag/rag/rag.xml"],
     "water_bath": [components.CommonContainer, "review/water_bath/water_bath/water_bath.xml"],

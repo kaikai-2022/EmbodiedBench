@@ -426,7 +426,13 @@ def simulation_node(state: Dict) -> Dict:
         # 6. Per-step condition 检查结果汇总
         # 如果有 condition_plan，检查是否所有 conditions 都满足
         all_conditions_met = True
-        if condition_plan and step_condition_results:
+        if condition_plan and not step_condition_results:
+            # condition_plan 存在但 step_condition_results 为空：
+            # 通常是 skill 中途失败 break 跳出，跳过了 condition 评估。
+            # 此时不能算"成功"——条件压根没被判断。
+            all_conditions_met = False
+            logger.warning("[Simulation]   ✗ step conditions 未被评估（skill 中途失败跳出），不能算成功")
+        elif condition_plan and step_condition_results:
             failed_conditions = [r for r in step_condition_results if not r["met"]]
             if failed_conditions:
                 all_conditions_met = False

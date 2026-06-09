@@ -94,6 +94,14 @@ Select from these condition types (registered in VLABench/tasks/condition.py):
   Use for: "shake X", "oscillate X"
   **IMPORTANT**: Always include `"robot": "robot"` in params. `check_axis` defaults to 1 (Y-axis pitch). `min_angle_threshold` filters out small vibrations.
 
+- **cap_open**(entities=[<uid>], open_threshold=3*pi/2, lift_threshold=0.003):
+  ContainerWithCap（如 pill_bottle）的盖子被认为已拧开。检查 hinge 关节相对初始的旋转量
+  是否达到 open_threshold（默认 3π/2 弧度≈270°）或 slide 关节相对位移达到 lift_threshold
+  （默认 0.003m）。
+  Use for: "unscrew X", "open X's cap", "screw off X's lid"
+  **IMPORTANT**: entities 必须是带盖容器的 uid（如 pill_bottle_0），且容器类是 ContainerWithCap。
+  open_threshold 和 lift_threshold 用默认值即可，无需调整。
+
 - **pass**: No physical condition check needed. Step succeeds simply by completing execution.
   Use for: "move to position without final placement goal", "open gripper"
 
@@ -118,6 +126,7 @@ Use this as reference, but the LLM should use semantic understanding:
 | press | **press_button** | Button pressed |
 | insert | **contain** | Entity inside target |
 | shake | **shake** | Object grasped and orientation oscillated |
+| unscrew/open cap | **cap_open** | ContainerWithCap's cap is unscrewed |
 | wait_for | **wait_for** | Entity stillness triggers auto change |
 | wait | **pass** | Just waiting, no state change |
 | move | **on_position** or **pass** | Depends on if position matters |
@@ -135,7 +144,7 @@ VALID_CONDITION_TYPES = {
     "contain", "not_contain", "on", "above", "pour", "heated",
     "on_position", "lift", "contact", "is_grasped", "on_orientation",
     "order", "press_button", "joint_in_range", "asyn_sequence", "or",
-    "pass", "wait_for", "shake"
+    "pass", "wait_for", "shake", "cap_open"
 }
 
 

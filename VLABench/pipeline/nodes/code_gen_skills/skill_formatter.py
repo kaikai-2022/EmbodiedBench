@@ -23,6 +23,7 @@ VALID_SKILLS = {
     "open_door", "close_door", "open_drawer", "open_laptop",
     "move_offset", "reset", "shake", "insert_to_entity", "stir_entity_with_tool",
     "wait_for",
+    "unscrew_cap",
 }
 
 

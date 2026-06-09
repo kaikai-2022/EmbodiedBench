@@ -113,7 +113,9 @@ def download_asset(keyword: str, max_downloads: int = 3) -> Dict:
             "error": "VLABENCH_ROOT 未设置"
         }
 
-    script_path = Path(vlabench_root) / "VLABench" / "pipeline" / "tools" / "get_assets.py"
+    # VLABENCH_ROOT 指向 VLABench 包内目录（如 .../VLABench/VLABench），
+    # get_assets.py 在该目录的 pipeline/tools/ 下，不要再多拼一层 VLABench
+    script_path = Path(vlabench_root) / "pipeline" / "tools" / "get_assets.py"
 
     if not script_path.exists():
         return {

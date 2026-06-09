@@ -46,12 +46,13 @@ class PickTubeShakeTubeConfigManager(BenchTaskConfigManager):
         self.target_entity = "tube_0"
 
     def get_instruction(self, target_entity, init_container, **kwargs):
-        self.config["task"]["instructions"] = ["Pick the <tube_0>."]
+        self.config["task"]["instructions"] = ["pick the <tube_0>."]
 
     def get_condition_config(self, target_entity, init_container, **kwargs):
-        conditions_config = dict(
-            shake=dict(entities=['tube_0'], robot='robot')
-        )
+        conditions_config = [
+            dict(is_grasped=dict(entities=['tube_0'], robot='robot')),
+            dict(shake=dict(entities=['tube_0'], robot='robot')),
+        ]
         self.config["task"]["conditions"] = conditions_config
 
 
@@ -64,7 +65,7 @@ class PickTubeShakeTubeTask(PrimitiveTask):
         skill_sequence = [
             partial(SkillLib.pick, target_entity_name="tube_0"),
             partial(SkillLib.lift, lift_height=0.15),
-            partial(SkillLib.shake, n_shakes=3, shake_angle=0.5, steps_per_swing=5),
+            partial(SkillLib.shake, n_shakes=3, shake_angle=0.7, steps_per_swing=5),
             partial(SkillLib.insert_to_entity, target_entity_name="chemistry_tube_stand"),
         ]
         return skill_sequence

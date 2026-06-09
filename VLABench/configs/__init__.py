@@ -41,4 +41,7 @@ name2config = {
     "pick_tube_shake_tube_series":["pick_tube_shake_tube"],
     "pick_small_beaker_shake_small_beaker_series":["pick_small_beaker_shake_small_beaker"],
     "pick_small_beaker_place_small_beaker_series":["pick_small_beaker_place_small_beaker"],
-}   
+    "pick_pill_bottle_lift_pill_bottle_series":["pick_pill_bottle_lift_pill_bottle"],
+    "unscrew_pill_bottle_series":["unscrew_pill_bottle"],
+    "unscrew_asprin_pill_bottle_series":["unscrew_asprin_pill_bottle"],
+}

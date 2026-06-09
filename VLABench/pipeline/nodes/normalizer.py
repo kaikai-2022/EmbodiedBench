@@ -47,6 +47,8 @@ STANDARD_ASSET_LIBRARY = [
     "funnel",
     "hot_plate",
     "electronic_scale",
+    "aspirin_pill_bottle",
+    "pill_bottle",
     "magnetic_stir_plate",
     "chemistry_lab_table",
     "petri_dish",

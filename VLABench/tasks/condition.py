@@ -233,25 +233,34 @@ class AboveCondition(Condition):
 @register.add_condition("pour")
 class PourCondition(Condition):
     """
-    The cup/shaker/other_entity is poured. 
-    As mujoco does not support the liquid simulation, use this condition to simplify. 
+    The cup/shaker/other_entity is poured.
+    As mujoco does not support the liquid simulation, use this condition to simplify.
     The condition is the top site z pos is lower than the bottom site z pos.
     params:
         target_entity: the target entity to be poured
-        threshold: the threshold of z_top - z_bottom, to confirm whether the entity is poured. 
+        threshold: the threshold of z_top - z_bottom, to confirm whether the entity is poured.
+
+    Once the container is detected as tilted (bottom_site above top_site) at any frame
+    during the step, self._met is latched to True, so the condition remains met even if
+    the container is later returned to an upright posture within the same step
+    (e.g. via a follow-up insert_to_entity skill). This mirrors the latch pattern used
+    by ShakeCondition.
     """
     def __init__(self, target_entity, threshold=0):
+        super().__init__()
         self.target_entity = target_entity
         self.threshold = threshold
-        
+
     def is_met(self, physics):
+        if self._met:
+            return True
         top_site = self.target_entity.mjcf_model.worldbody.find("site", "top_site")
         bottom_site = self.target_entity.mjcf_model.worldbody.find("site", "bottom_site")
         top_site_xpos, bottom_site_xpos = physics.bind(top_site).xpos, physics.bind(bottom_site).xpos
         if (bottom_site_xpos[-1] - top_site_xpos[-1]) > self.threshold:
+            self._met = True
             return True
-        else:
-            return False
+        return False
 
 @register.add_condition("on_position")
 class OnPositionCondition(Condition):
@@ -784,3 +793,104 @@ class ShakeCondition(Condition):
         total_changes = sum(self._direction_changes.values())
         progress = min(total_changes / self.min_direction_changes, 1.0) if self.min_direction_changes > 0 else 1.0
         return progress, []
+
+@register.add_condition("cap_open")
+class CapOpenCondition(Condition):
+    """
+    Check if the cap of a ContainerWithCap is unscrewed open.
+    Uses slide joint RELATIVE displacement from initial state (recorded via
+    record_initial_state), not absolute qpos, to avoid false positives from
+    static-balance physics deformation of the slide joint at MJCF compile time.
+
+    Rationale: the cap is held down by physical contact with the body — even after
+    the user unscrews and lifts it, MuJoCo's contact forces pull the slide joint
+    back to its static-balance qpos (~0.011m) and keep the collision meshes in
+    penetration. So a contact-based "no overlap" check never fires reliably in
+    the current physics setup. Using slide joint relative displacement captures
+    the *intent* of the user (cap is being lifted) without depending on the
+    physically-impossible complete separation.
+
+    params:
+        entities: list of ContainerWithCap entities
+        open_threshold: minimum hinge rotation DELTA from initial (radians) to consider cap open
+        lift_threshold: minimum slide displacement DELTA from initial (meters) to consider cap open
+    """
+    def __init__(self, entities, open_threshold=4*np.pi, lift_threshold=0.003):
+        super().__init__()
+        self.entities = entities
+        self.open_threshold = open_threshold
+        self.lift_threshold = lift_threshold
+        self._initial_joint_pos = {}
+        self._initial_slide_pos = {}
+
+    def record_initial_state(self, physics):
+        super().record_initial_state(physics)
+        for entity in self.entities:
+            name = entity.mjcf_model.model
+            if entity.cap_joint is not None:
+                qpos = physics.bind(entity.cap_joint).qpos
+                self._initial_joint_pos[name] = float(qpos.item() if hasattr(qpos, 'item') else qpos)
+            if entity.slide_joint is not None:
+                qpos = physics.bind(entity.slide_joint).qpos
+                self._initial_slide_pos[name] = float(qpos.item() if hasattr(qpos, 'item') else qpos)
+
+    def is_met(self, physics=None):
+        if not self._initial_state_recorded:
+            return False
+        for entity in self.entities:
+            name = entity.mjcf_model.model
+            # 条件 1: door (hinge) 累计旋转量 >= open_threshold (默认 4π)
+            if entity.cap_joint is not None and name in self._initial_joint_pos:
+                qpos = physics.bind(entity.cap_joint).qpos
+                current_door = float(qpos.item() if hasattr(qpos, 'item') else qpos)
+                if abs(current_door - self._initial_joint_pos[name]) > self.open_threshold:
+                    return True
+            # 条件 2: slide 相对位移 > lift_threshold (向后兼容)
+            if entity.slide_joint is not None and name in self._initial_slide_pos:
+                qpos = physics.bind(entity.slide_joint).qpos
+                current_slide = float(qpos.item() if hasattr(qpos, 'item') else qpos)
+                if current_slide - self._initial_slide_pos[name] > self.lift_threshold:
+                    return True
+        return False
+
+
+@register.add_condition("drawer_open")
+class DrawerOpenCondition(Condition):
+    """
+    抽屉打开判定：针对 ContainerWithDrawer 类型的实体（如 cabinet）。
+
+    记录初始状态时遍历所有抽屉关节（slide joint）的 qpos，
+    若任意抽屉关节相对初始位置移动超过 open_threshold（默认 0.05m），
+    视为该抽屉已被拉开。
+
+    params:
+        entities: Cabinet 实体列表（每个 entity 应有 self.joints 与 self.drawers）
+        open_threshold: 抽屉相对初始位置的最大位移（m），默认 0.05
+    """
+    def __init__(self, entities, open_threshold=0.05):
+        super().__init__()
+        self.entities = entities
+        self.open_threshold = open_threshold
+        self._initial_drawer_qpos = {}
+
+    def record_initial_state(self, physics):
+        super().record_initial_state(physics)
+        for entity in self.entities:
+            name = entity.mjcf_model.model
+            self._initial_drawer_qpos[name] = [
+                float(physics.bind(joint).qpos) for joint in entity.joints
+            ]
+
+    def is_met(self, physics=None):
+        if not self._initial_state_recorded:
+            return False
+        for entity in self.entities:
+            name = entity.mjcf_model.model
+            if name not in self._initial_drawer_qpos:
+                continue
+            initial_qpos = self._initial_drawer_qpos[name]
+            for joint, init_q in zip(entity.joints, initial_qpos):
+                current = float(physics.bind(joint).qpos)
+                if abs(current - init_q) > self.open_threshold:
+                    return True
+        return False

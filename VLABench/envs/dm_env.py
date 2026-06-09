@@ -57,7 +57,33 @@ class LM4ManipDMEnv(composer.Environment):
         # 让技能（如 place）在检测到条件满足后仍能继续执行后续动作（open_gripper、lift）
         self._skill_execution_mode = False
 
+        # reset 重入检测：防止 condition 误触 should_terminate 导致 reset→step→reset 死循环
+        # 见 TROUBLESHOOTING.md 条目 #3 和 #5
+        self._reset_depth = 0
+        self._reset_reentry_warned = False
+
     def reset(self):
+        # 重入检测：如果 reset 在自己的 wait_step 循环里又被 step→_reset_next_step 触发，
+        # 说明某个 condition 在 record_initial_state 调用前就返回 True，会导致无限递归卡死。
+        if self._reset_depth > 0 and not self._reset_reentry_warned:
+            import logging
+            logging.error(
+                "[dm_env.reset] 检测到重入（depth=%d）。这通常意味着某个 Condition 在 "
+                "record_initial_state 未调用时就返回 True，env.reset() 会陷入无限循环。"
+                "排查方法：检查 env.task.conditions 中所有 condition 的 is_met() 是否在 "
+                "reset 阶段误返 True。详见 TROUBLESHOOTING.md 条目 #3 / #5。" % self._reset_depth
+            )
+            self._reset_reentry_warned = True
+        self._reset_depth += 1
+        try:
+            return self._reset_impl()
+        finally:
+            self._reset_depth -= 1
+            if self._reset_depth == 0:
+                # 顶层 reset 返回，清掉警告标记以便下次 reset 周期重新检测
+                self._reset_reentry_warned = False
+
+    def _reset_impl(self):
         self.timestep = 0
         self._grasped_entity_info = None  # 清除 grasp lock 状态
         self._grasp_lock_hand_body_id = None  # 清除缓存

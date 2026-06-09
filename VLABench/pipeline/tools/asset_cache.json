@@ -118,5 +118,30 @@
     "spec": "large_beaker",
     "source_type": "local",
     "is_physical": true
+  },
+  "pill_bottle": {
+    "spec": "pill_bottle",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "pill bottle": {
+    "spec": "pill_bottle",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "asprin_pill_bottle": {
+    "spec": "aspirin_pill_bottle",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "aspirin_pill_bottle": {
+    "spec": "aspirin_pill_bottle",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "drawer": {
+    "spec": "drawer",
+    "source_type": "objaverse",
+    "is_physical": true
   }
 }

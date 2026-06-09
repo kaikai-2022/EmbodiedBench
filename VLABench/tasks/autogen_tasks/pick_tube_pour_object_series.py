@@ -55,12 +55,13 @@ class PickTubePourObjectConfigManager(BenchTaskConfigManager):
         self.target_entity = "tube_0"
 
     def get_instruction(self, target_entity, init_container, **kwargs):
-        self.config["task"]["instructions"] = ["Pick the <tube_0> which contains <CuSO4_0>."]
+        self.config["task"]["instructions"] = ["pick the <tube_0> which contains <CuSO4_0>."]
 
     def get_condition_config(self, target_entity, init_container, **kwargs):
-        conditions_config = dict(
-            pour=dict(target_entity='tube_0', threshold=0)
-        )
+        conditions_config = [
+            dict(is_grasped=dict(entities=['tube_0'], robot='robot')),
+            dict(pour=dict(target_entity='tube_0', threshold=0)),
+        ]
         self.config["task"]["conditions"] = conditions_config
 
 
@@ -72,7 +73,8 @@ class PickTubePourObjectTask(PrimitiveTask):
     def get_expert_skill_sequence(self, physics):
         skill_sequence = [
             partial(SkillLib.pick, target_entity_name="tube_0"),
-            partial(SkillLib.pour_to_entity, target_container_name="large_beaker_0"),
-            partial(SkillLib.insert_to_entity, target_entity_name="chemistry_tube_stand"),
+            partial(SkillLib.lift, lift_height=0.15),
+            partial(SkillLib.pour_to_entity, target_container_name="large_beaker_0", tilt_angle=1.8, wait_time=10),
+            partial(SkillLib.insert_to_entity, target_entity_name="chemistry_tube_stand", insert_depth=0.05),
         ]
         return skill_sequence

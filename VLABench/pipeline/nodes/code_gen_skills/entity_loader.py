@@ -33,6 +33,12 @@ ENTITY_POSITION_RANGES = [
     ([0.35, 0.45], [-0.15, -0.05]),   # 备用位置4
 ]
 
+# 容器类需要被固定到 arena 才能完成任务的清单
+# （单手机械臂无法在被自由放置的物体上完成拧/插/按等需要底座稳定的操作）
+ATTACH_TO_ARENA_CLASSES = {
+    "ContainerWithCap",  # 拧开瓶盖需要瓶身固定
+}
+
 
 @dataclass
 class EntityLoadPlan:
@@ -45,6 +51,7 @@ class EntityLoadPlan:
     properties: Dict = field(default_factory=dict)
     parent_spec: Optional[str] = None
     position_index: int = 0  # 用于位置分散
+    attach_to_arena: bool = False  # 加载后是否焊死到 arena
 
 
 def plan_entity_loading(
@@ -120,6 +127,7 @@ def plan_entity_loading(
                 load_mode="liquid", method_name="load_objects",
                 properties=properties,
                 position_index=plain_entity_counter,
+                attach_to_arena=(class_name in ATTACH_TO_ARENA_CLASSES),
             ))
             plain_entity_counter += 1
 
@@ -130,6 +138,7 @@ def plan_entity_loading(
                 load_mode="plain", method_name="load_objects",
                 properties=properties,
                 position_index=plain_entity_counter,
+                attach_to_arena=(class_name in ATTACH_TO_ARENA_CLASSES),
             ))
             plain_entity_counter += 1
 
@@ -265,7 +274,7 @@ def _gen_objects(plans: List[EntityLoadPlan], flags: Dict) -> str:
 
 def _code_plain(plan: EntityLoadPlan, flags: Dict) -> List[str]:
     pos_range = ENTITY_POSITION_RANGES[plan.position_index % len(ENTITY_POSITION_RANGES)]
-    return [
+    lines = [
         f'        obj_config = dict(',
         f'            name="{plan.uid}",',
         f'            xml_path=name2class_xml["{plan.spec}"][-1],',
@@ -273,9 +282,14 @@ def _code_plain(plan: EntityLoadPlan, flags: Dict) -> List[str]:
         f'        )',
         f'        obj_config["class"] = "{plan.class_name}"',
         f'        obj_config["randomness"] = dict(pos=[0.02, 0.02, 0], quat=[0, 0, 0.05])',
+    ]
+    if plan.attach_to_arena:
+        lines.append(f'        obj_config["attach_to_arena"] = True')
+    lines += [
         f'        self.config["task"]["components"].append(obj_config)',
         "",
     ]
+    return lines
 
 
 def _code_liquid(plan: EntityLoadPlan, flags: Dict) -> List[str]:
@@ -283,7 +297,7 @@ def _code_liquid(plan: EntityLoadPlan, flags: Dict) -> List[str]:
     solution = plan.properties.get("solution", plan.uid)
     pos_range = ENTITY_POSITION_RANGES[plan.position_index % len(ENTITY_POSITION_RANGES)]
     if solution_rgba:
-        return [
+        lines = [
             f'        obj_config = dict(',
             f'            name="{plan.uid}",',
             f'            xml_path=name2class_xml["{plan.spec}"][-1],',
@@ -292,11 +306,9 @@ def _code_liquid(plan: EntityLoadPlan, flags: Dict) -> List[str]:
             f'        )',
             f'        obj_config["class"] = "{plan.class_name}"',
             f'        obj_config["randomness"] = dict(pos=[0.02, 0.02, 0], quat=[0, 0, 0.05])',
-            f'        self.config["task"]["components"].append(obj_config)',
-            "",
         ]
     else:
-        return [
+        lines = [
             f'        obj_config = dict(',
             f'            name="{plan.uid}",',
             f'            xml_path=name2class_xml["{plan.spec}"][-1],',
@@ -305,9 +317,14 @@ def _code_liquid(plan: EntityLoadPlan, flags: Dict) -> List[str]:
             f'        )',
             f'        obj_config["class"] = "{plan.class_name}"',
             f'        obj_config["randomness"] = dict(pos=[0.02, 0.02, 0], quat=[0, 0, 0.05])',
-            f'        self.config["task"]["components"].append(obj_config)',
-            "",
         ]
+    if plan.attach_to_arena:
+        lines.append(f'        obj_config["attach_to_arena"] = True')
+    lines += [
+        f'        self.config["task"]["components"].append(obj_config)',
+        "",
+    ]
+    return lines
 
 
 def _code_subentity(plan: EntityLoadPlan, flags: Dict) -> List[str]:

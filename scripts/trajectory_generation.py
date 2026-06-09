@@ -1,6 +1,7 @@
 """
 The scripts to launch auto scene load and key-point based trajectory generation.
 """
+import json
 import numpy as np
 import os
 import open3d as o3d
