@@ -1,0 +1,28 @@
+{
+  "uid": "pipette_-_laboratory_essential_tool",
+  "centered": true,
+  "scaled": false,
+  "scale_factor": null,
+  "orientation_warning": null,
+  "original_dims": {
+    "center": [
+      0.049999995000000005,
+      0.0,
+      3.871999999999903e-05
+    ],
+    "ranges": [
+      0.01984689,
+      0.01984688,
+      0.19993255999999998
+    ],
+    "max_dim": 0.19993255999999998
+  },
+  "final_dims": {
+    "ranges": [
+      0.01984689,
+      0.01984688,
+      0.19993256
+    ],
+    "max_dim": 0.19993256
+  }
+}

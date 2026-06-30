@@ -1,0 +1,128 @@
+<?xml version="1.0" ?>
+<mujoco model="drying_box">
+  <compiler angle="radian" />
+  <asset>
+    <texture type="2d" name="body_mdl_0008_tex" file="body_mdl_0008.png"/>
+    <texture type="2d" name="body_mdl_0009_tex" file="body_mdl_0009.png"/>
+    <material name="body_aluminum_anodized_charcoal_mat" specular="0.4" shininess="0.001" rgba="0.471 0.471 0.471 1.0"/>
+    <material name="body_mdl_0007_mat" specular="0.4" shininess="0.001" rgba="0.059 0.102 0.353 1.0"/>
+    <material name="body_mdl_0008_mat" texture="body_mdl_0008_tex" specular="0.4" shininess="0.001" rgba="1 1 1 1"/>
+    <material name="body_mdl_0009_mat" texture="body_mdl_0009_tex" specular="0.4" shininess="0.001" rgba="1 1 1 1"/>
+    <material name="body_vcol_mat" specular="0.4" shininess="0.001" rgba="0.000 0.000 0.000 1.0"/>
+    <material name="button_vcol_mat" specular="0.4" shininess="0.001" rgba="0.400 0.400 0.400 1.0"/>
+    <material name="door_mdl_0007_mat" specular="0.4" shininess="0.001" rgba="0.059 0.102 0.353 1.0"/>
+    <!-- Visual meshes -->
+    <mesh file="body_aluminum_anodized_charcoal.obj"/>
+    <mesh file="body_mdl_0007.obj"/>
+    <mesh file="body_mdl_0008.obj"/>
+    <mesh file="body_mdl_0009.obj"/>
+    <mesh file="body_vcol.obj"/>
+    <mesh file="button_vcol.obj"/>
+    <mesh file="door_mdl_0007.obj"/>
+    <!-- Body collision meshes -->
+    <mesh file="body_collision/body_collision_0.obj"/>
+    <mesh file="body_collision/body_collision_1.obj"/>
+    <mesh file="body_collision/body_collision_10.obj"/>
+    <mesh file="body_collision/body_collision_11.obj"/>
+    <mesh file="body_collision/body_collision_2.obj"/>
+    <mesh file="body_collision/body_collision_3.obj"/>
+    <mesh file="body_collision/body_collision_4.obj"/>
+    <mesh file="body_collision/body_collision_5.obj"/>
+    <mesh file="body_collision/body_collision_6.obj"/>
+    <mesh file="body_collision/body_collision_7.obj"/>
+    <mesh file="body_collision/body_collision_8.obj"/>
+    <mesh file="body_collision/body_collision_9.obj"/>
+    <!-- Door collision meshes -->
+    <mesh file="door_collision/door_collision_0.obj"/>
+    <mesh file="door_collision/door_collision_1.obj"/>
+    <mesh file="door_collision/door_collision_2.obj"/>
+    <mesh file="door_collision/door_collision_3.obj"/>
+    <mesh file="door_collision/door_collision_4.obj"/>
+    <mesh file="door_collision/door_collision_5.obj"/>
+  </asset>
+  <default>
+    <default class="visual">
+      <geom group="2" type="mesh" contype="0" conaffinity="0" density="50"/>
+    </default>
+    <default class="collision">
+      <geom group="3" type="mesh" density="50" friction="1.5 0.1 0.1" solimp="0.9 0.95 0.001" solref="0.02 1"/>
+    </default>
+    <default class="keypoint">
+      <site type="sphere" size="0.01" group="3" rgba="1 0 0 1"/>
+    </default>
+    <default class="placepoint">
+      <site type="sphere" size="0.01" group="2" rgba="0 0 1 0"/>
+    </default>
+    <default class="grasppoint">
+      <site type="sphere" size="0.005" group="4" rgba="0 0 1 1"/>
+    </default>
+  </default>
+  <worldbody>
+    <body name="drying_box">
+      <inertial pos="0 0 0.3150" mass="20.0" diaginertia="0.5 0.5 0.5"/>
+      <!-- Body visual meshes -->
+      <geom mesh="body_aluminum_anodized_charcoal" material="body_aluminum_anodized_charcoal_mat" class="visual"/>
+      <geom mesh="body_mdl_0007" material="body_mdl_0007_mat" class="visual"/>
+      <geom mesh="body_mdl_0008" material="body_mdl_0008_mat" class="visual"/>
+      <geom mesh="body_mdl_0009" material="body_mdl_0009_mat" class="visual"/>
+      <geom mesh="body_vcol" material="body_vcol_mat" class="visual"/>
+      <!-- Body collision -->
+      <geom mesh="body_collision_0" class="collision"/>
+      <geom mesh="body_collision_1" class="collision"/>
+      <geom mesh="body_collision_10" class="collision"/>
+      <geom mesh="body_collision_11" class="collision"/>
+      <geom mesh="body_collision_2" class="collision"/>
+      <geom mesh="body_collision_3" class="collision"/>
+      <geom mesh="body_collision_4" class="collision"/>
+      <geom mesh="body_collision_5" class="collision"/>
+      <geom mesh="body_collision_6" class="collision"/>
+      <geom mesh="body_collision_7" class="collision"/>
+      <geom mesh="body_collision_8" class="collision"/>
+      <geom mesh="body_collision_9" class="collision"/>
+      <!-- Body keypoints + placepoints -->
+      <site class="keypoint" name="ext_p0" pos="-0.21421578060335378 -0.369553866222897 0.0"/>
+      <site class="keypoint" name="ext_px" pos="0.28820701490375455 -0.369553866222897 0.0"/>
+      <site class="keypoint" name="ext_py" pos="-0.21421578060335378 0.3704462501843404 0.0"/>
+      <site class="keypoint" name="ext_pz" pos="-0.21421578060335378 -0.369553866222897 0.6300000032205122"/>
+      <site class="keypoint" name="ext_pxyz" pos="0.28820701490375455 0.3704462501843404 0.6300000032205122"/>
+      <site class="placepoint" name="place_c" pos="-3.552713678800501e-15 -0.09762488409377923 0.3300000394482424"/>
+
+      <!-- Door (hinged on the back-left edge, opens by rotating around vertical Y axis) -->
+      <body name="door">
+        <joint name="drying_box_door_joint" type="hinge" axis="0 0 1"
+               pos="-0.2882 -0.3704 0.0331"
+               range="0.0 1.8"
+               damping="20" frictionloss="10" armature="0.5" ref="0" stiffness="0"/>
+        <inertial pos="0.0406 0.2728 0.2969" mass="5.0" diaginertia="0.1 0.5 0.5"/>
+        <!-- Door visual mesh -->
+        <geom mesh="door_mdl_0007" material="door_mdl_0007_mat" class="visual"/>
+        <!-- Door collision -->
+        <geom mesh="door_collision_0" class="collision"/>
+        <geom mesh="door_collision_1" class="collision"/>
+        <geom mesh="door_collision_2" class="collision"/>
+        <geom mesh="door_collision_3" class="collision"/>
+        <geom mesh="door_collision_4" class="collision"/>
+        <geom mesh="door_collision_5" class="collision"/>
+        <!-- Door keypoints -->
+        <site class="keypoint" name="door_p0" pos="-0.28820701490376166 -0.3704462501843404 0.033080921375821803"/>
+        <site class="keypoint" name="door_p1" pos="-0.28820701490376166 0.17519648199678195 0.033080921375821803"/>
+        <site class="keypoint" name="door_p2" pos="-0.28820701490376166 -0.3704462501843404 0.626919157520663"/>
+        <site class="keypoint" name="door_p3" pos="-0.28820701490376166 0.17519648199678195 0.626919157520663"/>
+        <!-- Handle grasppoint -->
+        <site class="grasppoint" name="door_handle_grasp" pos="-0.2265 -0.0014 0.0569"/>
+      </body>
+
+      <!-- Button (sliding joint along X, can be pressed inward) -->
+      <body name="button">
+        <joint name="drying_box_button_joint" type="slide" axis="1 0 0"
+               pos="-0.2288 0.2430 0.3738"
+               range="0 0.025"
+               damping="5" frictionloss="3" armature="0.001" ref="0"/>
+        <inertial pos="0 0 0" mass="0.02" diaginertia="0.0001 0.0001 0.0001"/>
+        <geom mesh="button_vcol" material="button_vcol_mat" class="visual"/>
+        <!-- Button collision (simple box) -->
+        <geom type="box" size="0.0200 0.0200 0.0200" class="collision"/>
+      </body>
+    </body>
+  </worldbody>
+</mujoco>

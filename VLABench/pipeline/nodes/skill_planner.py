@@ -33,7 +33,12 @@ logger = logging.getLogger(__name__)
 SKILL_LIB_DOC = """
 ## 可用原子技能 (Atomic Skills)
 
-- pick(target_uid, prior_eulers=[[-pi, 0, 0]]): 从上方抓取物体。prior_eulers 决定抓取朝向。
+- pick(target_uid, prior_eulers=[[-pi, 0, 0]]): 从上方抓取物体。prior_eulers 决定抓取朝向。**抓取时会完全闭合夹爪到 0，可能压坏易碎物体。如需轻柔抓取，请使用 gently_pick**。
+- gently_pick(target_uid, prior_eulers=[[-pi, 0, 0]], extra_close_ratio=0.2, n_close_steps=20, contact_dist_threshold=0.005, hold_steps=5): **柔性抓取技能**。逐步闭合夹爪并检测双侧接触，当左右手指均触碰到物体后仅再额外合上 extra_close_ratio 比例（默认 0.2 = 8mm）的宽度，避免压坏物体。适用场景：抓取易碎品（烧杯、试管）、轻小物体、需要保持物体形状的任务。参数说明：
+  - extra_close_ratio: 接触后额外闭合比例（相对 0.04 满开度），默认 0.2（8mm）。设为 0 表示接触后立即停止，设为 1.0 表示完全闭合（退化到 pick 行为）。
+  - n_close_steps: 闭合阶段总步数，默认 20。增加此值可减慢闭合速度，提高接触检测精度。
+  - contact_dist_threshold: 判定接触的距离阈值（m），默认 0.005（5mm）。物体越小可能需要调大此值。
+  - hold_steps: 接触后稳定步数，默认 5。用此期间的实际手指 qpos 作为最终保持目标。
 - place(target_container_uid): **将当前抓取的物体精确放置到目标容器/表面上**。target_container_uid 必须是场景中具体的实体（如 hot_plate_0, beaker_0, shelf_0）。place 会使用目标实体的 place_point 作为放置位置。**当任务要求将物体放到某个特定目标上时，必须使用 place，不要用 drop**。
 - drop(): **将抓取的物体放到桌面上**。仅用于"使用完物品后腾出抓夹"的场景，即物体不需要放到任何特定位置，只需放到桌面即可。**drop 不接受 target 参数**。如果任务要求将物体放到某个特定实体上（如加热板、架子），必须使用 place(target_container_uid)，不要用 drop。
 - pour(): 倾倒动作（假设手里已抓着容器）。仅旋转腕部关节，末端位置会偏移。
@@ -49,24 +54,32 @@ SKILL_LIB_DOC = """
 - stir_entity_with_tool(target_uid, stir_radius=0.02, stir_duration=5, insert_ratio=2/3): **使用搅拌工具搅动容器内液体**。假设当前夹爪已抓取搅拌工具。步骤：①获取容器的 place_point；②移动到 place_point 正上方 25cm；③下降到插入位置（深度 = 容器高度 × insert_ratio）；④以 place_point XY 为圆心做圆周运动。stir_radius=0.02 表示半径 2cm，stir_duration=5 表示持续 5 秒。
 - rotate(rotation_angle=pi/2): 旋转腕部关节实现物体翻转或小幅摇晃。适合单次大幅旋转。
 - unscrew_cap(target_uid, rotation_angle=-4*np.pi, target_q_velocity=pi/40, max_n_substep=30, tolerance=0.01, lift_height=0.03): **拧开带盖容器（如 pill_bottle）的瓶盖**。内部已封装 pick + 旋转腕关节 + 自动松夹，模拟人手拧开瓶盖动作。target_uid 是带盖容器的 uid（如 pill_bottle_0）。**任务要求拧开/打开瓶盖时，必须使用此技能，不要拆解为 pick+rotate+open_gripper**。rotation_angle 默认 4π。
+- open_drawer(target_container_uid, pick_prior_eulers=[[-np.pi/2, 0, 0]], drawer_id=0): **打开抽屉的专用技能**。内部已封装 pick + 抽屉打开轨迹，自动处理抓取把手和推动抽屉动作。target_container_uid 是抽屉容器的 uid（如 drawer_0）。drawer_id 指定打开哪个抽屉：0=顶层，1=中层，2=底层。pick_prior_eulers 控制抓取姿态，默认 [[-np.pi/2, 0, 0]] 是侧向水平抓取（避免碰撞）。**任务要求打开抽屉时，必须使用此技能，不要拆解为 moveto_entity+push**。
 - press(target_pos): 按压目标位置。
 - push(target_pos, push_distance=0.1): 推动物体。
 - reset(): 重置环境。
-- wait_for(wait_duration=2.0, entity_name=None, change_type=None, solution=None, color=None): **等待外部状态变化的技能**。用于人机协同场景，机械臂保持不动，等待指定时间后自动应用环境变化。change_type 可选 "add_solution"（添加溶液，需要 solution 参数如 "CuSO4"）、"solution_change_color"（改变溶液颜色，需要 color 参数如 [1, 0, 0, 0.4] 表示红色）、或 "change_color"（通用颜色变化）。
+- wait_for(wait_duration=2.0, entity_name=None, change_type=None, solution=None, color=None): **等待外部状态变化的技能**。用于人机协同场景，机械臂保持不动，等待指定时间后自动应用环境变化。change_type 可选：
+  - "add_solution"：添加溶液，需要 solution 参数（如 "CuSO4"、"FeCl3"、"KMnO4"）
+  - "solution_change_color"：改变溶液颜色，需要 color 参数（如 [1, 0, 0, 0.4] 表示红色）
+  - "change_color"：通用颜色变化，需要 color 参数
+  - "Light_the_alcohol_lamp"：点燃酒精灯火焰（仅需 entity_name，不需要额外参数）。场景中酒精灯默认火焰不可见，执行此操作后火焰显示。
 
 ## Skill Usage Guidelines
 
+- **pick vs gently_pick**:
+  - pick: 完全闭合夹爪到 0，适用于抓取坚固物体（金属块、工具、不易变形的容器）。
+  - gently_pick: 柔性抓取，检测双侧接触后仅轻压 20%（可调）（仅适用于pipette的抓取！！！）。
 - **place**: 将物体放置到指定的目标实体上（加热板、容器、架子等）。必须传 target_container_uid 参数。适用场景："put A on B", "place A onto B", "put A in B"。
 - **drop**: 仅用于将物体放到桌面上（无特定目标位置）。适用场景：使用完物品后腾出抓夹，需要抓取下一个物品时。**如果任务指定了放置目标，必须用 place，不能用 drop**。
 - **open_gripper**: 在当前位置直接松开夹爪，物体会掉落。仅用于不需要精确放置的场景。
 - **shake 任务的正确序列**:
-  - 试管类物体 (ChemistryTube): pick -> lift -> shake(n_shakes=3) -> insert_to_entity(target_uid=chemistry_tube_stand)。insert_to_entity 已包含松开夹爪，不需要额外 open_gripper。
-  - 其他物体 (烧杯等): pick -> lift -> shake(n_shakes=3) -> drop。用 drop 把物体放到桌面。
+  - 试管类物体 (ChemistryTube): gently_pick -> lift -> shake(n_shakes=3) -> insert_to_entity(target_uid=chemistry_tube_stand)。insert_to_entity 已包含松开夹爪，不需要额外 open_gripper。
+  - 其他物体 (烧杯等): gently_pick -> lift -> shake(n_shakes=3) -> drop。用 drop 把物体放到桌面。
 """
 
 # ========== 原子技能白名单 ==========
 VALID_SKILLS = {
-    "pick", "place", "drop", "lift", "moveto", "moveto_entity", "pour", "pour_to_entity", "push", "press",
+    "pick", "gently_pick", "place", "drop", "lift", "moveto", "moveto_entity", "pour", "pour_to_entity", "push", "press",
     "flip", "wait", "rotate", "open_gripper", "close_gripper",
     "open_door", "close_door", "open_drawer", "open_laptop",
     "move_offset", "reset", "insert_to_entity", "shake", "stir_entity_with_tool",
@@ -84,8 +97,9 @@ ACTION_TO_SKILL_HINT = {
     "dispense": ["moveto", "pick", "pour"],
     "heat": ["moveto", "pick", "lift", "moveto", "wait"],
     "move": ["moveto", "pick", "lift", "moveto", "open_gripper"],
-    "open": ["moveto", "pick", "open_gripper"],
+    "open": ["open_drawer"],  # 优先使用专用技能
     "wait_for": ["wait_for"],  # wait_for 是独立的技能
+    "light": ["wait_for"],  # 点燃酒精灯等 -> wait_for
 }
 
 
@@ -219,6 +233,8 @@ def build_skill_planner_prompt(
 
 4. **Condition Selection**: Success conditions are handled by the Condition Planner node (parallel to Skill Planner). Focus on generating the atomic skill sequence.
 
+5. **Special Rule for open_drawer**: When the action is "open" and the target is a drawer (ContainerWithDrawer), use open_drawer(target_container_uid="drawer_0", drawer_id=0). drawer_id=0 for top drawer, 1 for middle, 2 for bottom. The skill automatically handles grasp and push.
+
 5. **Use moveto_entity for targeting objects**: When you need to move to a specific object (e.g. to pour into a beaker), use moveto_entity(target_uid=<container_uid>) instead of moveto with hardcoded coordinates. NEVER use moveto with hardcoded target_pos for pour operations.
 
 6. **pour_to_entity replaces moveto+pour**: pour_to_entity already handles moving to the container and tilting. After pour_to_entity, just use open_gripper to release the container. Do NOT use place after pour_to_entity.
@@ -253,6 +269,7 @@ For each step, you MUST fill in:
 - Use wait_for skill with appropriate parameters:
   - wait_for(wait_duration=2.0) - simple waiting
   - wait_for(wait_duration=3.0, entity_name="beaker_0", change_type="add_solution", solution="CuSO4") - wait and add solution
+  - wait_for(wait_duration=2.0, entity_name="alcohol_lamp_0", change_type="Light_the_alcohol_lamp") - wait and light the alcohol lamp flame
 - The robot gripper should NOT release the held object during wait_for.
 
 ## Coordinate Reference

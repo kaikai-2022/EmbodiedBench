@@ -22,7 +22,7 @@ class PickTubePourObjectConfigManager(BenchTaskConfigManager):
             container_config = dict(
                 name="chemistry_tube_stand",
                 xml_path=name2class_xml["chemistry_tube_stand"][-1],
-                position=[random.uniform(-0.15, -0.05), random.uniform(0.05, 0.15), 0.8],
+                position=[random.uniform(-0.15, -0.05), random.uniform(-0.05, 0.00), 0.8],
             )
             container_config["class"] = "TubeStand"
             self.config["task"]["components"].append(container_config)
@@ -46,7 +46,7 @@ class PickTubePourObjectConfigManager(BenchTaskConfigManager):
         obj_config = dict(
             name="large_beaker_0",
             xml_path=name2class_xml["large_beaker"][-1],
-            position=[random.uniform(0.05, 0.15), random.uniform(-0.15, -0.05), 0.8],
+            position=[random.uniform(0.15, 0.20), random.uniform(0.10, 0.15), 0.8],
         )
         obj_config["class"] = "ChemistryBeaker"
         obj_config["randomness"] = dict(pos=[0.02, 0.02, 0], quat=[0, 0, 0.05])
@@ -55,12 +55,16 @@ class PickTubePourObjectConfigManager(BenchTaskConfigManager):
         self.target_entity = "tube_0"
 
     def get_instruction(self, target_entity, init_container, **kwargs):
-        self.config["task"]["instructions"] = ["pick the <tube_0> which contains <CuSO4_0>."]
+        self.config["task"]["instructions"] = ["Pick the tube_0 which contains CuSO4 solution_0."]
 
     def get_condition_config(self, target_entity, init_container, **kwargs):
         conditions_config = [
             dict(is_grasped=dict(entities=['tube_0'], robot='robot')),
-            dict(pour=dict(target_entity='tube_0', threshold=0)),
+            dict(pour_into=dict(
+            target_entity='tube_0',
+            receiver_container='large_beaker_0',
+            robot='robot',
+        )),
         ]
         self.config["task"]["conditions"] = conditions_config
 
@@ -75,6 +79,6 @@ class PickTubePourObjectTask(PrimitiveTask):
             partial(SkillLib.pick, target_entity_name="tube_0"),
             partial(SkillLib.lift, lift_height=0.15),
             partial(SkillLib.pour_to_entity, target_container_name="large_beaker_0", tilt_angle=1.8, wait_time=10),
-            partial(SkillLib.insert_to_entity, target_entity_name="chemistry_tube_stand", insert_depth=0.05),
+            partial(SkillLib.insert_to_entity, target_entity_name="chemistry_tube_stand"),
         ]
         return skill_sequence

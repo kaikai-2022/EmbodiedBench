@@ -1,0 +1,28 @@
+{
+  "uid": "alcohol_lamp",
+  "centered": true,
+  "scaled": true,
+  "scale_factor": 0.1782535176668012,
+  "orientation_warning": null,
+  "original_dims": {
+    "center": [
+      0.002755164999999976,
+      -0.0003050300000000117,
+      0.03838255500000001
+    ],
+    "ranges": [
+      0.55965883,
+      0.557706,
+      0.84149813
+    ],
+    "max_dim": 0.84149813
+  },
+  "final_dims": {
+    "ranges": [
+      0.09976115692332146,
+      0.09941305632388103,
+      0.15
+    ],
+    "max_dim": 0.15
+  }
+}

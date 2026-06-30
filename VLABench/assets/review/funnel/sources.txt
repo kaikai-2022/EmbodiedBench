@@ -1,0 +1,14 @@
+Model UID: funnel
+Model Name: funnel
+
+Source Information:
+============================================================
+Source: Local File
+Original Path: /ssd/mkqin/download/funnel.glb
+File Name: funnel.glb
+Keyword/Category: alcohol_lamp
+Rotation: 90.0° around X axis
+
+Processing:
+Pipeline: process_local_glb.py
+Steps: GLB->OBJ (trimesh) -> [rotate] -> MJCF (obj2mjcf) -> postprocess -> bottom-align -> validate -> size_fix

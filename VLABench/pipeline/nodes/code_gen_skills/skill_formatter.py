@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 # VLABench SkillLib 合法技能白名单
 VALID_SKILLS = {
-    "pick", "place", "drop", "lift", "moveto", "moveto_entity", "pour", "pour_to_entity", "push", "press",
+    "pick", "gently_pick", "place", "drop", "lift", "moveto", "moveto_entity", "pour", "pour_to_entity", "push", "press",
     "flip", "wait", "rotate", "open_gripper", "close_gripper",
     "open_door", "close_door", "open_drawer", "open_laptop",
     "move_offset", "reset", "shake", "insert_to_entity", "stir_entity_with_tool",
@@ -74,7 +74,7 @@ def _format_params(params: Dict, skill_name: str = "") -> str:
     for k, v in params.items():
         # 参数名映射
         if k == "target_uid" or k == "target_container_uid":
-            if skill_name in ("place", "pour_to_entity", "stir_entity_with_tool"):
+            if skill_name in ("place", "pour_to_entity", "stir_entity_with_tool", "open_drawer"):
                 k = "target_container_name"
             else:
                 k = "target_entity_name"

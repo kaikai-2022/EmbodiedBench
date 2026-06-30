@@ -88,9 +88,22 @@ python VLABench/pipeline/tests/process_local_glb.py \
 ```
 
 **参数说明**：
-- `--input_dir`：GLB 文件所在目录（脚本会自动查找目录中匹配 keyword 的 .glb 文件）
+- `--input_dir`：GLB 文件所在目录
 - `--keyword`：GLB 文件名的子串（用于匹配，如目录中有 `flask.glb` 则 keyword 为 `flask`）
 - `--output_dir`：输出路径
+- `--file`：可选，指定后**只处理**目录中文件名（不含扩展名）匹配此值的单个 GLB 文件；不指定则处理目录下**所有** `.glb` 文件
+
+> **⚠️ 默认行为**：`process_local_glb.py` 不指定 `--file` 时会处理 `--input_dir` 中**所有** `.glb` 文件。如果目录中有多个模型，会被一次性全部处理。
+> 当只需要处理单个模型时，**务必使用 `--file`** 限定，避免误处理其他模型。
+
+**只处理单个模型**（推荐）：
+```bash
+python VLABench/pipeline/tests/process_local_glb.py \
+    --input_dir <GLB所在目录> \
+    --keyword <模型关键词> \
+    --file <模型文件名（不含扩展名）> \
+    --output_dir VLABench/assets/review/<model_name>
+```
 
 **注意**：大部分待处理模型都需要绕 X 轴旋转 90 度才能正过来：
 ```bash

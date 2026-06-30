@@ -1,0 +1,14 @@
+Model UID: heat_device
+Model Name: heat_device
+
+Source Information:
+============================================================
+Source: Local File
+Original Path: /tmp/heat_device_input/heat_device.glb
+File Name: heat_device.glb
+Keyword/Category: heat_device
+Rotation: 90.0° around X axis
+
+Processing:
+Pipeline: process_local_glb.py
+Steps: GLB->OBJ (trimesh) -> [rotate] -> MJCF (obj2mjcf) -> postprocess -> bottom-align -> validate -> size_fix

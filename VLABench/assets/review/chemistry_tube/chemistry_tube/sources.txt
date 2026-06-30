@@ -1,0 +1,14 @@
+Model UID: chemistry_tube
+Model Name: chemistry_tube
+
+Source Information:
+============================================================
+Source: Local File
+Original Path: /tmp/chemistry_tube_input/chemistry_tube.glb
+File Name: chemistry_tube.glb
+Keyword/Category: chemistry_tube
+Rotation: 90.0° around X axis
+
+Processing:
+Pipeline: process_local_glb.py
+Steps: GLB->OBJ (trimesh) -> [rotate] -> MJCF (obj2mjcf) -> postprocess -> bottom-align -> validate -> size_fix

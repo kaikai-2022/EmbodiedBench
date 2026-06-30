@@ -1,0 +1,191 @@
+<?xml version="1.0" ?>
+<mujoco model="florence_flask">
+  <asset>
+    <material name="glass_florence_flask" specular="0.9" shininess="0.9" rgba="0.85 0.92 0.97 0.3"/>
+    <mesh file="florence_flask.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_0.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_1.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_2.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_3.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_4.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_5.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_6.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_7.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_8.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_9.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_10.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_11.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_12.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_13.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_14.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_15.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_16.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_17.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_18.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_19.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_20.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_21.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_22.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_23.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_24.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_25.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_26.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_27.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_28.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_29.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_30.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_31.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_32.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_33.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_34.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_35.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_36.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_37.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_38.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_39.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_40.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_41.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_42.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_43.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_44.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_45.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_46.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_47.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_48.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_49.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_50.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_51.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_52.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_53.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_54.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_55.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_56.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_57.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_58.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_59.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_60.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_61.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_62.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_63.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_64.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_65.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_66.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_67.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_68.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_69.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_70.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_71.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_72.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_73.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_74.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+    <mesh file="florence_flask/florence_flask_collision_75.obj" scale="0.022874139257576805 0.022874139257576805 0.022874139257576805"/>
+      <material name="CaSO4" rgba="1 1 1 0.7"/>
+    <material name="CuCl2" rgba="0.141 1.0 0.174 0.4"/>
+    <material name="CuSO4" rgba="0 0.45 1 0.4"/>
+    <material name="FeCl3" rgba="0.6475 0.5686 0.023 0.4"/>
+    <material name="KMnO4" rgba="0.5 0 0.5 0.4"/>
+    <material name="I2" rgba="0.3 0.13 0.0 0.4"/>
+    <material name="K2CrO4" rgba="0.57 0.12 0.013 0.4"/>
+    <material name="NaCl" rgba="1 1 1 0.3"/>
+</asset>
+  <worldbody>
+    <body name="florence_flask">
+      <inertial pos="0 0 0.075000" mass="0.02" diaginertia="0.0008 0.0008 0.0005"/>
+      <geom material="glass_florence_flask" mesh="florence_flask" class="visual"/>
+      <geom mesh="florence_flask_collision_0"  class="collision"/>
+      <geom mesh="florence_flask_collision_1"  class="collision"/>
+      <geom mesh="florence_flask_collision_2"  class="collision"/>
+      <geom mesh="florence_flask_collision_3"  class="collision"/>
+      <geom mesh="florence_flask_collision_4"  class="collision"/>
+      <geom mesh="florence_flask_collision_5"  class="collision"/>
+      <geom mesh="florence_flask_collision_6"  class="collision"/>
+      <geom mesh="florence_flask_collision_7"  class="collision"/>
+      <geom mesh="florence_flask_collision_8"  class="collision"/>
+      <geom mesh="florence_flask_collision_9"  class="collision"/>
+      <geom mesh="florence_flask_collision_10"  class="collision"/>
+      <geom mesh="florence_flask_collision_11"  class="collision"/>
+      <geom mesh="florence_flask_collision_12"  class="collision"/>
+      <geom mesh="florence_flask_collision_13"  class="collision"/>
+      <geom mesh="florence_flask_collision_14"  class="collision"/>
+      <geom mesh="florence_flask_collision_15"  class="collision"/>
+      <geom mesh="florence_flask_collision_16"  class="collision"/>
+      <geom mesh="florence_flask_collision_17"  class="collision"/>
+      <geom mesh="florence_flask_collision_18"  class="collision"/>
+      <geom mesh="florence_flask_collision_19"  class="collision"/>
+      <geom mesh="florence_flask_collision_20"  class="collision"/>
+      <geom mesh="florence_flask_collision_21"  class="collision"/>
+      <geom mesh="florence_flask_collision_22"  class="collision"/>
+      <geom mesh="florence_flask_collision_23"  class="collision"/>
+      <geom mesh="florence_flask_collision_24"  class="collision"/>
+      <geom mesh="florence_flask_collision_25"  class="collision"/>
+      <geom mesh="florence_flask_collision_26"  class="collision"/>
+      <geom mesh="florence_flask_collision_27"  class="collision"/>
+      <geom mesh="florence_flask_collision_28"  class="collision"/>
+      <geom mesh="florence_flask_collision_29"  class="collision"/>
+      <geom mesh="florence_flask_collision_30"  class="collision"/>
+      <geom mesh="florence_flask_collision_31"  class="collision"/>
+      <geom mesh="florence_flask_collision_32"  class="collision"/>
+      <geom mesh="florence_flask_collision_33"  class="collision"/>
+      <geom mesh="florence_flask_collision_34"  class="collision"/>
+      <geom mesh="florence_flask_collision_35"  class="collision"/>
+      <geom mesh="florence_flask_collision_36"  class="collision"/>
+      <geom mesh="florence_flask_collision_37"  class="collision"/>
+      <geom mesh="florence_flask_collision_38"  class="collision"/>
+      <geom mesh="florence_flask_collision_39"  class="collision"/>
+      <geom mesh="florence_flask_collision_40"  class="collision"/>
+      <geom mesh="florence_flask_collision_41"  class="collision"/>
+      <geom mesh="florence_flask_collision_42"  class="collision"/>
+      <geom mesh="florence_flask_collision_43"  class="collision"/>
+      <geom mesh="florence_flask_collision_44"  class="collision"/>
+      <geom mesh="florence_flask_collision_45"  class="collision"/>
+      <geom mesh="florence_flask_collision_46"  class="collision"/>
+      <geom mesh="florence_flask_collision_47"  class="collision"/>
+      <geom mesh="florence_flask_collision_48"  class="collision"/>
+      <geom mesh="florence_flask_collision_49"  class="collision"/>
+      <geom mesh="florence_flask_collision_50"  class="collision"/>
+      <geom mesh="florence_flask_collision_51"  class="collision"/>
+      <geom mesh="florence_flask_collision_52"  class="collision"/>
+      <geom mesh="florence_flask_collision_53"  class="collision"/>
+      <geom mesh="florence_flask_collision_54"  class="collision"/>
+      <geom mesh="florence_flask_collision_55"  class="collision"/>
+      <geom mesh="florence_flask_collision_56"  class="collision"/>
+      <geom mesh="florence_flask_collision_57"  class="collision"/>
+      <geom mesh="florence_flask_collision_58"  class="collision"/>
+      <geom mesh="florence_flask_collision_59"  class="collision"/>
+      <geom mesh="florence_flask_collision_60"  class="collision"/>
+      <geom mesh="florence_flask_collision_61"  class="collision"/>
+      <geom mesh="florence_flask_collision_62"  class="collision"/>
+      <geom mesh="florence_flask_collision_63"  class="collision"/>
+      <geom mesh="florence_flask_collision_64"  class="collision"/>
+      <geom mesh="florence_flask_collision_65"  class="collision"/>
+      <geom mesh="florence_flask_collision_66"  class="collision"/>
+      <geom mesh="florence_flask_collision_67"  class="collision"/>
+      <geom mesh="florence_flask_collision_68"  class="collision"/>
+      <geom mesh="florence_flask_collision_69"  class="collision"/>
+      <geom mesh="florence_flask_collision_70"  class="collision"/>
+      <geom mesh="florence_flask_collision_71"  class="collision"/>
+      <geom mesh="florence_flask_collision_72"  class="collision"/>
+      <geom mesh="florence_flask_collision_73"  class="collision"/>
+      <geom mesh="florence_flask_collision_74"  class="collision"/>
+      <geom mesh="florence_flask_collision_75"  class="collision"/>
+      <site class="grasppoint" pos="0.0000 0.0000 0.0900"/>
+      <site class="grasppoint" pos="0.0000 0.0000 0.1200"/>
+      <site class="grasppoint" pos="0.0000 0.0000 0.1425"/>
+          <geom name="solution" type="cylinder" size="0.04034 0.04500" pos="0.00000 0.00000 0.07500" material="CaSO4" class="visual"/>
+      <site name="top_site" pos="0.00000 0.00000 0.15000" size="0.01" rgba="1 0 0 0"/>
+      <site name="bottom_site" pos="0.00000 0.00000 0.00000" size="0.01" rgba="0 1 0 0"/>
+</body>
+  </worldbody>
+  <compiler boundmass="0.015" boundinertia="1e-05" angle="radian"/>
+  <default>
+    <default class="visual">
+      <geom group="2" type="mesh" contype="0" conaffinity="0" density="50"/>
+    </default>
+    <default class="collision">
+      <geom group="3" type="mesh" density="50" friction="1.5 0.1 0.1" solimp="0.9 0.95 0.001" solref="0.02 1"/>
+    </default>
+    <default class="grasppoint">
+      <site type="sphere" size="0.005" group="4" rgba="0 0 1 1"/>
+    </default>
+  </default>
+</mujoco>

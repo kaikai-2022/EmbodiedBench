@@ -18,6 +18,9 @@ import os
 from pathlib import Path
 from typing import Dict
 
+# 打破循环导入: configs.constant 需要 components 先导入
+import VLABench.tasks.components  # noqa: F401
+
 from ..tools.asset_tools import check_asset_exists, download_asset, _register_downloaded_asset
 from ..tools.asset_cache import load_cache, save_cache, set_cached
 from ..tools.xml_injector import inject_xml
@@ -169,19 +172,17 @@ def asset_manager_node(state: Dict) -> Dict:
         xml_path = fetch_result["xml_path"]
         is_objaverse = fetch_result["is_objaverse"]
 
-        # Objaverse 下载的资产注册到 registry
+        # ---------- 工序 4: XML 注入（仅对新下载的 Objaverse 资产）----------
+        # 本地已有资产（constant.py 注册的）跳过注入，避免 .msh 等不支持的格式报警告
         if is_objaverse:
             _register_downloaded_asset(spec, xml_path)
-
-        # ---------- 工序 4: XML 注入 ----------
-        vlabench_root = os.environ.get("VLABENCH_ROOT", "")
-        if vlabench_root:
-            abs_xml_path = os.path.join(vlabench_root, "assets", xml_path)
-        else:
-            abs_xml_path = xml_path
-
-        if os.path.exists(abs_xml_path):
-            xml_path = inject_xml(abs_xml_path, class_name, spec)
+            vlabench_root = os.environ.get("VLABENCH_ROOT", "")
+            if vlabench_root:
+                abs_xml_path = os.path.join(vlabench_root, "assets", xml_path)
+            else:
+                abs_xml_path = xml_path
+            if os.path.exists(abs_xml_path):
+                xml_path = inject_xml(abs_xml_path, class_name, spec)
 
         # ---------- 工序 5: 打包 properties ----------
         properties = dict(init_params)

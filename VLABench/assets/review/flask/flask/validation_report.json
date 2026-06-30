@@ -11,9 +11,8 @@
       0.0,
       0.0,
       0.3
-    ],
-    "video": "PASS: 90 frames, 3.0s"
+    ]
   },
   "preview_path": null,
-  "video_path": "/ssd/mkqin/workspace/VLABench/VLABench/assets/review/flask/flask/validation.mp4"
+  "video_path": null
 }

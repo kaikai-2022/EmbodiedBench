@@ -14,6 +14,36 @@
     "source_type": "local",
     "is_physical": true
   },
+  "chemistry_tube": {
+    "spec": "chemistry_tube",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "chemistry tube": {
+    "spec": "chemistry_tube",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "medium tube": {
+    "spec": "chemistry_tube",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "chemistry_tube_rack": {
+    "spec": "chemistry_tube_rack",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "chemistry tube rack": {
+    "spec": "chemistry_tube_rack",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "medium tube rack": {
+    "spec": "chemistry_tube_rack",
+    "source_type": "local",
+    "is_physical": true
+  },
   "small beaker": {
     "spec": "small_beaker",
     "source_type": "local",
@@ -141,7 +171,122 @@
   },
   "drawer": {
     "spec": "drawer",
-    "source_type": "objaverse",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "CoCL2": {
+    "spec": "CoCL2",
+    "source_type": "local",
+    "is_physical": false
+  },
+  "CuSO4 solution": {
+    "spec": "CuSO4 solution",
+    "source_type": "local",
+    "is_physical": false
+  },
+  "alcohol_lamp": {
+    "spec": "alcohol_lamp",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "square_mat": {
+    "spec": "square_mat",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "CSO4 solution": {
+    "spec": "CSO4 solution",
+    "source_type": "local",
+    "is_physical": false
+  },
+  "large beaker": {
+    "spec": "large_beaker",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "tube_stand": {
+    "spec": "chemistry_tube_stand",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "funnel": {
+    "spec": "funnel",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "universal_support": {
+    "spec": "universal_support",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "funnel_support": {
+    "spec": "funnel_support",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "water_bath": {
+    "spec": "water_bath",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "thermometer": {
+    "spec": "thermometer",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "heat_device": {
+    "spec": "heat_device",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "large_cylinder": {
+    "spec": "cylinder_big",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "pipette": {
+    "spec": "pipette",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "mid_cylinder": {
+    "spec": "cylinder_mid",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "mechanical_pipette": {
+    "spec": "mechanical_pipette",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "conical_flask_small": {
+    "spec": "conical_flask_small",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "conical_flask_large": {
+    "spec": "conical_flask_large",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "conical_flask_mid": {
+    "spec": "conical_flask_mid",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "beaker_large": {
+    "spec": "large_beaker",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "tripod": {
+    "spec": "tripod",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "florence_flask": {
+    "spec": "florence_flask",
+    "source_type": "local",
     "is_physical": true
   }
 }

@@ -1,0 +1,14 @@
+{
+  "uid": "florence_flask",
+  "name": "florence_flask",
+  "source": "local",
+  "original_path": "/tmp/florence_flask_input/florence_flask.glb",
+  "keyword": "florence_flask",
+  "tags": [],
+  "categories": [],
+  "description": "Local GLB model: florence_flask.glb",
+  "rotation": {
+    "axis": "x",
+    "degrees": 90.0
+  }
+}

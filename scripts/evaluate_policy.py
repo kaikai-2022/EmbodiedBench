@@ -57,6 +57,19 @@ def evaluate(args):
     elif args.policy.lower() == "openpi":
         from VLABench.evaluation.model.policy.openpi import OpenPiPolicy
         policy = OpenPiPolicy(host=args.host, port=args.port, replan_steps=args.replanstep)
+    elif args.policy.lower() == "act":
+        from VLABench.evaluation.model.policy.act import ACTPolicy
+        # Check if model_ckpt is provided and valid
+        use_checkpoint = (hasattr(args, 'model_ckpt') and
+                         args.model_ckpt and
+                         args.model_ckpt != "none" and
+                         not args.model_ckpt.startswith("/remote-home"))
+        policy = ACTPolicy(
+            pretrained_policy_path=args.model_ckpt if use_checkpoint else None,
+            camera_indices=[2, 3],  # front + wrist
+            replan_steps=args.replanstep,
+            device="cuda",
+        )
     else:
         policy = RandomPolicy(None)
 

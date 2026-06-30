@@ -262,6 +262,118 @@ class PourCondition(Condition):
             return True
         return False
 
+@register.add_condition("pour_into")
+class PourIntoCondition(Condition):
+    """
+    Strict pour-into-container check: the source container must be grasped by the robot,
+    tilted (bottom_site above top_site), and its mouth (top_site) must be positioned
+    within the receiver container's XY AABB AND above the receiver's top Z plane.
+
+    As mujoco does not support liquid simulation, this condition uses geometric checks.
+    Requires ALL of the following to be satisfied:
+      1. target_entity is currently grasped by the robot
+      2. target_entity is tilted (bottom_site above top_site) by more than tilt_threshold
+      3. top_site (mouth) is within receiver_container's XY AABB (via contain())
+         AND at least z_clearance meters above the receiver's top plane
+
+    Latches true on first success — once satisfied, subsequent is_met() calls return True
+    even if the container returns to an upright posture within the same step.
+
+    params:
+        target_entity: the container to be poured (e.g., test tube)
+        receiver_container: the container receiving the liquid (e.g., beaker)
+        robot: the robot (used for is_grasped check)
+        tilt_threshold: minimum (z_bottom - z_top) to confirm tilt, default 0
+        z_clearance: minimum height of mouth above receiver top Z, default 0.01m
+    """
+    def __init__(self, target_entity, receiver_container, robot,
+                 tilt_threshold=0, z_clearance=0.01):
+        super().__init__()
+        self.target_entity = target_entity
+        self.receiver_container = receiver_container
+        self.robot = robot
+        self.tilt_threshold = tilt_threshold
+        self.z_clearance = z_clearance
+        self._transfer_applied = False
+
+    def record_initial_state(self, physics=None):
+        super().record_initial_state(physics)
+        self._transfer_applied = False
+
+    def _transfer_solution(self, physics):
+        """
+        源容器清空 + 目标容器按源当前颜色灌入。
+        任一不是 SolutionMixin 则静默 return。
+        """
+        target = self.receiver_container
+        if not hasattr(target, "fill_solution"):
+            print(f"[DEBUG _transfer] target {getattr(target, 'name', '?')} has no fill_solution, returning")
+            return
+        source = self.target_entity
+        src_rgba = getattr(source, "_current_solution_rgba", None)
+        print(f"[DEBUG _transfer] source={getattr(source, 'name', '?')} _current_solution_rgba={src_rgba}")
+        print(f"[DEBUG _transfer] target={getattr(target, 'name', '?')}")
+        target.fill_solution(physics, source_solution_rgba=src_rgba)
+        print(f"[DEBUG _transfer] after fill: target._current_solution_rgba={getattr(target, '_current_solution_rgba', None)}")
+        if hasattr(source, "clear_solution"):
+            source.clear_solution(physics)
+            print(f"[DEBUG _transfer] source cleared, now _current_solution_rgba={getattr(source, '_current_solution_rgba', None)}")
+
+    def is_met(self, physics):
+        if self._met:
+            return True
+
+        # Gate 1: object must be grasped by the robot
+        if not self.target_entity.is_grasped(physics, self.robot):
+            return False
+
+        # Gate 2: object must be tilted (bottom higher than top)
+        top_site = self.target_entity.mjcf_model.worldbody.find("site", "top_site")
+        bottom_site = self.target_entity.mjcf_model.worldbody.find("site", "bottom_site")
+        top_xpos = physics.bind(top_site).xpos
+        bottom_xpos = physics.bind(bottom_site).xpos
+        if (bottom_xpos[-1] - top_xpos[-1]) <= self.tilt_threshold:
+            return False
+
+        # Gate 3: mouth must be within receiver container's XY AABB and above it
+        if not hasattr(self.receiver_container, 'contain'):
+            # Fallback: simple XY Euclidean distance if receiver has no contain()
+            receiver_xpos = physics.bind(
+                self.receiver_container.mjcf_model.worldbody).xpos
+            xy_dist = np.linalg.norm(top_xpos[:2] - receiver_xpos[:2])
+            if xy_dist > 0.1:  # 10cm fallback tolerance
+                return False
+        else:
+            # Use contain() for precise AABB check
+            keysites = self.receiver_container.key_sites(physics)
+            if not keysites:
+                # Fallback: simple XY Euclidean distance if no key_sites
+                receiver_xpos = physics.bind(
+                    self.receiver_container.mjcf_model.worldbody).xpos
+                xy_dist = np.linalg.norm(top_xpos[:2] - receiver_xpos[:2])
+                if xy_dist > 0.1:
+                    return False
+            else:
+                keypoints = np.array([physics.bind(kp).xpos for kp in keysites])
+                max_z = keypoints[:, 2].max()
+
+                # Step 3a: XY must be inside AABB (temporarily set Z to max_z)
+                point_to_check = top_xpos.copy()
+                point_to_check[2] = max_z
+                if not self.receiver_container.contain(point_to_check, physics):
+                    return False
+
+                # Step 3b: Z must be high enough above the receiver top
+                if top_xpos[2] < max_z + self.z_clearance:
+                    return False
+
+        # All gates passed — trigger solution transfer, then latch
+        if not self._transfer_applied:
+            self._transfer_solution(physics)
+            self._transfer_applied = True
+        self._met = True
+        return True
+
 @register.add_condition("on_position")
 class OnPositionCondition(Condition):
     """
@@ -794,6 +906,136 @@ class ShakeCondition(Condition):
         progress = min(total_changes / self.min_direction_changes, 1.0) if self.min_direction_changes > 0 else 1.0
         return progress, []
 
+@register.add_condition("stir")
+class StirCondition(Condition):
+    """
+    搅拌成功判定：搅拌工具插入容器后，累积 XY 方向运动距离达标且未与容器壁发生硬碰撞。
+
+    判定流程（每个 simulation step 调用一次 is_met）：
+    1. 检查工具是否被握住，未被握住则直接失败
+    2. 获取工具 tip 位置（优先 bottom_site，退化为 geom 均值或 worldbody xpos）
+    3. 插入验证：tip 必须在容器 AABB 内（通过 container.contain()），否则失败
+    4. 累积 XY 方向路径长度（只统计 X、Y 平面位移，忽略 Z 轴垂直下降/上升）
+    5. 扫描 contacts，工具与容器壁接触时记录软警告（_collision_warnings[name] = True）
+       但不阻止成功判定，最终评分时可查阅
+    6. 累积距离 >= min_distance 时锁存成功
+
+    params:
+        entities: 要检查的搅拌工具实体列表（通常为玻璃棒）
+        container: 目标容器（如烧杯），用于插入验证和碰撞检测
+        robot: 机器人对象（用于检查抓取状态）
+        min_distance: 累积 XY 运动距离阈值（m），默认 0.15
+        tool_tip_site: 工具上用于读取位置的 site 名称，默认 "bottom_site"
+    """
+    def __init__(self, entities, container, robot,
+                 min_distance=0.15, tool_tip_site="bottom_site"):
+        super().__init__()
+        self.entities = entities
+        self.container = container
+        self.robot = robot
+        self.min_distance = min_distance
+        self.tool_tip_site = tool_tip_site
+
+        # 每个工具实体的累加器
+        self._last_tip_pos = {}
+        self._cumulative_distance = {}
+        self._collision_warnings = {}  # 软警告：记录发生过碰撞
+
+        # 碰撞 geom id 缓存（首次 is_met 时构建）
+        self._tool_geom_ids = None
+        self._container_geom_ids = None
+
+    def record_initial_state(self, physics):
+        print(f"[DEBUG StirCondition.record_initial_state] Called, setting _initial_state_recorded=True")
+        super().record_initial_state(physics)
+        self._last_tip_pos = {}
+        self._cumulative_distance = {}
+        self._collision_warnings = {}
+        # 重置碰撞缓存，reset 后 geom 可能重新绑定
+        self._tool_geom_ids = None
+        self._container_geom_ids = None
+        for entity in self.entities:
+            name = entity.name if hasattr(entity, 'name') else str(id(entity))
+            tip = self._get_tool_tip_pos(entity, physics)
+            self._last_tip_pos[name] = tip.copy()
+            self._cumulative_distance[name] = 0.0
+            self._collision_warnings[name] = False
+
+    def _get_tool_tip_pos(self, entity, physics):
+        """获取工具 tip 的世界坐标。优先读取 named site，退化为 geom 均值或 worldbody。"""
+        site = entity.mjcf_model.find("site", self.tool_tip_site) if self.tool_tip_site else None
+        if site is not None:
+            return np.array(physics.bind(site).xpos).copy()
+        geoms = entity.mjcf_model.find_all('geom')
+        if geoms:
+            return np.mean([physics.bind(g).xpos for g in geoms], axis=0).copy()
+        return np.array(physics.bind(entity.mjcf_model.worldbody).xpos).copy()
+
+    def is_met(self, physics):
+        if not self._initial_state_recorded:
+            print(f"[DEBUG StirCondition.is_met] _initial_state_recorded=False, returning False")
+            return False
+        try:
+            result = self._is_met_impl(physics)
+            print(f"[DEBUG StirCondition.is_met] _is_met_impl returned {result}")
+            return result
+        except RecursionError:
+            # geom id 缓存可能指向旧模型，清理后下个 step 重建
+            print(f"[DEBUG StirCondition.is_met] RecursionError caught, resetting caches")
+            self._tool_geom_ids = None
+            self._container_geom_ids = None
+            return False
+
+    def _is_met_impl(self, physics):
+        # 1. 懒构建 geom id 集合（ContactCondition 模式）
+        if self._tool_geom_ids is None:
+            self._tool_geom_ids = set()
+            for e in self.entities:
+                self._tool_geom_ids.update(
+                    physics.bind(g).element_id for g in e.geoms)
+            self._container_geom_ids = set(
+                physics.bind(g).element_id for g in self.container.geoms)
+
+        # 2. 扫描 contacts，记录工具与容器壁的软警告
+        for c in physics.data.contact:
+            if (c.geom1 in self._tool_geom_ids and c.geom2 in self._container_geom_ids) or \
+               (c.geom2 in self._tool_geom_ids and c.geom1 in self._container_geom_ids):
+                for entity in self.entities:
+                    name = entity.name if hasattr(entity, 'name') else str(id(entity))
+                    self._collision_warnings[name] = True
+
+        # 3. 逐个工具更新距离并判断
+        all_passed = True
+        for entity in self.entities:
+            name = entity.name if hasattr(entity, 'name') else str(id(entity))
+            if not entity.is_grasped(physics, self.robot):
+                return False
+
+            tip = self._get_tool_tip_pos(entity, physics)
+
+            # 插入验证：tip 必须在容器 AABB 内
+            if not self.container.contain(tip, physics):
+                return False
+
+            # 累积 XY 方向路径长度（忽略 Z 轴垂直位移）
+            last = self._last_tip_pos.get(name, tip)
+            xy_distance = np.linalg.norm(tip[:2] - last[:2])
+            self._cumulative_distance[name] = self._cumulative_distance.get(name, 0.0) \
+                                              + float(xy_distance)
+            self._last_tip_pos[name] = tip
+
+            if self._cumulative_distance[name] < self.min_distance:
+                all_passed = False
+
+        if all_passed:
+            self._met = True
+        return self._met
+
+    def met_progress(self, physics):
+        total = sum(self._cumulative_distance.values())
+        progress = min(total / self.min_distance, 1.0) if self.min_distance > 0 else 1.0
+        return progress, []
+
 @register.add_condition("cap_open")
 class CapOpenCondition(Condition):
     """
@@ -878,7 +1120,7 @@ class DrawerOpenCondition(Condition):
         for entity in self.entities:
             name = entity.mjcf_model.model
             self._initial_drawer_qpos[name] = [
-                float(physics.bind(joint).qpos) for joint in entity.joints
+                float(physics.bind(joint).qpos[0]) for joint in entity.joints
             ]
 
     def is_met(self, physics=None):
@@ -890,7 +1132,59 @@ class DrawerOpenCondition(Condition):
                 continue
             initial_qpos = self._initial_drawer_qpos[name]
             for joint, init_q in zip(entity.joints, initial_qpos):
-                current = float(physics.bind(joint).qpos)
+                current = float(physics.bind(joint).qpos[0])
                 if abs(current - init_q) > self.open_threshold:
                     return True
+        return False
+
+@register.add_condition("door_open")
+class DoorOpenCondition(Condition):
+    """
+    门打开判定：针对 ContainerWithDoor 类型的实体（如 drying_box）。
+
+    记录初始状态时门关节（hinge joint）的 qpos，
+    若门关节相对初始位置移动超过 open_threshold（默认 0.1 弧度），
+    视为门已被打开。
+
+    params:
+        entities: ContainerWithDoor 实体列表
+        open_threshold: 门相对初始位置的最大旋转角度（弧度），默认 0.1
+    """
+    def __init__(self, entities, open_threshold=0.1):
+        super().__init__()
+        self.entities = entities
+        self.open_threshold = open_threshold
+        self._initial_door_qpos = {}
+
+    def record_initial_state(self, physics):
+        super().record_initial_state(physics)
+        for entity in self.entities:
+            if hasattr(entity, 'door_joint') and entity.door_joint is not None:
+                name = entity.mjcf_model.model
+                self._initial_door_qpos[name] = float(physics.bind(entity.door_joint).qpos[0])
+
+    def is_met(self, physics=None):
+        if not self._initial_state_recorded:
+            return False
+        for entity in self.entities:
+            if not (hasattr(entity, 'door_joint') and entity.door_joint is not None):
+                continue
+            name = entity.mjcf_model.model
+            if name not in self._initial_door_qpos:
+                continue
+            initial_qpos = self._initial_door_qpos[name]
+            current_qpos = float(physics.bind(entity.door_joint).qpos[0])
+            if abs(current_qpos - initial_qpos) > self.open_threshold:
+                return True
+        return False
+
+@register.add_condition("always_false")
+class AlwaysFalseCondition(Condition):
+    """
+    永远返回false的条件，用于测试模型而不触发任务成功。
+    """
+    def __init__(self):
+        super().__init__()
+
+    def is_met(self, physics=None):
         return False

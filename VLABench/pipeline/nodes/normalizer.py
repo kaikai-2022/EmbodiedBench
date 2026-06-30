@@ -32,8 +32,9 @@ logger = logging.getLogger(__name__)
 # 标准资产库列表 (从 constant.py 中提取的 key)
 STANDARD_ASSET_LIBRARY = [
     "beaker", "chemistry_beaker", "tube", "chemistry_tube_stand",
-    "flask", "conical_flask", "large_beaker", "small_beaker",
-    "cylinder_small", "cylinder_mid", "cylinder_big",
+    "chemistry_tube", "chemistry_tube_rack",
+    "flask", "conical_flask", "conical_flask_small", "conical_flask_mid", "conical_flask_large", "large_beaker", "small_beaker",
+    "cylinder_small", "cylinder_mid", "cylinder_big", "cylinder_large",
     "petri_dish", "bunsen_burner", "centrifuge",
     "coverslip", "nametag", "microscope", "scale",
     "plate", "tray", "cabinet", "fridge", "microwave",
@@ -52,6 +53,18 @@ STANDARD_ASSET_LIBRARY = [
     "magnetic_stir_plate",
     "chemistry_lab_table",
     "petri_dish",
+    "universal_support",
+    "funnel_support",
+    "alcohol_lamp",
+    "square_mat",
+    "thermometer",
+    "heat_device",
+    "drying_box",
+    "mechanical_pipette",
+    "pipettes_stand",
+    "tripod",
+    "pipette",
+    "florence_flask",
 ]
 
 
@@ -212,9 +225,12 @@ Examples:
 def _simple_spec_match(raw_type: str) -> str:
     """无 LLM 时的简单 spec 匹配"""
     raw_lower = raw_type.lower()
-    for standard in STANDARD_ASSET_LIBRARY:
-        if standard in raw_lower or raw_lower in standard:
-            return standard
+    # 正向子串匹配：longest-first 避免短 spec 抢匹配（如 pipette 抢 mechanical_pipette）
+    # 同时尝试 standard 的两种写法（下划线和空格）
+    for standard in sorted(STANDARD_ASSET_LIBRARY, key=len, reverse=True):
+        for variant in (standard, standard.replace("_", " ")):
+            if variant in raw_lower:
+                return standard
     # 回退: 直接用 raw_type 作为 spec（转下划线）
     return raw_lower.replace(" ", "_")
 

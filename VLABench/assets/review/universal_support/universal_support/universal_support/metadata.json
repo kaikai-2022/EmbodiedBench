@@ -1,0 +1,14 @@
+{
+  "uid": "universal_support",
+  "name": "universal_support",
+  "source": "local",
+  "original_path": "/tmp/universal_support_input/universal_support.glb",
+  "keyword": "universal_support",
+  "tags": [],
+  "categories": [],
+  "description": "Local GLB model: universal_support.glb",
+  "rotation": {
+    "axis": "x",
+    "degrees": 90.0
+  }
+}

@@ -1,0 +1,14 @@
+Model UID: conical_flask_large
+Model Name: conical_flask_large
+
+Source Information:
+============================================================
+Source: Local File
+Original Path: /tmp/conical_large/conical_flask_large.glb
+File Name: conical_flask_large.glb
+Keyword/Category: conical_flask_large
+Rotation: 90.0° around X axis
+
+Processing:
+Pipeline: process_local_glb.py
+Steps: GLB->OBJ (trimesh) -> [rotate] -> MJCF (obj2mjcf) -> postprocess -> bottom-align -> validate -> size_fix

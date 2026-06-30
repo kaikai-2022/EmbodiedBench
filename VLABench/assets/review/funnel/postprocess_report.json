@@ -1,0 +1,28 @@
+{
+  "uid": "funnel",
+  "centered": true,
+  "scaled": false,
+  "scale_factor": null,
+  "orientation_warning": null,
+  "original_dims": {
+    "center": [
+      0.0,
+      0.0,
+      0.033315155
+    ],
+    "ranges": [
+      0.05950206,
+      0.05950206,
+      0.10114029
+    ],
+    "max_dim": 0.10114029
+  },
+  "final_dims": {
+    "ranges": [
+      0.05950206,
+      0.05950206,
+      0.10114028
+    ],
+    "max_dim": 0.10114028
+  }
+}

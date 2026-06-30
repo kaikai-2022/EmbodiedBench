@@ -1,0 +1,14 @@
+{
+  "uid": "heat_device",
+  "name": "heat_device",
+  "source": "local",
+  "original_path": "/tmp/heat_device_input/heat_device.glb",
+  "keyword": "heat_device",
+  "tags": [],
+  "categories": [],
+  "description": "Local GLB model: heat_device.glb",
+  "rotation": {
+    "axis": "x",
+    "degrees": 90.0
+  }
+}

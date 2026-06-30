@@ -1,0 +1,137 @@
+<?xml version="1.0" ?>
+<mujoco model="chemistry_tube_rack">
+  <asset>
+    <texture type="2d" name="Tube_Rack_Material" file="Tube_Rack_Material.png"/>
+    <material name="Tube_Rack_Material" texture="Tube_Rack_Material" specular="0.4000000000000001" shininess="0.001"/>
+    <mesh file="chemistry_tube_rack.obj" scale="1.2 1.2 1.2"/>
+    <mesh file="chemistry_tube_rack/chemistry_tube_rack_collision_0.obj" scale="1.2 1.2 1.2"/>
+    <mesh file="chemistry_tube_rack/chemistry_tube_rack_collision_1.obj" scale="1.2 1.2 1.2"/>
+    <mesh file="chemistry_tube_rack/chemistry_tube_rack_collision_2.obj" scale="1.2 1.2 1.2"/>
+    <mesh file="chemistry_tube_rack/chemistry_tube_rack_collision_3.obj" scale="1.2 1.2 1.2"/>
+    <mesh file="chemistry_tube_rack/chemistry_tube_rack_collision_4.obj" scale="1.2 1.2 1.2"/>
+    <mesh file="chemistry_tube_rack/chemistry_tube_rack_collision_5.obj" scale="1.2 1.2 1.2"/>
+    <mesh file="chemistry_tube_rack/chemistry_tube_rack_collision_6.obj" scale="1.2 1.2 1.2"/>
+    <mesh file="chemistry_tube_rack/chemistry_tube_rack_collision_7.obj" scale="1.2 1.2 1.2"/>
+    <mesh file="chemistry_tube_rack/chemistry_tube_rack_collision_8.obj" scale="1.2 1.2 1.2"/>
+    <mesh file="chemistry_tube_rack/chemistry_tube_rack_collision_9.obj" scale="1.2 1.2 1.2"/>
+    <mesh file="chemistry_tube_rack/chemistry_tube_rack_collision_10.obj" scale="1.2 1.2 1.2"/>
+    <mesh file="chemistry_tube_rack/chemistry_tube_rack_collision_11.obj" scale="1.2 1.2 1.2"/>
+    <mesh file="chemistry_tube_rack/chemistry_tube_rack_collision_12.obj" scale="1.2 1.2 1.2"/>
+    <mesh file="chemistry_tube_rack/chemistry_tube_rack_collision_13.obj" scale="1.2 1.2 1.2"/>
+    <mesh file="chemistry_tube_rack/chemistry_tube_rack_collision_14.obj" scale="1.2 1.2 1.2"/>
+    <mesh file="chemistry_tube_rack/chemistry_tube_rack_collision_15.obj" scale="1.2 1.2 1.2"/>
+    <mesh file="chemistry_tube_rack/chemistry_tube_rack_collision_16.obj" scale="1.2 1.2 1.2"/>
+    <mesh file="chemistry_tube_rack/chemistry_tube_rack_collision_17.obj" scale="1.2 1.2 1.2"/>
+    <mesh file="chemistry_tube_rack/chemistry_tube_rack_collision_18.obj" scale="1.2 1.2 1.2"/>
+    <mesh file="chemistry_tube_rack/chemistry_tube_rack_collision_19.obj" scale="1.2 1.2 1.2"/>
+    <mesh file="chemistry_tube_rack/chemistry_tube_rack_collision_20.obj" scale="1.2 1.2 1.2"/>
+    <mesh file="chemistry_tube_rack/chemistry_tube_rack_collision_21.obj" scale="1.2 1.2 1.2"/>
+    <mesh file="chemistry_tube_rack/chemistry_tube_rack_collision_22.obj" scale="1.2 1.2 1.2"/>
+    <mesh file="chemistry_tube_rack/chemistry_tube_rack_collision_23.obj" scale="1.2 1.2 1.2"/>
+    <mesh file="chemistry_tube_rack/chemistry_tube_rack_collision_24.obj" scale="1.2 1.2 1.2"/>
+    <mesh file="chemistry_tube_rack/chemistry_tube_rack_collision_25.obj" scale="1.2 1.2 1.2"/>
+    <mesh file="chemistry_tube_rack/chemistry_tube_rack_collision_26.obj" scale="1.2 1.2 1.2"/>
+    <mesh file="chemistry_tube_rack/chemistry_tube_rack_collision_27.obj" scale="1.2 1.2 1.2"/>
+    <mesh file="chemistry_tube_rack/chemistry_tube_rack_collision_28.obj" scale="1.2 1.2 1.2"/>
+    <mesh file="chemistry_tube_rack/chemistry_tube_rack_collision_29.obj" scale="1.2 1.2 1.2"/>
+    <mesh file="chemistry_tube_rack/chemistry_tube_rack_collision_30.obj" scale="1.2 1.2 1.2"/>
+    <mesh file="chemistry_tube_rack/chemistry_tube_rack_collision_31.obj" scale="1.2 1.2 1.2"/>
+    <mesh file="chemistry_tube_rack/chemistry_tube_rack_collision_32.obj" scale="1.2 1.2 1.2"/>
+    <mesh file="chemistry_tube_rack/chemistry_tube_rack_collision_33.obj" scale="1.2 1.2 1.2"/>
+    <mesh file="chemistry_tube_rack/chemistry_tube_rack_collision_34.obj" scale="1.2 1.2 1.2"/>
+    <mesh file="chemistry_tube_rack/chemistry_tube_rack_collision_35.obj" scale="1.2 1.2 1.2"/>
+    <mesh file="chemistry_tube_rack/chemistry_tube_rack_collision_36.obj" scale="1.2 1.2 1.2"/>
+    <mesh file="chemistry_tube_rack/chemistry_tube_rack_collision_37.obj" scale="1.2 1.2 1.2"/>
+    <mesh file="chemistry_tube_rack/chemistry_tube_rack_collision_38.obj" scale="1.2 1.2 1.2"/>
+    <mesh file="chemistry_tube_rack/chemistry_tube_rack_collision_39.obj" scale="1.2 1.2 1.2"/>
+    <mesh file="chemistry_tube_rack/chemistry_tube_rack_collision_40.obj" scale="1.2 1.2 1.2"/>
+    <mesh file="chemistry_tube_rack/chemistry_tube_rack_collision_41.obj" scale="1.2 1.2 1.2"/>
+    <mesh file="chemistry_tube_rack/chemistry_tube_rack_collision_42.obj" scale="1.2 1.2 1.2"/>
+    <mesh file="chemistry_tube_rack/chemistry_tube_rack_collision_43.obj" scale="1.2 1.2 1.2"/>
+    <mesh file="chemistry_tube_rack/chemistry_tube_rack_collision_44.obj" scale="1.2 1.2 1.2"/>
+    <mesh file="chemistry_tube_rack/chemistry_tube_rack_collision_45.obj" scale="1.2 1.2 1.2"/>
+    <mesh file="chemistry_tube_rack/chemistry_tube_rack_collision_46.obj" scale="1.2 1.2 1.2"/>
+    <mesh file="chemistry_tube_rack/chemistry_tube_rack_collision_47.obj" scale="1.2 1.2 1.2"/>
+    <mesh file="chemistry_tube_rack/chemistry_tube_rack_collision_48.obj" scale="1.2 1.2 1.2"/>
+  </asset>
+  <worldbody>
+    <body name="chemistry_tube_rack">
+      <inertial pos="0 0 0.0486" mass="0.02" diaginertia="0.0008 0.0008 0.0005"/>
+      <geom material="Tube_Rack_Material" mesh="chemistry_tube_rack" class="visual"/>
+      <geom mesh="chemistry_tube_rack_collision_0" class="collision"/>
+      <geom mesh="chemistry_tube_rack_collision_1" class="collision"/>
+      <geom mesh="chemistry_tube_rack_collision_2" class="collision"/>
+      <geom mesh="chemistry_tube_rack_collision_3" class="collision"/>
+      <geom mesh="chemistry_tube_rack_collision_4" class="collision"/>
+      <geom mesh="chemistry_tube_rack_collision_5" class="collision"/>
+      <geom mesh="chemistry_tube_rack_collision_6" class="collision"/>
+      <geom mesh="chemistry_tube_rack_collision_7" class="collision"/>
+      <geom mesh="chemistry_tube_rack_collision_8" class="collision"/>
+      <geom mesh="chemistry_tube_rack_collision_9" class="collision"/>
+      <geom mesh="chemistry_tube_rack_collision_10" class="collision"/>
+      <geom mesh="chemistry_tube_rack_collision_11" class="collision"/>
+      <geom mesh="chemistry_tube_rack_collision_12" class="collision"/>
+      <geom mesh="chemistry_tube_rack_collision_13" class="collision"/>
+      <geom mesh="chemistry_tube_rack_collision_14" class="collision"/>
+      <geom mesh="chemistry_tube_rack_collision_15" class="collision"/>
+      <geom mesh="chemistry_tube_rack_collision_16" class="collision"/>
+      <geom mesh="chemistry_tube_rack_collision_17" class="collision"/>
+      <geom mesh="chemistry_tube_rack_collision_18" class="collision"/>
+      <geom mesh="chemistry_tube_rack_collision_19" class="collision"/>
+      <geom mesh="chemistry_tube_rack_collision_20" class="collision"/>
+      <geom mesh="chemistry_tube_rack_collision_21" class="collision"/>
+      <geom mesh="chemistry_tube_rack_collision_22" class="collision"/>
+      <geom mesh="chemistry_tube_rack_collision_23" class="collision"/>
+      <geom mesh="chemistry_tube_rack_collision_24" class="collision"/>
+      <geom mesh="chemistry_tube_rack_collision_25" class="collision"/>
+      <geom mesh="chemistry_tube_rack_collision_26" class="collision"/>
+      <geom mesh="chemistry_tube_rack_collision_27" class="collision"/>
+      <geom mesh="chemistry_tube_rack_collision_28" class="collision"/>
+      <geom mesh="chemistry_tube_rack_collision_29" class="collision"/>
+      <geom mesh="chemistry_tube_rack_collision_30" class="collision"/>
+      <geom mesh="chemistry_tube_rack_collision_31" class="collision"/>
+      <geom mesh="chemistry_tube_rack_collision_32" class="collision"/>
+      <geom mesh="chemistry_tube_rack_collision_33" class="collision"/>
+      <geom mesh="chemistry_tube_rack_collision_34" class="collision"/>
+      <geom mesh="chemistry_tube_rack_collision_35" class="collision"/>
+      <geom mesh="chemistry_tube_rack_collision_36" class="collision"/>
+      <geom mesh="chemistry_tube_rack_collision_37" class="collision"/>
+      <geom mesh="chemistry_tube_rack_collision_38" class="collision"/>
+      <geom mesh="chemistry_tube_rack_collision_39" class="collision"/>
+      <geom mesh="chemistry_tube_rack_collision_40" class="collision"/>
+      <geom mesh="chemistry_tube_rack_collision_41" class="collision"/>
+      <geom mesh="chemistry_tube_rack_collision_42" class="collision"/>
+      <geom mesh="chemistry_tube_rack_collision_43" class="collision"/>
+      <geom mesh="chemistry_tube_rack_collision_44" class="collision"/>
+      <geom mesh="chemistry_tube_rack_collision_45" class="collision"/>
+      <geom mesh="chemistry_tube_rack_collision_46" class="collision"/>
+      <geom mesh="chemistry_tube_rack_collision_47" class="collision"/>
+      <geom mesh="chemistry_tube_rack_collision_48" class="collision"/>
+      <site class="keypoint" pos="-0.1181 -0.0432 0.0000"/>
+      <site class="keypoint" pos="0.1181 0.0432 0.0972"/>
+      <!-- 4 tube holes in the rack top surface: X=±0.094, Y=±0.012, Z_top=0.081 -->
+      <site class="placepoint" pos="-0.1128 -0.0144 0.1092" name="hole_0_0"/>
+      <site class="placepoint" pos="-0.1128 0.0144 0.1092" name="hole_0_1"/>
+      <site class="placepoint" pos="0.1128 -0.0144 0.1092" name="hole_1_0"/>
+      <site class="placepoint" pos="0.1128 0.0144 0.1092" name="hole_1_1"/>
+</body>
+  </worldbody>
+  <compiler boundmass="0.015" boundinertia="1e-05" angle="radian"/>
+  <default>
+    <default class="visual">
+      <geom group="2" type="mesh" contype="0" conaffinity="0" density="50"/>
+    </default>
+    <default class="collision">
+      <geom group="3" type="mesh" density="50" friction="1.5 0.1 0.1" solimp="0.9 0.95 0.001" solref="0.02 1"/>
+    </default>
+    <default class="grasppoint">
+      <site type="sphere" size="0.005" group="4" rgba="0 0 1 1"/>
+    </default>
+    <default class="keypoint">
+      <site type="sphere" size="0.01" group="3" rgba="1 0 0 1"/>
+    </default>
+    <default class="placepoint">
+      <site type="sphere" size="0.01" group="2" rgba="0 0 1 0"/>
+    </default>
+  </default>
+</mujoco>

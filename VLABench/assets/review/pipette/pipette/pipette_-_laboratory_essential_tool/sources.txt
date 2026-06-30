@@ -1,0 +1,14 @@
+Model UID: pipette_-_laboratory_essential_tool
+Model Name: pipette_-_laboratory_essential_tool
+
+Source Information:
+============================================================
+Source: Local File
+Original Path: /ssd/mkqin/download/pipette_-_laboratory_essential_tool.glb
+File Name: pipette_-_laboratory_essential_tool.glb
+Keyword/Category: pipette
+Rotation: 180.0° around X axis
+
+Processing:
+Pipeline: process_local_glb.py
+Steps: GLB->OBJ (trimesh) -> [rotate] -> MJCF (obj2mjcf) -> postprocess -> bottom-align -> validate -> size_fix

@@ -40,6 +40,7 @@ class SolutionMixin:
     def __init__(self, solution=None, solution_rgba=None, **kwargs):
         self.solution = solution
         self.solution_rgba = solution_rgba
+        self._current_solution_rgba = None  # 最近生效的 rgba；None=空
         super().__init__(**kwargs)
 
     def set_solution_rgba(self, physics, solution_name=None, target_rgba=None):
@@ -63,10 +64,40 @@ class SolutionMixin:
             physics.bind(geom).rgba = rgba
         else:
             physics.bind(geom).rgba = [1, 1, 1, 0]
+        self._current_solution_rgba = physics.bind(geom).rgba
 
     def get_solution(self):
         """Return the current solvent name."""
         return self.solution
+
+    def clear_solution(self, physics):
+        """
+        清空容器中的溶液（设置为透明）。
+        """
+        geom = self.mjcf_model.worldbody.find("geom", self._solution_geom_name)
+        if geom is None:
+            return
+        physics.bind(geom).rgba = [1, 1, 1, 0]
+        self._current_solution_rgba = [1, 1, 1, 0]
+        self.solution = None
+        self.solution_rgba = None
+
+    def fill_solution(self, physics, source_solution_rgba=None):
+        """
+        向容器中灌入溶液（按指定颜色显示）。
+        source_solution_rgba: 要灌入的 RGBA 颜色，如 [0, 0.45, 1, 0.4]。
+                              缺省时 fallback 到 [1, 1, 1, 0.3]（默认无色溶液）。
+        """
+        geom = self.mjcf_model.worldbody.find("geom", self._solution_geom_name)
+        print(f"[DEBUG fill_solution] entity={getattr(self, 'name', '?')}, geom found={geom}")
+        if geom is None:
+            print("[DEBUG fill_solution] geom is None, returning")
+            return
+        rgba = source_solution_rgba if source_solution_rgba is not None else [1, 1, 1, 0.3]
+        physics.bind(geom).rgba = rgba
+        print(f"[DEBUG fill_solution] set rgba={rgba}, physics.bind result={physics.bind(geom).rgba}")
+        self._current_solution_rgba = rgba
+        self.solution_rgba = rgba  # 保证重放时 set_solution_rgba 走 self.solution_rgba 分支
 
     def initialize_episode(self, physics, random_state):
         self.set_solution_rgba(physics)

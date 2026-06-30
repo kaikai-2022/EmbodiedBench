@@ -1,0 +1,14 @@
+{
+  "uid": "funnel",
+  "name": "funnel",
+  "source": "local",
+  "original_path": "/ssd/mkqin/download/funnel.glb",
+  "keyword": "alcohol_lamp",
+  "tags": [],
+  "categories": [],
+  "description": "Local GLB model: funnel.glb",
+  "rotation": {
+    "axis": "x",
+    "degrees": 90.0
+  }
+}

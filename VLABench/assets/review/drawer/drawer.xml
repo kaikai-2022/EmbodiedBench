@@ -1,0 +1,103 @@
+<mujoco model="drawer">
+    <compiler angle="radian" meshdir="./" />
+    <default>
+		<default class="visual">
+		<geom conaffinity="0" contype="0" />
+		</default>
+		<default class="collision">
+		<geom type="box" mass="0" group="3" solimp="0.998 0.998 0.001" solref="0.001 1" friction="0.95 0.3 0.1"/>
+		</default>
+		<default class="placepoint">
+		<site type="sphere" size="0.01" group="2" rgba="0 1 0 0" />
+		</default>
+		<default class="keypoint">
+		<site type="sphere" size="0.01" group="3" rgba="1 0 0 1" />
+		</default>
+		<default class="grasppoint">
+		<site type="sphere" size="0.01" group="4" rgba="0 0 1 1" />
+		</default>
+  	</default>
+	<asset>
+        <texture file="./base/dark-wood.png" name="tex-base_vis" type="2d" />
+        <material name="base_vis" reflectance="0.5" texrepeat="1 1" texture="tex-base_vis" texuniform="false" />
+        <mesh name="base_vis_vis" file="./base/visual/base_vis_vis.msh" scale="0.13000 0.13000 0.13000" />
+		<mesh file="./drawer_middle/visual/drawer_middle_vis.msh" name="drawer_middle_vis" scale="0.13000 0.13000 0.13000" />
+		<mesh file="./drawer_high/visual/drawer_high_vis.msh" name="drawer_high_vis" scale="0.13000 0.13000 0.13000" />
+		<mesh file="./drawer_low/visual/drawer_low_vis.msh" name="drawer_low_vis" scale="0.13000 0.13000 0.13000" />
+    </asset>
+    <worldbody>
+	    <body name="base" pos="0.00000 0.00000 0.13000" quat="0.5 0.5 -0.5 -0.5">
+	      <geom solimp="0.998 0.998 0.001" solref="0.001 1" density="100" friction="0.95 0.3 0.1" type="mesh" mesh="base_vis_vis" class="visual" material="base_vis" />
+	      <geom class="collision" pos="-0.00000 0.18268 -0.00000" quat="0.00000 0.70711 0.70711 0.00000" size="0.00478 0.24448 0.25158" rgba="0.8 0.8 0.8 0.3" />
+	      <geom class="collision" pos="0.00000 0.05639 -0.00000" quat="0.00000 0.70711 0.70711 0.00000" size="0.00257 0.24448 0.25158" rgba="0.8 0.8 0.8 0.3" />
+	      <geom class="collision" pos="0.00000 -0.06596 -0.00000" quat="0.70711 -0.00000 -0.00000 -0.70711" size="0.00273 0.24448 0.25158" rgba="0.8 0.8 0.8 0.3" />
+	      <geom class="collision" pos="-0.00000 -0.00000 -0.25969" quat="0.70711 0.00000 0.70711 0.00000" size="0.00341 0.18632 0.24019" rgba="0.8 0.8 0.8 0.3" />
+	      <geom class="collision" pos="0.00000 0.00000 0.25992" quat="0.70711 0.00000 -0.70711 0.00000" size="0.00341 0.18632 0.24019" rgba="0.8 0.8 0.8 0.3" />
+	      <geom class="collision" pos="-0.24687 0.01453 -0.00000" quat="0.00000 0.00000 1.00000 0.00000" size="0.00525 0.20054 0.26138" rgba="0.8 0.8 0.8 0.3" />
+	     
+		<body name="drawer_top" pos="0.00000 0.00000 0.00000">
+			<inertial pos="0 0 0" mass="3" diaginertia="1 1 1" />
+			<joint name="top_drawer" type="slide" pos="0.00000 0.00000 0.00000" axis="1 0 0" limited="true" range="-0.005 0.32" damping="50" />
+			<site rgba="0 0 0 0" type="box" pos="-0.00218 0.05636 -0.00000" quat="0.00000 0.70711 0.70711 0.00000" size="0.02022 0.08279 0.08821" name="top_region" />
+			<site class="grasppoint" pos="0.26000 0.13000 0.00000" group="4" />
+			<geom solimp="0.998 0.998 0.001" solref="0.001 1" density="100" friction="0.95 0.3 0.1" type="mesh" mesh="drawer_high_vis" class="visual" material="base_vis" />		
+			<geom class="collision" pos="0.22961 0.11677 -0.00000" quat="1.00000 0.00000 0.00000 -0.00000" size="0.01375 0.05382 0.25090" rgba="0.8 0.8 0.8 0.3" />
+			<geom class="collision" pos="-0.22347 0.11677 0.00000" quat="1.00000 0.00000 0.00000 0.00000" size="0.01375 0.05294 0.25415" rgba="0.8 0.8 0.8 0.3" />
+			<geom class="collision" pos="-0.00000 0.07712 0.00000" quat="0.00000 -0.70711 -0.70711 -0.00000" size="0.00580 0.23863 0.25420" rgba="0.8 0.8 0.8 0.3" />
+			<geom class="collision" pos="0.00335 0.11536 -0.24058" quat="0.70711 0.00000 0.70711 0.00000" size="0.00944 0.05140 0.21406" rgba="0.8 0.8 0.8 0.3" />
+			<geom class="collision" pos="0.26497 0.12483 0.00000" quat="0.00000 0.00000 1.00000 0.00000" size="0.00265 0.00593 0.02681" rgba="0.8 0.8 0.8 0.3" />
+			<geom class="collision" pos="0.25688 0.12483 -0.03487" quat="0.00000 -0.97198 0.00000 0.23506" size="0.00270 0.00593 0.02096" rgba="0.8 0.8 0.8 0.3" />
+			<geom class="collision" pos="0.25566 0.12483 0.03526" quat="0.32083 -0.00000 0.94714 -0.00000" size="0.00270 0.00593 0.02096" rgba="0.8 0.8 0.8 0.3" />
+			<geom class="collision" pos="0.24796 0.12483 0.05470" quat="0.14192 -0.14192 0.69272 0.69272" size="0.00335 0.00528 0.00593" rgba="0.8 0.8 0.8 0.3" />
+			<geom class="collision" pos="0.24835 0.12483 -0.05431" quat="0.68385 0.68385 0.17987 -0.17987" size="0.00335 0.00528 0.00593" rgba="0.8 0.8 0.8 0.3" />
+			<geom class="collision" pos="0.00335 0.11536 0.24177" quat="0.70711 0.00000 0.70711 0.00000" size="0.00944 0.05140 0.21406" rgba="0.8 0.8 0.8 0.3" />
+	    	<site class="keypoint" pos="0.26000 0.19500 0.26000" />
+			<site class="keypoint" pos="-0.20800 0.06500 -0.26000" />
+		    <site name="top_site" pos="0 0 0.1" size="0.01" rgba="1 0 0 0"/>
+    <site name="bottom_site" pos="0 0 0.0" size="0.01" rgba="0 1 0 0"/>
+</body>
+		<body name="drawer_middle" pos="0.00000 0.00000 0.00000">
+			<inertial pos="0 0 0" mass="3" diaginertia="1 1 1" />
+			<joint name="middle_drawer" type="slide" pos="0.00000 0.00000 0.00000" axis="1 0 0" limited="true" range="-0.005 0.32" damping="50" />
+			<site rgba="0 0 0 0" type="box" pos="-0.00218 0.00046 -0.00000" quat="0.00000 0.70711 0.70711 0.00000" size="0.02022 0.08279 0.08821" name="middle_region" />
+			<site class="grasppoint" pos="0.26000 0.00000 0.00000" group="4" />
+			<geom solimp="0.998 0.998 0.001" solref="0.001 1" density="100" friction="0.95 0.3 0.1" type="mesh" mesh="drawer_middle_vis" class="visual" material="base_vis" />
+			<geom class="collision" pos="0.22961 -0.00281 -0.00000" quat="0.00000 0.00000 1.00000 0.00000" size="0.01375 0.05382 0.25090" rgba="0.8 0.8 0.8 0.3" />
+			<geom class="collision" pos="-0.22347 -0.00281 -0.00000" quat="0.00000 0.00000 1.00000 0.00000" size="0.01375 0.05294 0.25415" rgba="0.8 0.8 0.8 0.3" />
+			<geom class="collision" pos="-0.00000 -0.04243 -0.00000" quat="0.00000 0.70711 0.70711 0.00000" size="0.00580 0.23863 0.25420" rgba="0.8 0.8 0.8 0.3" />
+			<geom class="collision" pos="0.00335 -0.00421 -0.24058" quat="0.70711 0.00000 0.70711 0.00000" size="0.00944 0.05140 0.21406" rgba="0.8 0.8 0.8 0.3" />
+			<geom class="collision" pos="0.26497 0.00525 0.00000" quat="0.00000 0.00000 1.00000 0.00000" size="0.00265 0.00593 0.02681" rgba="0.8 0.8 0.8 0.3" />
+			<geom class="collision" pos="0.25688 0.00525 -0.03487" quat="0.23506 0.00000 -0.97198 -0.00000" size="0.00270 0.00593 0.02096" rgba="0.8 0.8 0.8 0.3" />
+			<geom class="collision" pos="0.25566 0.00525 0.03526" quat="0.32083 -0.00000 0.94714 -0.00000" size="0.00270 0.00593 0.02096" rgba="0.8 0.8 0.8 0.3" />
+			<geom class="collision" pos="0.24796 0.00525 0.05470" quat="0.14192 -0.14192 0.69272 0.69272" size="0.00335 0.00528 0.00593" rgba="0.8 0.8 0.8 0.3" />
+			<geom class="collision" pos="0.24835 0.00525 -0.05431" quat="0.68385 0.68385 0.17987 -0.17987" size="0.00335 0.00528 0.00593" rgba="0.8 0.8 0.8 0.3" />
+			<geom class="collision" pos="0.00335 -0.00421 0.24177" quat="0.70711 0.00000 0.70711 0.00000" size="0.00944 0.05140 0.21406" rgba="0.8 0.8 0.8 0.3" />	
+	    	<site class="keypoint" pos="0.26000 0.06500 0.26000" />
+			<site class="keypoint" pos="-0.20800 -0.06500 -0.26000" />
+		</body>
+
+	    <body name="drawer_bottom" pos="0.00000 0.00000 0.00000">
+			<inertial pos="0 0 0" mass="3" diaginertia="1 1 1" />
+			<joint name="bottom_drawer" type="slide" pos="0.00000 0.00000 0.00000" axis="1 0 0" limited="true" range="-0.005 0.32" damping="50" />
+			<site rgba="0 0 0 0" type="box" pos="-0.00218 -0.05636 -0.00000" quat="0.00000 0.70711 0.70711 0.00000" size="0.02022 0.08279 0.08821" name="bottom_region" />
+			<site class="grasppoint" pos="0.26000 -0.11700 0.00000" group="4" />
+			<geom solimp="0.998 0.998 0.001" solref="0.001 1" density="100" friction="0.95 0.3 0.1" type="mesh" mesh="drawer_low_vis" class="visual" material="base_vis" />		
+			<geom class="collision" pos="0.22961 -0.12584 -0.00000" quat="0.00000 0.00000 1.00000 0.00000" size="0.01375 0.05382 0.25090" rgba="0.8 0.8 0.8 0.3" />
+			<geom class="collision" pos="-0.22347 -0.12584 -0.00000" quat="0.00000 0.00000 1.00000 0.00000" size="0.01375 0.05294 0.25415" rgba="0.8 0.8 0.8 0.3" />
+			<geom class="collision" pos="-0.00000 -0.16546 -0.00000" quat="0.00000 -0.70711 0.70711 0.00000" size="0.00580 0.23863 0.25420" rgba="0.8 0.8 0.8 0.3" />
+			<geom class="collision" pos="0.00335 -0.12724 -0.24058" quat="0.70711 0.00000 0.70711 0.00000" size="0.00944 0.05140 0.21406" rgba="0.8 0.8 0.8 0.3" />
+			<geom class="collision" pos="0.26497 -0.11778 0.00000" quat="0.00000 0.00000 1.00000 0.00000" size="0.00265 0.00593 0.02681" rgba="0.8 0.8 0.8 0.3" />
+			<geom class="collision" pos="0.25688 -0.11778 -0.03487" quat="0.97198 -0.00000 0.23506 -0.00000" size="0.00270 0.00593 0.02096" rgba="0.8 0.8 0.8 0.3" />
+			<geom class="collision" pos="0.25566 -0.11778 0.03526" quat="0.32083 -0.00000 0.94714 -0.00000" size="0.00270 0.00593 0.02096" rgba="0.8 0.8 0.8 0.3" />
+			<geom class="collision" pos="0.24796 -0.11778 0.05470" quat="0.14192 -0.14192 0.69272 0.69272" size="0.00335 0.00528 0.00593" rgba="0.8 0.8 0.8 0.3" />
+			<geom class="collision" pos="0.24835 -0.11778 -0.05431" quat="0.68385 0.68385 0.17987 -0.17987" size="0.00335 0.00528 0.00593" rgba="0.8 0.8 0.8 0.3" />
+			<geom class="collision" pos="0.00335 -0.12724 0.24177" quat="0.70711 0.00000 0.70711 0.00000" size="0.00944 0.05140 0.21406" rgba="0.8 0.8 0.8 0.3" />
+	    	<site class="keypoint" pos="0.26000 -0.06500 0.26000" />
+			<site class="keypoint" pos="-0.20800 -0.19500 -0.26000" />
+		</body>	      
+		<site rgba="1 0 0 0" size="0.05" pos="0.00000 0.00000 -0.05850" name="cabinet_bottom_site" />
+		<site rgba="1 0 0 0" size="0.05" pos="0.00000 0.00000 0.05850" name="cabinet_top_site" />
+		<site rgba="1 0 0 0" size="0.05" pos="0.05850 0.05850 0.00000" name="cabinet_horizontal_radius_site" />
+        </body>
+    </worldbody>
+</mujoco>

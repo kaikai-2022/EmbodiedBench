@@ -1,0 +1,80 @@
+<?xml version="1.0" ?>
+<mujoco model="petri_dish">
+  <asset>
+    <material name="lambert1" specular="0.4000000000000001" shininess="0.001" rgba="0.50196078 0.50196078 0.50196078 1.0"/>
+    <mesh file="petri_dish.obj"/>
+    <mesh file="petri_dish/petri_dish_collision_0.obj"/>
+    <mesh file="petri_dish/petri_dish_collision_1.obj"/>
+    <mesh file="petri_dish/petri_dish_collision_2.obj"/>
+    <mesh file="petri_dish/petri_dish_collision_3.obj"/>
+    <mesh file="petri_dish/petri_dish_collision_4.obj"/>
+    <mesh file="petri_dish/petri_dish_collision_5.obj"/>
+    <mesh file="petri_dish/petri_dish_collision_6.obj"/>
+    <mesh file="petri_dish/petri_dish_collision_7.obj"/>
+    <mesh file="petri_dish/petri_dish_collision_8.obj"/>
+    <mesh file="petri_dish/petri_dish_collision_9.obj"/>
+    <mesh file="petri_dish/petri_dish_collision_10.obj"/>
+    <mesh file="petri_dish/petri_dish_collision_11.obj"/>
+    <mesh file="petri_dish/petri_dish_collision_12.obj"/>
+    <mesh file="petri_dish/petri_dish_collision_13.obj"/>
+    <mesh file="petri_dish/petri_dish_collision_14.obj"/>
+    <mesh file="petri_dish/petri_dish_collision_15.obj"/>
+    <mesh file="petri_dish/petri_dish_collision_16.obj"/>
+    <mesh file="petri_dish/petri_dish_collision_17.obj"/>
+    <mesh file="petri_dish/petri_dish_collision_18.obj"/>
+    <mesh file="petri_dish/petri_dish_collision_19.obj"/>
+    <mesh file="petri_dish/petri_dish_collision_20.obj"/>
+    <mesh file="petri_dish/petri_dish_collision_21.obj"/>
+    <mesh file="petri_dish/petri_dish_collision_22.obj"/>
+    <mesh file="petri_dish/petri_dish_collision_23.obj"/>
+    <mesh file="petri_dish/petri_dish_collision_24.obj"/>
+    <mesh file="petri_dish/petri_dish_collision_25.obj"/>
+  </asset>
+  <worldbody>
+    <body name="petri_dish">
+      <inertial pos="0 0 0.006800" mass="0.02" diaginertia="0.0008 0.0008 0.0005"/>
+      <geom material="lambert1" mesh="petri_dish" class="visual"/>
+      <geom mesh="petri_dish_collision_0" rgba="0.1860684267201348 0.5502312622119268 0.1576423774288379 1" class="collision"/>
+      <geom mesh="petri_dish_collision_1" rgba="0.4811376083786282 0.5034479153312724 0.37477778305383314 1" class="collision"/>
+      <geom mesh="petri_dish_collision_2" rgba="0.4002864524993981 0.18323683734862106 0.9640563853043363 1" class="collision"/>
+      <geom mesh="petri_dish_collision_3" rgba="0.755357616117166 0.8770275760042017 0.4874170566129431 1" class="collision"/>
+      <geom mesh="petri_dish_collision_4" rgba="0.3629139999250084 0.39837993192755483 0.0016693973795991468 1" class="collision"/>
+      <geom mesh="petri_dish_collision_5" rgba="0.4975956009792878 0.6565499028829419 0.9146782304489851 1" class="collision"/>
+      <geom mesh="petri_dish_collision_6" rgba="0.6611850383895087 0.07171621826818397 0.2544028568472235 1" class="collision"/>
+      <geom mesh="petri_dish_collision_7" rgba="0.06463781251386913 0.5864497310999579 0.5691516318326096 1" class="collision"/>
+      <geom mesh="petri_dish_collision_8" rgba="0.7064784322550767 0.9699001009944357 0.6920814272564785 1" class="collision"/>
+      <geom mesh="petri_dish_collision_9" rgba="0.06678016341460757 0.4242881302432251 0.45516979772914523 1" class="collision"/>
+      <geom mesh="petri_dish_collision_10" rgba="0.09475393975101987 0.4499678759932976 0.8324465670804199 1" class="collision"/>
+      <geom mesh="petri_dish_collision_11" rgba="0.4182485606409122 0.2532329811344779 0.9683731501623598 1" class="collision"/>
+      <geom mesh="petri_dish_collision_12" rgba="0.8033550530229033 0.5952483678280386 0.2261403126075079 1" class="collision"/>
+      <geom mesh="petri_dish_collision_13" rgba="0.37107206445996255 0.3325105769712383 0.7775446987278168 1" class="collision"/>
+      <geom mesh="petri_dish_collision_14" rgba="0.4094756735348365 0.06710783281908472 0.9855142537197509 1" class="collision"/>
+      <geom mesh="petri_dish_collision_15" rgba="0.23563913952984006 0.1751726904157559 0.31242634005052994 1" class="collision"/>
+      <geom mesh="petri_dish_collision_16" rgba="0.5281261931669037 0.40108635630285794 0.5648470255605688 1" class="collision"/>
+      <geom mesh="petri_dish_collision_17" rgba="0.5812363770748841 0.3413919310727094 0.6191401362600694 1" class="collision"/>
+      <geom mesh="petri_dish_collision_18" rgba="0.4780740466671247 0.42334607530617085 0.244672904939364 1" class="collision"/>
+      <geom mesh="petri_dish_collision_19" rgba="0.8472599881691718 0.4168379382824908 0.8182833120138518 1" class="collision"/>
+      <geom mesh="petri_dish_collision_20" rgba="0.025991141737136014 0.15902845999797954 0.9019026295488535 1" class="collision"/>
+      <geom mesh="petri_dish_collision_21" rgba="0.6486509680919984 0.7588195968417824 0.6422077111038019 1" class="collision"/>
+      <geom mesh="petri_dish_collision_22" rgba="0.6276143537320528 0.27085742408899094 0.7081561405325139 1" class="collision"/>
+      <geom mesh="petri_dish_collision_23" rgba="0.7601517448632094 0.6900941498121876 0.49306984098198225 1" class="collision"/>
+      <geom mesh="petri_dish_collision_24" rgba="0.1193490736064805 0.9172584049681956 0.711220655549277 1" class="collision"/>
+      <geom mesh="petri_dish_collision_25" rgba="0.22759629777371493 0.26612365112718717 0.18441261535152143 1" class="collision"/>
+      <site class="grasppoint" pos="0.0000 0.0000 0.0082"/>
+      <site class="grasppoint" pos="0.0000 0.0000 0.0109"/>
+      <site class="grasppoint" pos="0.0000 0.0000 0.0129"/>
+    </body>
+  </worldbody>
+  <compiler boundmass="0.015" boundinertia="1e-05" angle="radian"/>
+  <default>
+    <default class="visual">
+      <geom group="2" type="mesh" contype="0" conaffinity="0" density="50"/>
+    </default>
+    <default class="collision">
+      <geom group="3" type="mesh" density="50" friction="1.5 0.1 0.1" solimp="0.9 0.95 0.001" solref="0.02 1"/>
+    </default>
+    <default class="grasppoint">
+      <site type="sphere" size="0.005" group="4" rgba="0 0 1 1"/>
+    </default>
+  </default>
+</mujoco>

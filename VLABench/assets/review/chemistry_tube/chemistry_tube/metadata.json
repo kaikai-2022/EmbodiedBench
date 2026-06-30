@@ -1,0 +1,14 @@
+{
+  "uid": "chemistry_tube",
+  "name": "chemistry_tube",
+  "source": "local",
+  "original_path": "/tmp/chemistry_tube_input/chemistry_tube.glb",
+  "keyword": "chemistry_tube",
+  "tags": [],
+  "categories": [],
+  "description": "Local GLB model: chemistry_tube.glb",
+  "rotation": {
+    "axis": "x",
+    "degrees": 90.0
+  }
+}

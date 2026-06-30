@@ -1,0 +1,14 @@
+Model UID: petri_dish
+Model Name: petri_dish
+
+Source Information:
+============================================================
+Source: Local File
+Original Path: /ssd/mkqin/download/petri_dish.glb
+File Name: petri_dish.glb
+Keyword/Category: alcohol_lamp
+Rotation: 90.0° around X axis
+
+Processing:
+Pipeline: process_local_glb.py
+Steps: GLB->OBJ (trimesh) -> [rotate] -> MJCF (obj2mjcf) -> postprocess -> bottom-align -> validate -> size_fix

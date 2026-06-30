@@ -1,0 +1,19 @@
+{
+  "status": "PASS",
+  "xml_path": "/ssd/mkqin/workspace/VLABench/VLABench/assets/review/pipette/pipette/pipette_-_laboratory_essential_tool/pipette_-_laboratory_essential_tool.xml",
+  "checks": {
+    "xml_load": "PASS",
+    "physics_compile": "PASS",
+    "body_found": "PASS: pipette_-_laboratory_essential_tool/",
+    "stability": "PASS: final_z=0.300",
+    "xy_drift": "PASS: drift=0.000m",
+    "final_position": [
+      0.0,
+      0.0,
+      0.3
+    ],
+    "render": "PASS"
+  },
+  "preview_path": "/ssd/mkqin/workspace/VLABench/VLABench/assets/review/pipette/pipette/pipette_-_laboratory_essential_tool/validation_preview.png",
+  "video_path": null
+}

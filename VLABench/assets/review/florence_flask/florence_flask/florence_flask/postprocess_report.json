@@ -1,0 +1,28 @@
+{
+  "uid": "florence_flask",
+  "centered": true,
+  "scaled": true,
+  "scale_factor": 0.022874139257576805,
+  "orientation_warning": null,
+  "original_dims": {
+    "center": [
+      1.5100000001488922e-06,
+      -1.1800000001560562e-06,
+      1.0744363899999998
+    ],
+    "ranges": [
+      4.4087451,
+      4.40874208,
+      6.5576238
+    ],
+    "max_dim": 6.5576238
+  },
+  "final_dims": {
+    "ranges": [
+      0.10084624936855938,
+      0.10084618028865881,
+      0.15
+    ],
+    "max_dim": 0.15
+  }
+}

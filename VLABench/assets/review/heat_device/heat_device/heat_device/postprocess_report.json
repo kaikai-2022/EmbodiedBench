@@ -1,0 +1,28 @@
+{
+  "uid": "heat_device",
+  "centered": true,
+  "scaled": false,
+  "scale_factor": null,
+  "orientation_warning": "模型最长轴为 X (0.254m)，Z轴为 0.089m，可能需要旋转",
+  "original_dims": {
+    "center": [
+      0.57587941,
+      -4.36500325,
+      0.75270239
+    ],
+    "ranges": [
+      0.25442478,
+      0.18000003999999947,
+      0.08943324000000008
+    ],
+    "max_dim": 0.25442478
+  },
+  "final_dims": {
+    "ranges": [
+      0.25442478,
+      0.18000004,
+      0.08943324
+    ],
+    "max_dim": 0.25442478
+  }
+}

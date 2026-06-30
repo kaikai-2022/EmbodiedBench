@@ -564,8 +564,10 @@ class AssetPipeline:
         """MuJoCo 加载验证"""
         try:
             scripts_dir = Path(__file__).resolve().parent
-            if str(scripts_dir) not in sys.path:
-                sys.path.insert(0, str(scripts_dir))
+            tests_dir = scripts_dir.parent / "tests"
+            for d in [scripts_dir, tests_dir]:
+                if str(d) not in sys.path:
+                    sys.path.insert(0, str(d))
 
             from validate_asset import validate_asset
 

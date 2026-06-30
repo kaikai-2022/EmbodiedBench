@@ -20,7 +20,9 @@ logger = logging.getLogger(__name__)
 # 已内置 site 的模型（不需要注入）
 BUILTIN_SITES = {
     "tube": ["top_site", "bottom_site"],      # tube.xml 有 top_site/bottom_site
+    "chemistry_tube": ["top_site", "bottom_site"],  # 新 tube（register_model.py 已注入）
     "chemistry_tube_stand": [],                # TubeStand 没有 site
+    "chemistry_tube_rack": [],                 # MediumTubeStand 没有 site
 }
 
 # 已内置 solution geom 的模型（不需要注入 solution 占位符）
@@ -28,6 +30,7 @@ BUILTIN_SOLUTION = {
     "chemistry_beaker": True,                  # chemistry_beaker.xml 有 solution geom
     "chemistry_beaker_0": True,
     "tube": True,                               # tube.xml 有 solution geom
+    "chemistry_tube": True,                    # 新 tube（register_model.py 已注入）
 }
 
 

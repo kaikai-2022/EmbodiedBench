@@ -1,0 +1,37 @@
+<?xml version="1.0" ?>
+<mujoco model="square_mat">
+  <asset>
+    <material name="Material" specular="0.4000000000000001" shininess="0.001" rgba="0.0 0.31 0.18 1.0"/>
+    <mesh file="square_mat.obj" scale="0.075 0.075 0.075"/>
+    <mesh file="square_mat/square_mat_collision_0.obj" scale="0.075 0.075 0.075"/>
+  </asset>
+  <worldbody>
+    <body name="square_mat">
+      <inertial pos="0 0 0.000750" mass="0.02" diaginertia="0.0008 0.0008 0.0005"/>
+      <geom material="Material" mesh="square_mat" class="visual"/>
+      <geom mesh="square_mat_collision_0" class="collision"/>
+      <site class="grasppoint" pos="0.0000 0.0000 0.0009"/>
+      <site class="grasppoint" pos="0.0000 0.0000 0.0012"/>
+      <site class="grasppoint" pos="0.0000 0.0000 0.0014"/>
+          <site class="keypoint" pos="-0.0750 -0.0750 0.0000"/>
+      <site class="keypoint" pos="0.0750 0.0750 0.0000"/>
+      <site class="keypoint" pos="-0.0750 0.0750 0.0000"/>
+      <site class="keypoint" pos="0.0750 -0.0750 0.0000"/>
+      <site class="placepoint" pos="0.0000 0.0000 0.0300"/>
+</body>
+  </worldbody>
+  <compiler boundmass="0.015" boundinertia="1e-05" angle="radian"/>
+  <default>
+    <default class="visual">
+      <geom group="2" type="mesh" contype="0" conaffinity="0" density="50"/>
+          <default class="keypoint"><site type="sphere" size="0.01" group="3" rgba="1 0 0 1"/></default>
+      <default class="placepoint"><site type="sphere" size="0.01" group="2" rgba="0 0 1 0"/></default>
+</default>
+    <default class="collision">
+      <geom group="3" type="mesh" density="50" friction="1.5 0.1 0.1" solimp="0.9 0.95 0.001" solref="0.02 1"/>
+    </default>
+    <default class="grasppoint">
+      <site type="sphere" size="0.005" group="4" rgba="0 0 1 1"/>
+    </default>
+  </default>
+</mujoco>

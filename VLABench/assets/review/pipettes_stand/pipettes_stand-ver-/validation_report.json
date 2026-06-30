@@ -12,8 +12,8 @@
       0.0,
       0.3
     ],
-    "video": "PASS: 90 frames, 3.0s"
+    "render": "PASS"
   },
-  "preview_path": null,
-  "video_path": "/ssd/mkqin/workspace/VLABench/VLABench/assets/review/pipettes_stand/pipettes_stand-ver-/validation.mp4"
+  "preview_path": "/ssd/mkqin/workspace/VLABench/VLABench/assets/review/pipettes_stand/pipettes_stand-ver-/validation_preview.png",
+  "video_path": null
 }

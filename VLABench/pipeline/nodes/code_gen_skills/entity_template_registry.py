@@ -30,6 +30,14 @@ ENTITY_SUBENTITY_PARENTS = {
 # 依赖注入：当检测到某类实体时，自动注入其必需的父容器实体
 # =============================================================================
 
+def _find_tube_spec(asset_status: Dict) -> str:
+    """Find the spec name of a ChemistryTube entity in asset_status."""
+    for uid, info in asset_status.items():
+        if info.get("class_name") == "ChemistryTube":
+            return info.get("spec", "tube")
+    return "tube"
+
+
 def infer_dependencies(entity_class_name: str, asset_status: Dict) -> List[str]:
     """
     当检测到某类实体时，返回需要自动注入的额外实体 canonical name 列表。
@@ -44,8 +52,10 @@ def infer_dependencies(entity_class_name: str, asset_status: Dict) -> List[str]:
     injected = []
 
     if entity_class_name == "ChemistryTube":
-        if "chemistry_tube_stand" not in asset_status:
-            injected.append("chemistry_tube_stand")
+        tube_spec = _find_tube_spec(asset_status)
+        parent = "chemistry_tube_rack" if tube_spec == "chemistry_tube" else "chemistry_tube_stand"
+        if parent not in asset_status:
+            injected.append(parent)
     elif entity_class_name == "Poker":
         if "card_holder" not in asset_status:
             injected.append("card_holder")
@@ -69,6 +79,12 @@ def inject_entity_status(entity_name: str, asset_status: Dict) -> Dict:
             asset_status[entity_name] = {
                 "class_name": "TubeStand",
                 "xml_path": "obj/meshes/tube/tube_container/tube_stand.xml",
+                "properties": {},
+            }
+        elif entity_name == "chemistry_tube_rack":
+            asset_status[entity_name] = {
+                "class_name": "MediumTubeStand",
+                "xml_path": "review/chemistry_tube_rack/chemistry_tube_rack/chemistry_tube_rack.xml",
                 "properties": {},
             }
         elif entity_name == "card_holder":

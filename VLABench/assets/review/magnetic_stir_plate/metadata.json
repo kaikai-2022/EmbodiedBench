@@ -1,0 +1,14 @@
+{
+  "uid": "magnetic_stir_plate",
+  "name": "magnetic_stir_plate",
+  "source": "local",
+  "original_path": "/ssd/mkqin/download/magnetic_stir_plate.glb",
+  "keyword": "alcohol_lamp",
+  "tags": [],
+  "categories": [],
+  "description": "Local GLB model: magnetic_stir_plate.glb",
+  "rotation": {
+    "axis": "x",
+    "degrees": 90.0
+  }
+}

@@ -1,0 +1,14 @@
+Model UID: thermometer
+Model Name: thermometer
+
+Source Information:
+============================================================
+Source: Local File
+Original Path: /tmp/thermometer_input/thermometer.glb
+File Name: thermometer.glb
+Keyword/Category: thermometer
+Rotation: 90.0° around X axis
+
+Processing:
+Pipeline: process_local_glb.py
+Steps: GLB->OBJ (trimesh) -> [rotate] -> MJCF (obj2mjcf) -> postprocess -> bottom-align -> validate -> size_fix

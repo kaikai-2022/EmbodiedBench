@@ -1,0 +1,28 @@
+{
+  "uid": "thermometer",
+  "centered": true,
+  "scaled": false,
+  "scale_factor": null,
+  "orientation_warning": null,
+  "original_dims": {
+    "center": [
+      0.0,
+      0.0,
+      0.08496192500000001
+    ],
+    "ranges": [
+      0.0070533,
+      0.0070533,
+      0.17100731
+    ],
+    "max_dim": 0.17100731
+  },
+  "final_dims": {
+    "ranges": [
+      0.0070533,
+      0.0070533,
+      0.17100731
+    ],
+    "max_dim": 0.17100731
+  }
+}

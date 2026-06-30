@@ -120,7 +120,39 @@ class TubeStand(CommonContainer):
         super().__init__(**kwargs)
         self.col_pos = [-0.16, -0.08, 0, 0.08, 0.16]
         self.row_pos = [-0.05, 0.05]
-        
+
+@register.add_entity("MediumTubeStand")
+class MediumTubeStand(CommonContainer):
+    """Tube stand for the medium_tube_and_rack model: 2×2 hole layout."""
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.col_pos = [-0.1128, 0.1128]
+        self.row_pos = [-0.0144, 0.0144]
+
+@register.add_entity("FunnelSupport")
+class FunnelSupport(CommonContainer):
+    """
+    Universal support (iron stand) with a funnel placed on the ring.
+    The funnel position is at the placepoint site 'funnel_ring'.
+    """
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        # Funnel is placed at the ring position (z=0.35 when stand height=0.5m)
+        self.col_pos = [0]
+        self.row_pos = [0]
+
+@register.add_entity("PipetteStand")
+class PipetteStand(CommonContainer):
+    """
+    Pipette stand with 4-slot top surface for mechanical_pipette placement.
+    Slots are midpoints of the 4 segments along the long edge (Y axis).
+    """
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        # X fixed at 0 (short edge midpoint); 4 Y midpoints (long edge 4-segmented)
+        self.col_pos = [0]
+        self.row_pos = [-0.1088, -0.0363, 0.0363, 0.1088]
+
 @register.add_entity("Fridge")
 class Fridge(ContainerWithDoor):
     def _build(self, name="fridge", **kwargs):

@@ -1,0 +1,13 @@
+Model UID: cylinder_large
+Model Name: cylinder_large
+
+Source Information:
+============================================================
+Source: Local File
+Original Path: /tmp/cylinder_large_input/cylinder_large.glb
+File Name: cylinder_large.glb
+Keyword/Category: cylinder_large
+
+Processing:
+Pipeline: process_local_glb.py
+Steps: GLB->OBJ (trimesh) -> [rotate] -> MJCF (obj2mjcf) -> postprocess -> bottom-align -> validate -> size_fix

@@ -1,0 +1,14 @@
+{
+  "uid": "tripod",
+  "name": "tripod",
+  "source": "local",
+  "original_path": "/tmp/tripod_input/tripod.glb",
+  "keyword": "tripod",
+  "tags": [],
+  "categories": [],
+  "description": "Local GLB model: tripod.glb",
+  "rotation": {
+    "axis": "x",
+    "degrees": 90.0
+  }
+}

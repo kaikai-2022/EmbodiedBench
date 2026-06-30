@@ -1,6 +1,8 @@
 """
 The scripts to launch auto scene load and key-point based trajectory generation.
 """
+import os
+os.environ["MUJOCO_GL"] = "egl"
 import json
 import numpy as np
 import os
@@ -20,8 +22,6 @@ from VLABench.utils.utils import find_key_by_value, get_logger
 from VLABench.envs import load_env
 from VLABench.utils.skill_lib import SkillLib
 from VLABench.configs import name2config
-
-os.environ["MUJOCO_GL"] = "egl"
 
 def get_args():
     parser = argparse.ArgumentParser(description='Generate trajectory for a task')
@@ -60,6 +60,22 @@ def generate_trajectory(args, index, logger):
     t1 = time.time()
     env.reset()
     print(f"[TIMING] env.reset() 完成, 耗时 {time.time()-t1:.1f}s")
+
+    # 技能执行模式：避免 step 中 should_terminate_episode 触发 reset 导致重入死循环
+    env._skill_execution_mode = True
+
+    # 初始化顺序条件评测（与 test_simulation_only.py 一致）：
+    # 1) 重置条件锁 2) 记录初始状态 3) 挂载逐帧回调
+    if hasattr(env.task, 'conditions') and env.task.conditions is not None:
+        if hasattr(env.task.conditions, 'reset_locks'):
+            env.task.conditions.reset_locks()
+        for condition in env.task.conditions.conditions:
+            if hasattr(condition, 'record_initial_state'):
+                condition.record_initial_state(env.physics)
+        if not hasattr(env.task, '_per_step_condition_callbacks'):
+            env.task._per_step_condition_callbacks = []
+        if env.task.conditions.is_met not in env.task._per_step_condition_callbacks:
+            env.task._per_step_condition_callbacks.append(env.task.conditions.is_met)
 
     episode_config = env.save()
 
@@ -165,6 +181,8 @@ def generate_trajectory(args, index, logger):
     if not task_success:
         logger.warning("Task failed, skip saving data")
         print(f"[TIMING] generate_trajectory 结束 (失败), 总耗时: {time.time()-t0:.1f}s")
+        env._skill_execution_mode = False
+        env.close()
         return
     else:
         logger.info("Task success, saving data")
@@ -179,10 +197,11 @@ def generate_trajectory(args, index, logger):
     data_to_save["target_entity"] = meta_info["target_entity"]
     data_to_save["episode_config"] = json.dumps(episode_config)
     data_to_save["instruction"] =meta_info["instruction"]
-    save_single_data(data_to_save, 
+    save_single_data(data_to_save,
                      save_dir=task_dir,
                      filename=f"data_{index}.hdf5",
                      )
+    env._skill_execution_mode = False
     env.close()
     
         

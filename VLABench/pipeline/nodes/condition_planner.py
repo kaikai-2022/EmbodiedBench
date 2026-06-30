@@ -48,8 +48,17 @@ Select from these condition types (registered in VLABench/tasks/condition.py):
 - **above**(target_entity=<uid>, platform=<uid>): Entity is floating above a platform.
   Use for: "hover X above Y"
 
-- **pour**(target_entity=<uid>, threshold=0): Container's top site z < bottom site z (container is tilted).
-  Use for: "pour from X", "tilt X"
+- **pour_into**(target_entity=<uid>, receiver_container=<uid>, robot="robot",
+  tilt_threshold=0, z_clearance=0.01): Strict pour-into-container check. Requires ALL of:
+  (1) target_entity is grasped by the robot;
+  (2) target_entity is tilted (bottom_site above top_site) by more than tilt_threshold;
+  (3) the mouth (top_site) is within receiver_container's XY AABB (via contain()) AND
+  at least z_clearance meters above the receiver's top plane.
+  Latches true on first success.
+  Use for: "pour X into Y" where the liquid destination matters (e.g., chemistry tasks,
+  mixing tasks). Prefer this over plain `pour` + `above` when the task fails if the
+  liquid misses the target container.
+  **IMPORTANT**: Always include `"robot": "robot"` in params.
 
 - **heated**(target_entity=<uid>, heat_source=<uid>, duration=5.0, xy_tolerance=0.08):
   Target entity has been above heat source for cumulative duration seconds.
@@ -94,6 +103,16 @@ Select from these condition types (registered in VLABench/tasks/condition.py):
   Use for: "shake X", "oscillate X"
   **IMPORTANT**: Always include `"robot": "robot"` in params. `check_axis` defaults to 1 (Y-axis pitch). `min_angle_threshold` filters out small vibrations.
 
+- **stir**(entities=[<uid>], container=<uid>, robot="robot", min_distance=0.15, tool_tip_site="bottom_site"):
+  Stirring tool is inside the container, has cumulatively moved at least min_distance meters (3D path),
+  and has not collided with the container wall (soft warning recorded but does not block success).
+  Use for: "stir X in Y", "mix X with Y"
+  **IMPORTANT**: Always include `"robot": "robot"` in params.
+  - `entities`: the stirring tool entity (e.g., glass_rod_0)
+  - `container`: the target container entity (e.g., beaker_0)
+  - `min_distance`: cumulative 3D path length threshold in meters (default 0.15)
+  - `tool_tip_site`: MuJoCo site name on the tool for position reading (default "bottom_site")
+
 - **cap_open**(entities=[<uid>], open_threshold=3*pi/2, lift_threshold=0.003):
   ContainerWithCap（如 pill_bottle）的盖子被认为已拧开。检查 hinge 关节相对初始的旋转量
   是否达到 open_threshold（默认 3π/2 弧度≈270°）或 slide 关节相对位移达到 lift_threshold
@@ -101,6 +120,13 @@ Select from these condition types (registered in VLABench/tasks/condition.py):
   Use for: "unscrew X", "open X's cap", "screw off X's lid"
   **IMPORTANT**: entities 必须是带盖容器的 uid（如 pill_bottle_0），且容器类是 ContainerWithCap。
   open_threshold 和 lift_threshold 用默认值即可，无需调整。
+
+- **drawer_open**(entities=[<uid>], open_threshold=0.05):
+  ContainerWithDrawer（如 cabinet/drawer）的抽屉被认为已拉开。检查实体的所有 slide 抽屉关节，
+  若任意一个抽屉关节相对初始位置移动超过 open_threshold（默认 0.05m），视为抽屉已开。
+  Use for: "open the drawer", "open drawer of X", "pull out drawer"
+  **IMPORTANT**: entities 必须是带抽屉容器的 uid（如 drawer_0），且容器类是 ContainerWithDrawer。
+  open_threshold 用默认值即可，无需调整。
 
 - **pass**: No physical condition check needed. Step succeeds simply by completing execution.
   Use for: "move to position without final placement goal", "open gripper"
@@ -117,7 +143,7 @@ Use this as reference, but the LLM should use semantic understanding:
 
 | Action | Typical Condition | Reasoning |
 |--------|-------------------|-----------|
-| pour | **pour** (source tilted) | Check if source container is tilted (top_site below bottom_site) |
+| pour (into target) | **pour_into** | Source grasped, tilted, AND mouth over receiver AABB |
 | place (in/into) | **contain** | Entity inside container |
 | place (on) | **on** | Entity resting on surface |
 | remove (from) | **not_contain** | Entity no longer inside |
@@ -136,15 +162,15 @@ Use this as reference, but the LLM should use semantic understanding:
 - All entity parameters MUST use UIDs from the Physical Asset Inventory (e.g., "tube_0", "beaker_0"). Do NOT use substance/solution names (e.g., "CuSO4_0", "NaCl_1") as entity parameters — they are not physical objects in the simulation.
 - Numeric parameters (duration, tolerance, target_height, etc.) use reasonable defaults unless the instruction specifies exact values
 - Some conditions accept additional kwargs (e.g., contain accepts "layer" for multi-layer containers)
-- **pour action**: Always use the **pour** condition (checks if source container is tilted). Do NOT use contain for pour actions, since liquids are not simulated as physical entities.
+- **pour action**: Always use the **pour_into** condition (checks if source container is tilted). Do NOT use contain for pour actions, since liquids are not simulated as physical entities.
 """
 
 # ========== 合法 Condition 类型集合 ==========
 VALID_CONDITION_TYPES = {
-    "contain", "not_contain", "on", "above", "pour", "heated",
+    "contain", "not_contain", "on", "above", "pour_into", "heated",
     "on_position", "lift", "contact", "is_grasped", "on_orientation",
     "order", "press_button", "joint_in_range", "asyn_sequence", "or",
-    "pass", "wait_for", "shake", "cap_open"
+    "pass", "wait_for", "shake", "stir", "cap_open", "drawer_open"
 }
 
 
@@ -221,7 +247,8 @@ def _validate_condition_plan(plan: List[Dict], num_steps: int, valid_uids: set) 
                          "tolerance_angle", "dimension", "offset", "threshold", "check_axes",
                          "layer", "tilt_angle", "wait_time", "insert_depth", "lift_height",
                          "push_distance", "rotation_angle", "gripper_state",
-                         "min_direction_changes", "min_angle_threshold", "check_axis"]:
+                         "min_direction_changes", "min_angle_threshold", "check_axis",
+                         "min_distance", "tool_tip_site"]:
                     continue
                     continue
                 # entity 参数应该是字符串 UID

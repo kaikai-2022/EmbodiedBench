@@ -1,0 +1,13 @@
+Model UID: chemistry_tube_rack
+Model Name: chemistry_tube_rack
+
+Source Information:
+============================================================
+Source: Local File
+Original Path: /tmp/chemistry_tube_rack_input/chemistry_tube_rack.glb
+File Name: chemistry_tube_rack.glb
+Keyword/Category: chemistry_tube_rack
+
+Processing:
+Pipeline: process_local_glb.py
+Steps: GLB->OBJ (trimesh) -> [rotate] -> MJCF (obj2mjcf) -> postprocess -> bottom-align -> validate -> size_fix

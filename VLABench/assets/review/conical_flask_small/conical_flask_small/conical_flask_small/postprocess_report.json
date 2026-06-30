@@ -1,0 +1,28 @@
+{
+  "uid": "conical_flask_small",
+  "centered": true,
+  "scaled": true,
+  "scale_factor": 0.004352431115511938,
+  "orientation_warning": null,
+  "original_dims": {
+    "center": [
+      0.04372214999999979,
+      4.7500000022182576e-07,
+      17.13603371
+    ],
+    "ranges": [
+      22.0921917,
+      22.13587093,
+      34.463497759999996
+    ],
+    "max_dim": 34.463497759999996
+  },
+  "final_dims": {
+    "ranges": [
+      0.09615474256493459,
+      0.09634485336116387,
+      0.15
+    ],
+    "max_dim": 0.15
+  }
+}

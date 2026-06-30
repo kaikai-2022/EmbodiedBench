@@ -26,6 +26,9 @@ Usage:
 
     # 递归扫描子目录
     python process_local_glb.py --input_dir /path/to/glbs --keyword lab_equip --recursive --rotate_axis x --rotate_degrees 90
+
+    # 只处理目录中匹配 --file 的单个模型（不会处理其他 GLB）
+    python process_local_glb.py --input_dir /path/to/glbs --keyword thermometer --file thermometer --rotate_axis x --rotate_degrees 90
 """
 
 import argparse
@@ -350,6 +353,7 @@ class LocalGLBPipeline:
         recursive: bool = False,
         rotate_axis: str = None,
         rotate_degrees: float = 0,
+        target_file: str = None,
     ):
         self.input_dir = Path(input_dir)
         self.keyword = keyword.lower().replace(" ", "_")
@@ -358,6 +362,7 @@ class LocalGLBPipeline:
         self.skip_existing = skip_existing
         self.rotate_axis = rotate_axis
         self.rotate_degrees = rotate_degrees
+        self.target_file = target_file
 
         # 默认输出目录
         if output_dir is None:
@@ -384,6 +389,14 @@ class LocalGLBPipeline:
 
         pattern = "**/*.glb" if self.recursive else "*.glb"
         glb_files = list(self.input_dir.glob(pattern))
+
+        if self.target_file:
+            glb_files = [p for p in glb_files if p.stem == self.target_file]
+            if not glb_files:
+                raise FileNotFoundError(
+                    f"在 {self.input_dir} 中未找到 {self.target_file}.glb（--file 指定）"
+                )
+            logger.info(f"--file 指定只处理: {self.target_file}.glb")
 
         if not glb_files:
             logger.warning(f"在 {self.input_dir} 中未找到 GLB 文件")
@@ -606,6 +619,9 @@ def parse_args():
                         help='旋转轴（x/y/z），需配合 --rotate_degrees 使用')
     parser.add_argument('--rotate_degrees', type=float, default=0,
                         help='旋转角度（正负均可，如 90/-90/180），需配合 --rotate_axis 使用')
+    parser.add_argument('--file', type=str, default=None,
+                        help='只处理输入目录中文件名（不含扩展名）匹配此值的单个 GLB；'
+                             '不指定则处理目录下所有 .glb 文件')
 
     return parser.parse_args()
 
@@ -626,6 +642,7 @@ def main():
         recursive=args.recursive,
         rotate_axis=args.rotate_axis,
         rotate_degrees=args.rotate_degrees,
+        target_file=args.file,
     )
 
     pipeline.run()

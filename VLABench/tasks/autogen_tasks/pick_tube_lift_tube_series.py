@@ -43,30 +43,16 @@ class PickTubeLiftTubeConfigManager(BenchTaskConfigManager):
         obj_config["class"] = "ChemistryTube"
         init_container_config["subentities"].append(obj_config)
 
-        col_pos = random.choice(relative_col_pos)
-        row_pos = random.choice(relative_row_pos)
-        pos = [col_pos, row_pos, 0.05]
-        init_container_config = self.config["task"]["components"][-1]
-        if "subentities" not in init_container_config:
-            init_container_config["subentities"] = []
-        obj_config = dict(
-            name="tube_1",
-            solution="tube_1",
-            xml_path=name2class_xml["tube"][-1],
-            position=pos,
-        )
-        obj_config["class"] = "ChemistryTube"
-        init_container_config["subentities"].append(obj_config)
-
         self.target_entity = "tube_0"
 
     def get_instruction(self, target_entity, init_container, **kwargs):
-        self.config["task"]["instructions"] = ["pick the <tube_0> from the <tube_1>"]
+        self.config["task"]["instructions"] = ["pick the <tube_0>"]
 
     def get_condition_config(self, target_entity, init_container, **kwargs):
-        conditions_config = dict(
-            lift=dict(entities=['tube_0'], lift_height=0.15)
-        )
+        conditions_config = [
+            dict(is_grasped=dict(entities=['tube_0'], robot='robot')),
+            dict(lift=dict(entities=['tube_0'], lift_height=0.15)),
+        ]
         self.config["task"]["conditions"] = conditions_config
 
 
@@ -77,7 +63,7 @@ class PickTubeLiftTubeTask(PrimitiveTask):
 
     def get_expert_skill_sequence(self, physics):
         skill_sequence = [
-            partial(SkillLib.pick, target_entity_name="tube_0"),
-            partial(SkillLib.lift, lift_height=0.15),
+            partial(SkillLib.pick, target_entity_name="tube_0", prior_eulers=[[-3.141592653589793, 0, 0]]),
+            partial(SkillLib.lift, lift_height=0.15, gripper_state=[0, 0]),
         ]
         return skill_sequence

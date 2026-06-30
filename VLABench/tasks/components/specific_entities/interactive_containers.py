@@ -5,6 +5,7 @@ import numpy as np
 from VLABench.utils.register import register
 from VLABench.utils.utils import rotate_point_around_axis
 from VLABench.tasks.components.container import CommonContainer, ContainerWithDoor
+from VLABench.tasks.components.specific_entities.entity_with_button import EntityWithButton
 
 @register.add_entity("CoffeeMachine")
 class CoffeeMachine(CommonContainer):
@@ -297,3 +298,38 @@ class ContainerWithCap(CommonContainer):
                (c.geom2 in gripper_geom_ids and c.geom1 in entity_geom_ids):
                 return True
         return False
+
+
+@register.add_entity("HeatDevice")
+class HeatDevice(CommonContainer, EntityWithButton):
+    """
+    Heat plate / heating device with interactive button.
+
+    This is a laboratory heating instrument with:
+    - A flat heating surface (for placing beakers, flasks, etc.)
+    - A control button to toggle heating on/off
+    """
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self._is_pressed = False
+        self._heating_active = False
+
+    def is_activate(self, physics):
+        """
+        Check if button is pressed and toggle heating state.
+
+        This extends the base mixin is_activate to add heating state logic.
+        """
+        # Call mixin's is_activate logic
+        contacts = physics.data.contact
+        contact_geoms = [c.geom1 for c in contacts] + [c.geom2 for c in contacts]
+        base_result = physics.bind(self.start_button).element_id in contact_geoms
+
+        if base_result and not self._heating_active:
+            self._heating_active = True
+            self._is_pressed = True
+        elif not base_result and self._heating_active:
+            self._heating_active = False
+            self._is_pressed = False
+
+        return base_result

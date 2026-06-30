@@ -1,0 +1,28 @@
+{
+  "uid": "square_mat",
+  "centered": false,
+  "scaled": true,
+  "scale_factor": 0.075,
+  "orientation_warning": "模型最长轴为 X (2.000m)，Z轴为 0.020m，可能需要旋转",
+  "original_dims": {
+    "center": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "ranges": [
+      2.0,
+      2.0,
+      0.02
+    ],
+    "max_dim": 2.0
+  },
+  "final_dims": {
+    "ranges": [
+      0.15,
+      0.15,
+      0.0015
+    ],
+    "max_dim": 0.15
+  }
+}

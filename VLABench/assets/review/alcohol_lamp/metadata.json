@@ -1,0 +1,14 @@
+{
+  "uid": "alcohol_lamp",
+  "name": "alcohol_lamp",
+  "source": "local",
+  "original_path": "/ssd/mkqin/download/alcohol_lamp.glb",
+  "keyword": "alcohol_lamp",
+  "tags": [],
+  "categories": [],
+  "description": "Local GLB model: alcohol_lamp.glb",
+  "rotation": {
+    "axis": "x",
+    "degrees": 90.0
+  }
+}

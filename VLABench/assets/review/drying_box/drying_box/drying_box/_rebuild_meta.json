@@ -1,0 +1,97 @@
+[
+  {
+    "group": "body",
+    "obj_file": "body_aluminum_anodized_charcoal.obj",
+    "mtl_file": "body_aluminum_anodized_charcoal.mtl",
+    "material_name": "Aluminum_Anodized_Charcoal",
+    "has_texture": false,
+    "texture_file": null,
+    "rgba": [
+      0.47058823529411764,
+      0.47058823529411764,
+      0.47058823529411764,
+      1.0
+    ],
+    "n_geoms": 24
+  },
+  {
+    "group": "body",
+    "obj_file": "body_mdl_0007.obj",
+    "mtl_file": "body_mdl_0007.mtl",
+    "material_name": "mdl_0007",
+    "has_texture": false,
+    "texture_file": null,
+    "rgba": [
+      0.058823529411764705,
+      0.10196078431372549,
+      0.35294117647058826,
+      1.0
+    ],
+    "n_geoms": 4
+  },
+  {
+    "group": "body",
+    "obj_file": "body_mdl_0008.obj",
+    "mtl_file": "body_mdl_0008.mtl",
+    "material_name": "mdl_0008",
+    "has_texture": true,
+    "texture_file": "body_mdl_0008.png",
+    "rgba": null,
+    "n_geoms": 1
+  },
+  {
+    "group": "body",
+    "obj_file": "body_mdl_0009.obj",
+    "mtl_file": "body_mdl_0009.mtl",
+    "material_name": "mdl_0009",
+    "has_texture": true,
+    "texture_file": "body_mdl_0009.png",
+    "rgba": null,
+    "n_geoms": 1
+  },
+  {
+    "group": "body",
+    "obj_file": "body_vcol.obj",
+    "mtl_file": "body_vcol.mtl",
+    "material_name": null,
+    "has_texture": false,
+    "texture_file": null,
+    "rgba": [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "n_geoms": 1
+  },
+  {
+    "group": "button",
+    "obj_file": "button_vcol.obj",
+    "mtl_file": "button_vcol.mtl",
+    "material_name": null,
+    "has_texture": false,
+    "texture_file": null,
+    "rgba": [
+      0.4,
+      0.4,
+      0.4,
+      1.0
+    ],
+    "n_geoms": 1
+  },
+  {
+    "group": "door",
+    "obj_file": "door_mdl_0007.obj",
+    "mtl_file": "door_mdl_0007.mtl",
+    "material_name": "mdl_0007",
+    "has_texture": false,
+    "texture_file": null,
+    "rgba": [
+      0.058823529411764705,
+      0.10196078431372549,
+      0.35294117647058826,
+      1.0
+    ],
+    "n_geoms": 2
+  }
+]

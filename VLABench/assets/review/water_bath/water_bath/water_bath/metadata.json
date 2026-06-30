@@ -1,0 +1,14 @@
+{
+  "uid": "water_bath",
+  "name": "water_bath",
+  "source": "local",
+  "original_path": "/tmp/water_bath_input/water_bath.glb",
+  "keyword": "water_bath",
+  "tags": [],
+  "categories": [],
+  "description": "Local GLB model: water_bath.glb",
+  "rotation": {
+    "axis": "x",
+    "degrees": 90.0
+  }
+}

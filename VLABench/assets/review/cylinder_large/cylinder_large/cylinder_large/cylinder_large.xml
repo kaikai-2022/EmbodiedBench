@@ -1,0 +1,56 @@
+<?xml version="1.0" ?>
+<mujoco model="cylinder_large">
+  <asset>
+    <texture type="2d" name="lab_cylinder_a" file="lab_cylinder_a.png"/>
+    <material name="lab_cylinder_a" texture="lab_cylinder_a" specular="0.4000000000000001" shininess="0.001" rgba="1 1 1 0.3"/>
+    <mesh file="cylinder_large.obj" scale="0.011148996505364010 0.011148996505364010 0.011148996505364010"/>
+    <mesh file="cylinder_large/cylinder_large_collision_0.obj" scale="0.011148996505364010 0.011148996505364010 0.011148996505364010"/>
+    <mesh file="cylinder_large/cylinder_large_collision_1.obj" scale="0.011148996505364010 0.011148996505364010 0.011148996505364010"/>
+    <mesh file="cylinder_large/cylinder_large_collision_2.obj" scale="0.011148996505364010 0.011148996505364010 0.011148996505364010"/>
+    <mesh file="cylinder_large/cylinder_large_collision_3.obj" scale="0.011148996505364010 0.011148996505364010 0.011148996505364010"/>
+    <mesh file="cylinder_large/cylinder_large_collision_4.obj" scale="0.011148996505364010 0.011148996505364010 0.011148996505364010"/>
+    <mesh file="cylinder_large/cylinder_large_collision_5.obj" scale="0.011148996505364010 0.011148996505364010 0.011148996505364010"/>
+    <mesh file="cylinder_large/cylinder_large_collision_6.obj" scale="0.011148996505364010 0.011148996505364010 0.011148996505364010"/>
+    <mesh file="cylinder_large/cylinder_large_collision_7.obj" scale="0.011148996505364010 0.011148996505364010 0.011148996505364010"/>
+    <mesh file="cylinder_large/cylinder_large_collision_8.obj" scale="0.011148996505364010 0.011148996505364010 0.011148996505364010"/>
+      <material name="CaSO4" rgba="1 1 1 0.7"/>
+    <material name="CuCl2" rgba="0.141 1.0 0.174 0.4"/>
+    <material name="CuSO4" rgba="0 0.45 1 0.4"/>
+    <material name="FeCl3" rgba="0.6475 0.5686 0.023 0.4"/>
+    <material name="KMnO4" rgba="0.5 0 0.5 0.4"/>
+    <material name="I2" rgba="0.3 0.13 0.0 0.4"/>
+    <material name="K2CrO4" rgba="0.57 0.12 0.013 0.4"/>
+    <material name="NaCl" rgba="1 1 1 0.3"/>
+</asset>
+  <worldbody>
+    <body name="cylinder_large">
+      <inertial pos="0 0 0.115000" mass="0.02" diaginertia="0.001881 0.001881 0.001176"/>
+      <geom material="lab_cylinder_a" mesh="cylinder_large" class="visual"/>
+      <geom mesh="cylinder_large_collision_0" class="collision"/>
+      <geom mesh="cylinder_large_collision_1" class="collision"/>
+      <geom mesh="cylinder_large_collision_2" class="collision"/>
+      <geom mesh="cylinder_large_collision_3" class="collision"/>
+      <geom mesh="cylinder_large_collision_4" class="collision"/>
+      <geom mesh="cylinder_large_collision_5" class="collision"/>
+      <geom mesh="cylinder_large_collision_6" class="collision"/>
+      <geom mesh="cylinder_large_collision_7" class="collision"/>
+      <geom mesh="cylinder_large_collision_8" class="collision"/>
+      <site class="grasppoint" pos="0.0000 0.0000 0.2185"/>
+          <geom name="solution" type="cylinder" size="0.013833 0.069000" pos="0 0 0.068967" material="CaSO4" class="visual"/>
+      <site name="top_site" pos="0 0 0.230000" size="0.01" rgba="1 0 0 0"/>
+      <site name="bottom_site" pos="0 0 0.000000" size="0.01" rgba="0 1 0 0"/>
+</body>
+  </worldbody>
+  <compiler boundmass="0.015" boundinertia="1e-05" angle="radian"/>
+  <default>
+    <default class="visual">
+      <geom group="2" type="mesh" contype="0" conaffinity="0" density="50"/>
+    </default>
+    <default class="collision">
+      <geom group="3" type="mesh" density="50" friction="1.5 0.1 0.1" solimp="0.9 0.95 0.001" solref="0.02 1"/>
+    </default>
+    <default class="grasppoint">
+      <site type="sphere" size="0.005" group="4" rgba="0 0 1 1"/>
+    </default>
+  </default>
+</mujoco>

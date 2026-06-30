@@ -22,6 +22,24 @@ logger = logging.getLogger(__name__)
 TUBE_COL_POS = [-0.16, -0.08, 0, 0.08, 0.16]
 TUBE_ROW_POS = [-0.05, 0.05]
 
+# 移液枪架 subentity 布局常量 (4 段中点)
+PIPETTE_STAND_COL_POS = [0]
+PIPETTE_STAND_ROW_POS = [-0.1088, -0.0363, 0.0363, 0.1088]
+
+# Funnel subentity 位置：铁环 placepoint 高度 (z=0.35)，向竖直铁杆偏移 -0.03m
+FUNNEL_SUBENTITY_POSITION = [-0.02, 0.008, 0.30]
+
+# Funnel 支持的父容器
+FUNNEL_PARENT_CONTAINERS = {
+    "funnel": ("funnel_support", "FunnelSupport"),
+}
+
+# 默认父容器映射（class_name -> (spec, class)）
+DEFAULT_PARENT_CONTAINERS = {
+    "ChemistryTube": ("chemistry_tube_stand", "TubeStand"),
+    "Funnel": ("funnel_support", "FunnelSupport"),
+}
+
 # 多实体位置分散策略：确保同场景多个实体不会重叠
 # 每个实体的位置范围之间有足够的间隔（至少0.1m）
 ENTITY_POSITION_RANGES = [
@@ -52,6 +70,7 @@ class EntityLoadPlan:
     parent_spec: Optional[str] = None
     position_index: int = 0  # 用于位置分散
     attach_to_arena: bool = False  # 加载后是否焊死到 arena
+    subentity_position: list = field(default_factory=list)  # 子实体相对位置
 
 
 def plan_entity_loading(
@@ -72,15 +91,18 @@ def plan_entity_loading(
     has_init_container = False
     plain_entity_counter = 0  # 用于位置分散
 
-    # 第一遍扫描：找出已有的 tube_stand uid
+    # 第一遍扫描：找出已有的 tube_stand / funnel_support uid
     existing_tube_stand_uid = None
+    existing_funnel_support_uid = None
     for inst in instances:
         if not inst.get("is_physical", True):
             continue
         uid = inst["uid"]
         info = asset_status.get(uid, {})
-        if info.get("class_name") == "TubeStand" or inst.get("spec") == "chemistry_tube_stand":
+        if info.get("class_name") in ("TubeStand", "MediumTubeStand") or inst.get("spec") in ("chemistry_tube_stand", "chemistry_tube_rack"):
             existing_tube_stand_uid = uid
+        if info.get("class_name") == "FunnelSupport" or inst.get("spec") == "funnel_support":
+            existing_funnel_support_uid = uid
 
     for inst in instances:
         if not inst.get("is_physical", True):
@@ -94,30 +116,105 @@ def plan_entity_loading(
 
         # SubEntity: ChemistryTube
         if class_name == "ChemistryTube":
-            parent_spec = "chemistry_tube_stand"
+            parent_spec = "chemistry_tube_rack" if spec == "chemistry_tube" else "chemistry_tube_stand"
+            parent_class = "MediumTubeStand" if parent_spec == "chemistry_tube_rack" else "TubeStand"
             if existing_tube_stand_uid:
                 parent_uid = existing_tube_stand_uid
             else:
                 parent_uid = parent_spec
                 if parent_uid not in asset_status:
-                    _inject_tube_stand(asset_status)
+                    _inject_tube_stand(asset_status, parent_spec)
             if not has_init_container:
                 plans.append(EntityLoadPlan(
                     uid=parent_uid, spec=parent_spec,
-                    class_name="TubeStand",
+                    class_name=parent_class,
                     load_mode="plain",
                     method_name="load_init_containers",
                 ))
                 has_init_container = True
 
             plans.append(EntityLoadPlan(
-                uid=uid, spec="tube", class_name="ChemistryTube",
+                uid=uid, spec=spec, class_name="ChemistryTube",
                 load_mode="subentity", method_name="load_objects",
                 properties=properties, parent_spec=parent_spec,
             ))
 
-        # 跳过已被 ChemistryTube 作为父容器使用的 TubeStand
-        elif uid == existing_tube_stand_uid and has_init_container:
+        # SubEntity: pipette (放在 tube_stand 试管架上)
+        elif spec == "pipette":
+            parent_spec = "chemistry_tube_stand"
+            parent_class = "TubeStand"
+            if existing_tube_stand_uid:
+                parent_uid = existing_tube_stand_uid
+            else:
+                parent_uid = parent_spec
+                if parent_uid not in asset_status:
+                    _inject_tube_stand(asset_status, parent_spec)
+            if not has_init_container:
+                plans.append(EntityLoadPlan(
+                    uid=parent_uid, spec=parent_spec,
+                    class_name=parent_class,
+                    load_mode="plain",
+                    method_name="load_init_containers",
+                ))
+                has_init_container = True
+
+            plans.append(EntityLoadPlan(
+                uid=uid, spec=spec, class_name=class_name,
+                load_mode="subentity", method_name="load_objects",
+                properties=properties, parent_spec=parent_spec,
+            ))
+
+        # SubEntity: mechanical_pipette (放在 pipettes_stand 顶部)
+        elif spec == "mechanical_pipette":
+            parent_spec = "pipettes_stand"
+            parent_class = "PipetteStand"
+            parent_uid = parent_spec
+            if parent_uid not in asset_status:
+                _inject_pipettes_stand(asset_status)
+            if not has_init_container:
+                plans.append(EntityLoadPlan(
+                    uid=parent_uid, spec=parent_spec,
+                    class_name=parent_class,
+                    load_mode="plain",
+                    method_name="load_init_containers",
+                ))
+                has_init_container = True
+
+            plans.append(EntityLoadPlan(
+                uid=uid, spec=spec, class_name=class_name,
+                load_mode="subentity", method_name="load_objects",
+                properties=properties, parent_spec=parent_spec,
+            ))
+
+        # SubEntity: Funnel (漏斗放在铁架台的铁环上)
+        # 注意：funnel 注册的 class 是 CommonGraspedEntity，所以用 spec 判断
+        elif spec == "funnel":
+            parent_spec = "funnel_support"
+            parent_class = "FunnelSupport"
+            if existing_funnel_support_uid:
+                parent_uid = existing_funnel_support_uid
+            else:
+                parent_uid = parent_spec
+                if parent_uid not in asset_status:
+                    _inject_funnel_support(asset_status)
+            if not has_init_container:
+                plans.append(EntityLoadPlan(
+                    uid=parent_uid, spec=parent_spec,
+                    class_name=parent_class,
+                    load_mode="plain",
+                    method_name="load_init_containers",
+                ))
+                has_init_container = True
+
+            plans.append(EntityLoadPlan(
+                uid=uid, spec=spec, class_name=class_name,
+                load_mode="subentity", method_name="load_objects",
+                properties=properties, parent_spec=parent_spec,
+                subentity_position=FUNNEL_SUBENTITY_POSITION,
+            ))
+
+        # 跳过已被作为父容器使用的 TubeStand / FunnelSupport
+        elif (uid == existing_tube_stand_uid or spec == "funnel_support") and has_init_container:
             continue
 
         # Liquid: 带 solution
@@ -145,10 +242,36 @@ def plan_entity_loading(
     return plans
 
 
-def _inject_tube_stand(asset_status: Dict) -> None:
-    asset_status["chemistry_tube_stand"] = {
-        "xml_path": "obj/meshes/tube/tube_container/tube_stand.xml",
-        "class_name": "TubeStand",
+def _inject_tube_stand(asset_status: Dict, parent_spec: str = "chemistry_tube_stand") -> None:
+    xml_paths = {
+        "chemistry_tube_stand": "obj/meshes/tube/tube_container/tube_stand.xml",
+        "chemistry_tube_rack": "review/chemistry_tube_rack/chemistry_tube_rack/chemistry_tube_rack.xml",
+    }
+    class_names = {
+        "chemistry_tube_stand": "TubeStand",
+        "chemistry_tube_rack": "MediumTubeStand",
+    }
+    asset_status[parent_spec] = {
+        "xml_path": xml_paths.get(parent_spec, xml_paths["chemistry_tube_stand"]),
+        "class_name": class_names.get(parent_spec, "TubeStand"),
+        "properties": {},
+    }
+
+
+def _inject_funnel_support(asset_status: Dict, parent_spec: str = "funnel_support") -> None:
+    """注入 funnel_support 到 asset_status（如果不在 name2class_xml 中）"""
+    asset_status[parent_spec] = {
+        "xml_path": "review/universal_support/universal_support/universal_support/universal_support.xml",
+        "class_name": "FunnelSupport",
+        "properties": {},
+    }
+
+
+def _inject_pipettes_stand(asset_status: Dict, parent_spec: str = "pipettes_stand") -> None:
+    """注入 pipettes_stand 到 asset_status（如果不在 name2class_xml 中）"""
+    asset_status[parent_spec] = {
+        "xml_path": "review/pipettes_stand/pipettes_stand-ver-/pipettes_stand-ver-.xml",
+        "class_name": "PipetteStand",
         "properties": {},
     }
 
@@ -168,6 +291,7 @@ def generate_load_methods(plans: List[EntityLoadPlan], asset_status: Dict) -> tu
     code_parts = []
     needs_name2class_xml = False
     needs_tube_constants = False
+    needs_pipette_stand_constants = False
 
     # 只处理 load_init_containers 和 load_objects（不再生成 load_containers）
     for method_name in ["load_init_containers", "load_objects"]:
@@ -178,6 +302,7 @@ def generate_load_methods(plans: List[EntityLoadPlan], asset_status: Dict) -> tu
         code_parts.append(code)
         needs_name2class_xml = needs_name2class_xml or flags.get("needs_name2class_xml", False)
         needs_tube_constants = needs_tube_constants or flags.get("needs_tube_constants", False)
+        needs_pipette_stand_constants = needs_pipette_stand_constants or flags.get("needs_pipette_stand_constants", False)
 
     load_methods_code = "\n".join(code_parts)
 
@@ -185,19 +310,21 @@ def generate_load_methods(plans: List[EntityLoadPlan], asset_status: Dict) -> tu
     if needs_name2class_xml:
         extra_imports = "from VLABench.configs.constant import name2class_xml"
 
-    extra_constants = None
+    extra_constants_lines = []
     if needs_tube_constants:
-        extra_constants = (
-            f"relative_col_pos = {TUBE_COL_POS}\n"
-            f"relative_row_pos = {TUBE_ROW_POS}\n"
-        )
+        extra_constants_lines.append(f"relative_col_pos = {TUBE_COL_POS}")
+        extra_constants_lines.append(f"relative_row_pos = {TUBE_ROW_POS}")
+    if needs_pipette_stand_constants:
+        extra_constants_lines.append(f"relative_pipette_stand_col_pos = {PIPETTE_STAND_COL_POS}")
+        extra_constants_lines.append(f"relative_pipette_stand_row_pos = {PIPETTE_STAND_ROW_POS}")
+    extra_constants = "\n".join(extra_constants_lines) + "\n" if extra_constants_lines else None
 
     return load_methods_code, extra_imports, extra_constants
 
 
 def _generate_method(method_name: str, plans: List[EntityLoadPlan]) -> tuple:
     """生成单个 load 方法"""
-    flags = {"needs_name2class_xml": False, "needs_tube_constants": False}
+    flags = {"needs_name2class_xml": False, "needs_tube_constants": False, "needs_pipette_stand_constants": False}
 
     if method_name == "load_init_containers":
         return _gen_init_containers(plans, flags)
@@ -209,12 +336,8 @@ def _generate_method(method_name: str, plans: List[EntityLoadPlan]) -> tuple:
 def _gen_init_containers(plans: List[EntityLoadPlan], flags: Dict) -> str:
     """
     生成 load_init_containers 方法。
-    仅用于 ChemistryTube 的父容器（TubeStand）。
+    用于 ChemistryTube 和 Funnel 的父容器（TubeStand / FunnelSupport）。
     """
-    DEFAULT_PARENT_CONTAINERS = {
-        "ChemistryTube": ("chemistry_tube_stand", "TubeStand"),
-    }
-
     lines = ["    def load_init_containers(self, init_container):"]
 
     default_parents = {}
@@ -328,10 +451,30 @@ def _code_liquid(plan: EntityLoadPlan, flags: Dict) -> List[str]:
 
 
 def _code_subentity(plan: EntityLoadPlan, flags: Dict) -> List[str]:
+    """生成子实体代码，支持 ChemistryTube 和 Funnel"""
     solution_rgba = plan.properties.get("solution_rgba")
     solution = plan.properties.get("solution", plan.uid)
-    flags["needs_tube_constants"] = True
+
+    # Funnel 使用固定的铁环位置
+    if plan.spec == "funnel":
+        pos = plan.subentity_position if plan.subentity_position else FUNNEL_SUBENTITY_POSITION
+        return [
+            f'        init_container_config = self.config["task"]["components"][-1]',
+            '        if "subentities" not in init_container_config:',
+            '            init_container_config["subentities"] = []',
+            f'        funnel_config = dict(',
+            f'            name="{plan.uid}",',
+            f'            xml_path=name2class_xml["{plan.spec}"][-1],',
+            f'            position={pos},',
+            f'        )',
+            f'        funnel_config["class"] = "{plan.class_name}"',
+            '        init_container_config["subentities"].append(funnel_config)',
+            "",
+        ]
+
+    # ChemistryTube 使用试管架孔位布局
     if solution_rgba:
+        flags["needs_tube_constants"] = True
         return [
             "        col_pos = random.choice(relative_col_pos)",
             "        row_pos = random.choice(relative_row_pos)",
@@ -342,7 +485,40 @@ def _code_subentity(plan: EntityLoadPlan, flags: Dict) -> List[str]:
             f'        obj_config = dict(',
             f'            name="{plan.uid}",',
             f'            solution_rgba={solution_rgba},',
-            f'            xml_path=name2class_xml["tube"][-1],',
+            f'            xml_path=name2class_xml["{plan.spec}"][-1],',
+            f'            position=pos,',
+            f'        )',
+            f'        obj_config["class"] = "{plan.class_name}"',
+            '        init_container_config["subentities"].append(obj_config)',
+            "",
+        ]
+    elif plan.spec in ("pipette", "mechanical_pipette"):
+        if plan.spec == "mechanical_pipette":
+            # mechanical_pipette uses pipette_stand's 1x4 slot layout
+            pos_lines = [
+                "        col_pos = random.choice(relative_pipette_stand_col_pos)",
+                "        row_pos = random.choice(relative_pipette_stand_row_pos)",
+            ]
+            flags["needs_pipette_stand_constants"] = True
+            # mechanical_pipette: position relative to stand body origin
+            # Pipette body sits in the stand's top groove at Z=0.077 (local stand frame)
+            # X offset 0.1 accounts for the pipette tilt direction
+            # entity.py adds parent's init_pos, so world Z = 0.077 + stand_init_z (≈0.8) = 0.877 (groove)
+            pos_line_value = "[0.1, -0.0363, 0.077]"
+        else:
+            pos_lines = [
+                "        col_pos = random.choice(relative_col_pos)",
+                "        row_pos = random.choice(relative_row_pos)",
+            ]
+            pos_line_value = "[col_pos, row_pos, 0.05]"
+        return pos_lines + [
+            f"        pos = {pos_line_value}",
+            '        init_container_config = self.config["task"]["components"][-1]',
+            '        if "subentities" not in init_container_config:',
+            '            init_container_config["subentities"] = []',
+            f'        obj_config = dict(',
+            f'            name="{plan.uid}",',
+            f'            xml_path=name2class_xml["{plan.spec}"][-1],',
             f'            position=pos,',
             f'        )',
             f'        obj_config["class"] = "{plan.class_name}"',
@@ -350,6 +526,8 @@ def _code_subentity(plan: EntityLoadPlan, flags: Dict) -> List[str]:
             "",
         ]
     else:
+        # ChemistryTube (no solution)
+        flags["needs_tube_constants"] = True
         return [
             "        col_pos = random.choice(relative_col_pos)",
             "        row_pos = random.choice(relative_row_pos)",
@@ -360,7 +538,7 @@ def _code_subentity(plan: EntityLoadPlan, flags: Dict) -> List[str]:
             f'        obj_config = dict(',
             f'            name="{plan.uid}",',
             f'            solution="{solution}",',
-            f'            xml_path=name2class_xml["tube"][-1],',
+            f'            xml_path=name2class_xml["{plan.spec}"][-1],',
             f'            position=pos,',
             f'        )',
             f'        obj_config["class"] = "{plan.class_name}"',

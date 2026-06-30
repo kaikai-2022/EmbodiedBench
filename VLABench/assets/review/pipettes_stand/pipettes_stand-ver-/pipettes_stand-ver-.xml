@@ -2,53 +2,53 @@
 <mujoco model="pipettes_stand-ver-">
   <asset>
     <material name="Scene_-_Root" specular="0.4000000000000001" shininess="0.001" rgba="0.40000000 0.40000000 0.40000000 1.0"/>
-    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-.obj" scale="0.000625 0.000625 0.000625"/>
-    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_0.obj" scale="0.000625 0.000625 0.000625"/>
-    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_1.obj" scale="0.000625 0.000625 0.000625"/>
-    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_2.obj" scale="0.000625 0.000625 0.000625"/>
-    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_3.obj" scale="0.000625 0.000625 0.000625"/>
-    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_4.obj" scale="0.000625 0.000625 0.000625"/>
-    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_5.obj" scale="0.000625 0.000625 0.000625"/>
-    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_6.obj" scale="0.000625 0.000625 0.000625"/>
-    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_7.obj" scale="0.000625 0.000625 0.000625"/>
-    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_8.obj" scale="0.000625 0.000625 0.000625"/>
-    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_9.obj" scale="0.000625 0.000625 0.000625"/>
-    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_10.obj" scale="0.000625 0.000625 0.000625"/>
-    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_11.obj" scale="0.000625 0.000625 0.000625"/>
-    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_12.obj" scale="0.000625 0.000625 0.000625"/>
-    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_13.obj" scale="0.000625 0.000625 0.000625"/>
-    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_14.obj" scale="0.000625 0.000625 0.000625"/>
-    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_15.obj" scale="0.000625 0.000625 0.000625"/>
-    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_16.obj" scale="0.000625 0.000625 0.000625"/>
-    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_17.obj" scale="0.000625 0.000625 0.000625"/>
-    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_18.obj" scale="0.000625 0.000625 0.000625"/>
-    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_19.obj" scale="0.000625 0.000625 0.000625"/>
-    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_20.obj" scale="0.000625 0.000625 0.000625"/>
-    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_21.obj" scale="0.000625 0.000625 0.000625"/>
-    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_22.obj" scale="0.000625 0.000625 0.000625"/>
-    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_23.obj" scale="0.000625 0.000625 0.000625"/>
-    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_24.obj" scale="0.000625 0.000625 0.000625"/>
-    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_25.obj" scale="0.000625 0.000625 0.000625"/>
-    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_26.obj" scale="0.000625 0.000625 0.000625"/>
-    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_27.obj" scale="0.000625 0.000625 0.000625"/>
-    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_28.obj" scale="0.000625 0.000625 0.000625"/>
-    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_29.obj" scale="0.000625 0.000625 0.000625"/>
-    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_30.obj" scale="0.000625 0.000625 0.000625"/>
-    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_31.obj" scale="0.000625 0.000625 0.000625"/>
-    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_32.obj" scale="0.000625 0.000625 0.000625"/>
-    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_33.obj" scale="0.000625 0.000625 0.000625"/>
-    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_34.obj" scale="0.000625 0.000625 0.000625"/>
-    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_35.obj" scale="0.000625 0.000625 0.000625"/>
-    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_36.obj" scale="0.000625 0.000625 0.000625"/>
-    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_37.obj" scale="0.000625 0.000625 0.000625"/>
-    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_38.obj" scale="0.000625 0.000625 0.000625"/>
-    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_39.obj" scale="0.000625 0.000625 0.000625"/>
-    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_40.obj" scale="0.000625 0.000625 0.000625"/>
-    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_41.obj" scale="0.000625 0.000625 0.000625"/>
+    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-.obj" scale="0.0012086 0.0012086 0.0012086"/>
+    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_0.obj" scale="0.0012086 0.0012086 0.0012086"/>
+    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_1.obj" scale="0.0012086 0.0012086 0.0012086"/>
+    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_2.obj" scale="0.0012086 0.0012086 0.0012086"/>
+    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_3.obj" scale="0.0012086 0.0012086 0.0012086"/>
+    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_4.obj" scale="0.0012086 0.0012086 0.0012086"/>
+    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_5.obj" scale="0.0012086 0.0012086 0.0012086"/>
+    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_6.obj" scale="0.0012086 0.0012086 0.0012086"/>
+    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_7.obj" scale="0.0012086 0.0012086 0.0012086"/>
+    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_8.obj" scale="0.0012086 0.0012086 0.0012086"/>
+    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_9.obj" scale="0.0012086 0.0012086 0.0012086"/>
+    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_10.obj" scale="0.0012086 0.0012086 0.0012086"/>
+    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_11.obj" scale="0.0012086 0.0012086 0.0012086"/>
+    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_12.obj" scale="0.0012086 0.0012086 0.0012086"/>
+    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_13.obj" scale="0.0012086 0.0012086 0.0012086"/>
+    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_14.obj" scale="0.0012086 0.0012086 0.0012086"/>
+    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_15.obj" scale="0.0012086 0.0012086 0.0012086"/>
+    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_16.obj" scale="0.0012086 0.0012086 0.0012086"/>
+    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_17.obj" scale="0.0012086 0.0012086 0.0012086"/>
+    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_18.obj" scale="0.0012086 0.0012086 0.0012086"/>
+    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_19.obj" scale="0.0012086 0.0012086 0.0012086"/>
+    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_20.obj" scale="0.0012086 0.0012086 0.0012086"/>
+    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_21.obj" scale="0.0012086 0.0012086 0.0012086"/>
+    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_22.obj" scale="0.0012086 0.0012086 0.0012086"/>
+    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_23.obj" scale="0.0012086 0.0012086 0.0012086"/>
+    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_24.obj" scale="0.0012086 0.0012086 0.0012086"/>
+    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_25.obj" scale="0.0012086 0.0012086 0.0012086"/>
+    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_26.obj" scale="0.0012086 0.0012086 0.0012086"/>
+    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_27.obj" scale="0.0012086 0.0012086 0.0012086"/>
+    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_28.obj" scale="0.0012086 0.0012086 0.0012086"/>
+    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_29.obj" scale="0.0012086 0.0012086 0.0012086"/>
+    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_30.obj" scale="0.0012086 0.0012086 0.0012086"/>
+    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_31.obj" scale="0.0012086 0.0012086 0.0012086"/>
+    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_32.obj" scale="0.0012086 0.0012086 0.0012086"/>
+    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_33.obj" scale="0.0012086 0.0012086 0.0012086"/>
+    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_34.obj" scale="0.0012086 0.0012086 0.0012086"/>
+    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_35.obj" scale="0.0012086 0.0012086 0.0012086"/>
+    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_36.obj" scale="0.0012086 0.0012086 0.0012086"/>
+    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_37.obj" scale="0.0012086 0.0012086 0.0012086"/>
+    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_38.obj" scale="0.0012086 0.0012086 0.0012086"/>
+    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_39.obj" scale="0.0012086 0.0012086 0.0012086"/>
+    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_40.obj" scale="0.0012086 0.0012086 0.0012086"/>
+    <mesh file="pipettes_stand-ver-/pipettes_stand-ver-_collision_41.obj" scale="0.0012086 0.0012086 0.0012086"/>
   </asset>
   <worldbody>
     <body name="pipettes_stand-ver-">
-      <inertial pos="0 0 0.072395" mass="0.02" diaginertia="0.0008 0.0008 0.0005"/>
+      <inertial pos="0 0 0.140000" mass="0.02" diaginertia="0.0008 0.0008 0.0005"/>
       <geom material="Scene_-_Root" mesh="pipettes_stand-ver-" class="visual"/>
       <geom mesh="pipettes_stand-ver-_collision_0" rgba="0.42854341583297706 0.3707708800581443 0.9156908521138059 1" class="collision"/>
       <geom mesh="pipettes_stand-ver-_collision_1" rgba="0.28319376862662005 0.8807286475346793 0.05917100431796074 1" class="collision"/>
@@ -92,12 +92,18 @@
       <geom mesh="pipettes_stand-ver-_collision_39" rgba="0.42622914597462025 0.5968450174565851 0.03705088104947629 1" class="collision"/>
       <geom mesh="pipettes_stand-ver-_collision_40" rgba="0.6733458095367374 0.7141668638708442 0.38291730066860696 1" class="collision"/>
       <geom mesh="pipettes_stand-ver-_collision_41" rgba="0.08633945535996579 0.5569901133496278 0.3473218588164374 1" class="collision"/>
-      <site class="grasppoint" pos="0.0000 0.0000 0.1303"/>
-      <site class="grasppoint" pos="0.0000 0.0000 0.1303"/>
-      <site class="grasppoint" pos="0.0000 0.0000 0.1448"/>
-        <site name="top_site" pos="0 0 0.1" size="0.01" rgba="1 0 0 0"/>
+      <site class="grasppoint" pos="0.0000 0.0000 0.2520"/>
+      <site class="grasppoint" pos="0.0000 0.0000 0.2520"/>
+      <site class="grasppoint" pos="0.0000 0.0000 0.2800"/>
+        <site name="top_site" pos="0 0 0.28" size="0.01" rgba="1 0 0 0"/>
     <site name="bottom_site" pos="0 0 0.0" size="0.01" rgba="0 1 0 0"/>
-</body>>
+      <site class="placepoint" pos="0 -0.1088 0.077"/>
+      <site class="placepoint" pos="0 -0.0363 0.077"/>
+      <site class="placepoint" pos="0 0.0363 0.077"/>
+      <site class="placepoint" pos="0 0.1088 0.077"/>
+      <site class="keypoint" pos="-0.08 -0.14 0.0"/>
+      <site class="keypoint" pos="0.08 0.14 0.28"/>
+</body>
   </worldbody>
   <compiler boundmass="0.015" boundinertia="1e-05" angle="radian"/>
   <default>
@@ -109,6 +115,12 @@
     </default>
     <default class="grasppoint">
       <site type="sphere" size="0.005" group="4" rgba="0 0 1 1"/>
+    </default>
+    <default class="placepoint">
+      <site type="sphere" size="0.01" group="2" rgba="0 0 1 0"/>
+    </default>
+    <default class="keypoint">
+      <site type="sphere" size="0.01" group="3" rgba="1 0 0 1"/>
     </default>
   </default>
 </mujoco>

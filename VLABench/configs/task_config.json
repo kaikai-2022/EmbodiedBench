@@ -1209,37 +1209,18 @@
       }
     }
   },
-  "open_drawer": {
-    "robot": {
-      "position": [
-        0,
-        -0.7,
-        0.7
-      ]
-    },
+  "open_drawer_series": {
     "task": {
-      "ngrid": [
-        3,
-        3
-      ],
-      "workspace": [
-        -0.2,
-        0.2,
-        -0.45,
-        -0.3,
-        0.8,
-        1.5
-      ],
-      "random_ignored_entities": [
-        "table"
-      ],
       "asset": {
-        "seen_init_container": [
-          "cabinet_seen"
+        "seen_object": [
+          "drawer"
         ],
-        "unseen_init_container": [
-          "cabinet_unseen"
+        "unseen_object": [
+          "drawer"
         ]
+      },
+      "scene": {
+        "name": "laboratory_0"
       },
       "components": [
         {
@@ -1250,10 +1231,32 @@
             "texture": false
           }
         }
-      ],
+      ]
+    }
+  },
+  "open_drying_box_door_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "drying_box"
+        ],
+        "unseen_object": [
+          "drying_box"
+        ]
+      },
       "scene": {
-        "name": "store_0"
-      }
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
     }
   },
   "cool_drink_series": {
@@ -1896,31 +1899,6 @@
       "scene": {
         "name": "lab_0"
       }
-    }
-  },
-  "lift_beaker_series": {
-    "task": {
-      "asset": {
-        "seen_object": [
-          "beaker"
-        ],
-        "unseen_object": [
-          "beaker"
-        ]
-      },
-      "scene": {
-        "name": "laboratory_0"
-      },
-      "components": [
-        {
-          "name": "table",
-          "xml_path": "obj/meshes/table/table.xml",
-          "class": "Table",
-          "randomness": {
-            "texture": false
-          }
-        }
-      ]
     }
   },
   "place_test_tube_into_rack_series": {
@@ -2887,31 +2865,6 @@
       ]
     }
   },
-  "lift_cylinder_series": {
-    "task": {
-      "asset": {
-        "seen_object": [
-          "cylinder_small"
-        ],
-        "unseen_object": [
-          "cylinder_small"
-        ]
-      },
-      "scene": {
-        "name": "laboratory_0"
-      },
-      "components": [
-        {
-          "name": "table",
-          "xml_path": "obj/meshes/table/table.xml",
-          "class": "Table",
-          "randomness": {
-            "texture": false
-          }
-        }
-      ]
-    }
-  },
   "lift_flask_series": {
     "task": {
       "asset": {
@@ -2945,162 +2898,6 @@
         ],
         "unseen_object": [
           "flask"
-        ]
-      },
-      "scene": {
-        "name": "laboratory_0"
-      },
-      "components": [
-        {
-          "name": "table",
-          "xml_path": "obj/meshes/table/table.xml",
-          "class": "Table",
-          "randomness": {
-            "texture": false
-          }
-        }
-      ]
-    }
-  },
-  "lift_small_beaker_series": {
-    "task": {
-      "asset": {
-        "seen_object": [
-          "small_beaker"
-        ],
-        "unseen_object": [
-          "small_beaker"
-        ]
-      },
-      "scene": {
-        "name": "laboratory_0"
-      },
-      "components": [
-        {
-          "name": "table",
-          "xml_path": "obj/meshes/table/table.xml",
-          "class": "Table",
-          "randomness": {
-            "texture": false
-          }
-        }
-      ]
-    }
-  },
-  "lift_small_cylinder_series": {
-    "task": {
-      "asset": {
-        "seen_object": [
-          "cylinder_small"
-        ],
-        "unseen_object": [
-          "cylinder_small"
-        ]
-      },
-      "scene": {
-        "name": "laboratory_0"
-      },
-      "components": [
-        {
-          "name": "table",
-          "xml_path": "obj/meshes/table/table.xml",
-          "class": "Table",
-          "randomness": {
-            "texture": false
-          }
-        }
-      ]
-    }
-  },
-  "pick_small_beaker_place_small_beaker_series": {
-    "task": {
-      "asset": {
-        "seen_object": [
-          "small_beaker",
-          "electronic_scale"
-        ],
-        "unseen_object": [
-          "small_beaker",
-          "electronic_scale"
-        ]
-      },
-      "scene": {
-        "name": "laboratory_0"
-      },
-      "components": [
-        {
-          "name": "table",
-          "xml_path": "obj/meshes/table/table.xml",
-          "class": "Table",
-          "randomness": {
-            "texture": false
-          }
-        }
-      ]
-    }
-  },
-  "pick_beaker_place_beaker_series": {
-    "task": {
-      "asset": {
-        "seen_object": [
-          "small_beaker",
-          "electronic_scale"
-        ],
-        "unseen_object": [
-          "small_beaker",
-          "electronic_scale"
-        ]
-      },
-      "scene": {
-        "name": "laboratory_0"
-      },
-      "components": [
-        {
-          "name": "table",
-          "xml_path": "obj/meshes/table/table.xml",
-          "class": "Table",
-          "randomness": {
-            "texture": false
-          }
-        }
-      ]
-    }
-  },
-  "pick_tube_lift_tube_series": {
-    "task": {
-      "asset": {
-        "seen_object": [
-          "tube"
-        ],
-        "unseen_object": [
-          "tube"
-        ]
-      },
-      "scene": {
-        "name": "laboratory_0"
-      },
-      "components": [
-        {
-          "name": "table",
-          "xml_path": "obj/meshes/table/table.xml",
-          "class": "Table",
-          "randomness": {
-            "texture": false
-          }
-        }
-      ]
-    }
-  },
-  "pick_glass_stirring_rod_insert_glass_stirring_rod_series": {
-    "task": {
-      "asset": {
-        "seen_object": [
-          "glass_stirring_rod",
-          "large_beaker"
-        ],
-        "unseen_object": [
-          "glass_stirring_rod",
-          "large_beaker"
         ]
       },
       "scene": {
@@ -3222,85 +3019,6 @@
       ]
     }
   },
-  "pick_small_beaker_shake_small_beaker_series": {
-    "task": {
-      "asset": {
-        "seen_object": [
-          "small_beaker"
-        ],
-        "unseen_object": [
-          "small_beaker"
-        ]
-      },
-      "scene": {
-        "name": "laboratory_0"
-      },
-      "components": [
-        {
-          "name": "table",
-          "xml_path": "obj/meshes/table/table.xml",
-          "class": "Table",
-          "randomness": {
-            "texture": false
-          }
-        }
-      ]
-    }
-  },
-  "pick_flask_place_flask_series": {
-    "task": {
-      "asset": {
-        "seen_object": [
-          "flask",
-          "electronic_scale"
-        ],
-        "unseen_object": [
-          "flask",
-          "electronic_scale"
-        ]
-      },
-      "scene": {
-        "name": "laboratory_0"
-      },
-      "components": [
-        {
-          "name": "table",
-          "xml_path": "obj/meshes/table/table.xml",
-          "class": "Table",
-          "randomness": {
-            "texture": false
-          }
-        }
-      ]
-    }
-  },
-  "pick_small_beaker_pour_small_beaker_series": {
-    "task": {
-      "asset": {
-        "seen_object": [
-          "small_beaker",
-          "large_beaker"
-        ],
-        "unseen_object": [
-          "small_beaker",
-          "large_beaker"
-        ]
-      },
-      "scene": {
-        "name": "laboratory_0"
-      },
-      "components": [
-        {
-          "name": "table",
-          "xml_path": "obj/meshes/table/table.xml",
-          "class": "Table",
-          "randomness": {
-            "texture": false
-          }
-        }
-      ]
-    }
-  },
   "pick_pill_bottle_lift_pill_bottle_series": {
     "task": {
       "asset": {
@@ -3376,106 +3094,6 @@
       ]
     }
   },
-  "unscrew_bottle_series": {
-    "task": {
-      "asset": {
-        "seen_object": [
-          "pill_bottle"
-        ],
-        "unseen_object": [
-          "pill_bottle"
-        ]
-      },
-      "scene": {
-        "name": "laboratory_0"
-      },
-      "components": [
-        {
-          "name": "table",
-          "xml_path": "obj/meshes/table/table.xml",
-          "class": "Table",
-          "randomness": {
-            "texture": false
-          }
-        }
-      ]
-    }
-  },
-  "pick_pill_bottle_series": {
-    "task": {
-      "asset": {
-        "seen_object": [
-          "pill_bottle"
-        ],
-        "unseen_object": [
-          "pill_bottle"
-        ]
-      },
-      "scene": {
-        "name": "laboratory_0"
-      },
-      "components": [
-        {
-          "name": "table",
-          "xml_path": "obj/meshes/table/table.xml",
-          "class": "Table",
-          "randomness": {
-            "texture": false
-          }
-        }
-      ]
-    }
-  },
-  "pick_bottle_lift_bottle_series": {
-    "task": {
-      "asset": {
-        "seen_object": [
-          "pill_bottle"
-        ],
-        "unseen_object": [
-          "pill_bottle"
-        ]
-      },
-      "scene": {
-        "name": "laboratory_0"
-      },
-      "components": [
-        {
-          "name": "table",
-          "xml_path": "obj/meshes/table/table.xml",
-          "class": "Table",
-          "randomness": {
-            "texture": false
-          }
-        }
-      ]
-    }
-  },
-  "pick_asprin_pill_bottle_lift_asprin_pill_bottle_series": {
-    "task": {
-      "asset": {
-        "seen_object": [
-          "aspirin_pill_bottle"
-        ],
-        "unseen_object": [
-          "aspirin_pill_bottle"
-        ]
-      },
-      "scene": {
-        "name": "laboratory_0"
-      },
-      "components": [
-        {
-          "name": "table",
-          "xml_path": "obj/meshes/table/table.xml",
-          "class": "Table",
-          "randomness": {
-            "texture": false
-          }
-        }
-      ]
-    }
-  },
   "unscrew_asprin_pill_bottle_series": {
     "task": {
       "asset": {
@@ -3501,7 +3119,294 @@
       ]
     }
   },
-  "unscrew_aspirin_pill_bottle_series": {
+  "put_small_beaker_wait_for_object_lift_small_beaker_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "small_beaker",
+          "hot_plate"
+        ],
+        "unseen_object": [
+          "small_beaker",
+          "hot_plate"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "lift_chemistry_tube_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "chemistry_tube"
+        ],
+        "unseen_object": [
+          "chemistry_tube"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "lift_alcohol_lamp_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "alcohol_lamp"
+        ],
+        "unseen_object": [
+          "alcohol_lamp"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "wait_for_object_pick_up_alcohol_lamp_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "alcohol_lamp"
+        ],
+        "unseen_object": [
+          "alcohol_lamp"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "weight_beaker_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "small_beaker",
+          "electronic_scale"
+        ],
+        "unseen_object": [
+          "small_beaker",
+          "electronic_scale"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "pick_beaker_place_beaker_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "small_beaker",
+          "electronic_scale"
+        ],
+        "unseen_object": [
+          "small_beaker",
+          "electronic_scale"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "lift_beaker_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "small_beaker"
+        ],
+        "unseen_object": [
+          "small_beaker"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "lift_cylinder_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "cylinder_small"
+        ],
+        "unseen_object": [
+          "cylinder_small"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "weight_flask_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "flask",
+          "electronic_scale"
+        ],
+        "unseen_object": [
+          "flask",
+          "electronic_scale"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "insert_stirring_rod_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "glass_stirring_rod",
+          "large_beaker"
+        ],
+        "unseen_object": [
+          "glass_stirring_rod",
+          "large_beaker"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "place_flask_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "flask",
+          "heat_device"
+        ],
+        "unseen_object": [
+          "flask",
+          "heat_device"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "unscrew_bottle_series": {
     "task": {
       "asset": {
         "seen_object": [
@@ -3509,6 +3414,771 @@
         ],
         "unseen_object": [
           "aspirin_pill_bottle"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "pour_beaker_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "small_beaker",
+          "large_beaker"
+        ],
+        "unseen_object": [
+          "small_beaker",
+          "large_beaker"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "shake_beaker_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "small_beaker"
+        ],
+        "unseen_object": [
+          "small_beaker"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "lift_tube_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "tube"
+        ],
+        "unseen_object": [
+          "tube"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "pour_tube_insert_tube_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "tube",
+          "large_beaker",
+          "chemistry_tube_stand"
+        ],
+        "unseen_object": [
+          "tube",
+          "large_beaker",
+          "chemistry_tube_stand"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "pour_tube_insert_tube_v2_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "tube",
+          "large_beaker",
+          "chemistry_tube_stand"
+        ],
+        "unseen_object": [
+          "tube",
+          "large_beaker",
+          "chemistry_tube_stand"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "pick_small_beaker_pour_object_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "small_beaker",
+          "large_beaker"
+        ],
+        "unseen_object": [
+          "small_beaker",
+          "large_beaker"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "stir_beaker_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "large_beaker",
+          "glass_stirring_rod"
+        ],
+        "unseen_object": [
+          "large_beaker",
+          "glass_stirring_rod"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "place_large_beaker_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "large_beaker",
+          "universal_support"
+        ],
+        "unseen_object": [
+          "large_beaker",
+          "universal_support"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "pick_funnel": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "funnel",
+          "funnel_support"
+        ],
+        "unseen_object": [
+          "funnel",
+          "funnel_support"
+        ],
+        "seen_init_container": [
+          "funnel_support"
+        ],
+        "unseen_init_container": [
+          "funnel_support"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "pick_funnel_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "funnel"
+        ],
+        "unseen_object": [
+          "funnel"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "pick_universal_support_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "universal_support"
+        ],
+        "unseen_object": [
+          "universal_support"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "put_small_beaker_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "small_beaker",
+          "water_bath"
+        ],
+        "unseen_object": [
+          "small_beaker",
+          "water_bath"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "pick_tube_lift_tube_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "tube"
+        ],
+        "unseen_object": [
+          "tube"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "pick_thermometer_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "thermometer"
+        ],
+        "unseen_object": [
+          "thermometer"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "measure_solution_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "small_beaker",
+          "thermometer"
+        ],
+        "unseen_object": [
+          "small_beaker",
+          "thermometer"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "pour_large_cylinder_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "cylinder_big",
+          "large_beaker"
+        ],
+        "unseen_object": [
+          "cylinder_big",
+          "large_beaker"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "pick_pipette_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "pipette"
+        ],
+        "unseen_object": [
+          "pipette"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "pick_pipette_lift_pipette_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "pipette"
+        ],
+        "unseen_object": [
+          "pipette"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "pour_cylinder_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "cylinder_mid",
+          "large_beaker"
+        ],
+        "unseen_object": [
+          "cylinder_mid",
+          "large_beaker"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "pick_mechanical_pipette_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "mechanical_pipette"
+        ],
+        "unseen_object": [
+          "mechanical_pipette"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "place_beaker_in_water_bath_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "small_beaker",
+          "water_bath"
+        ],
+        "unseen_object": [
+          "small_beaker",
+          "water_bath"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "shake_flask_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "flask"
+        ],
+        "unseen_object": [
+          "flask"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "place_beaker_on_the_mat_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "small_beaker",
+          "square_mat"
+        ],
+        "unseen_object": [
+          "small_beaker",
+          "square_mat"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "pick_mechanical_pipette_lift_mechanical_pipette_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "mechanical_pipette"
+        ],
+        "unseen_object": [
+          "mechanical_pipette"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "pick_conical_flask_small_lift_conical_flask_small_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "conical_flask_small"
+        ],
+        "unseen_object": [
+          "conical_flask_small"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "pick_conical_flask_large_lift_conical_flask_large_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "conical_flask_large"
+        ],
+        "unseen_object": [
+          "conical_flask_large"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "pick_conical_flask_mid_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "conical_flask_mid"
+        ],
+        "unseen_object": [
+          "conical_flask_mid"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "place_beaker_large_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "large_beaker",
+          "tripod"
+        ],
+        "unseen_object": [
+          "large_beaker",
+          "tripod"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "place_florence_flask_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "florence_flask",
+          "tripod"
+        ],
+        "unseen_object": [
+          "florence_flask",
+          "tripod"
         ]
       },
       "scene": {

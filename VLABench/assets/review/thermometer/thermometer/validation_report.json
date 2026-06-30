@@ -1,0 +1,18 @@
+{
+  "status": "PASS",
+  "xml_path": "/ssd/mkqin/workspace/VLABench/VLABench/assets/review/thermometer/thermometer/thermometer.xml",
+  "checks": {
+    "xml_load": "PASS",
+    "physics_compile": "PASS",
+    "body_found": "PASS: thermometer/",
+    "stability": "PASS: final_z=0.300",
+    "xy_drift": "PASS: drift=0.000m",
+    "final_position": [
+      0.0,
+      0.0,
+      0.3
+    ]
+  },
+  "preview_path": null,
+  "video_path": null
+}

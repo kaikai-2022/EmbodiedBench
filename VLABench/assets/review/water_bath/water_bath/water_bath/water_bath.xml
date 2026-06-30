@@ -1,0 +1,61 @@
+<?xml version="1.0" ?>
+<mujoco model="water_bath">
+  <asset>
+    <texture type="2d" name="material_0" file="material_0.png"/>
+    <material name="material_0" texture="material_0" specular="0.4000000000000001" shininess="0.001"/>
+    <mesh file="water_bath.obj" scale="4.87 4.87 4.87"/>
+  </asset>
+  <worldbody>
+    <body name="water_bath">
+      <inertial pos="0 0 0.100" mass="0.02" diaginertia="0.0008 0.0008 0.0005"/>
+      <!-- Visual mesh (no collision) -->
+      <geom material="material_0" mesh="water_bath" class="visual"/>
+
+      <!-- Collision: 基于mesh分析，水浴槽有三个水平面 -->
+      <!-- 顶面 Z=0.20, 水槽底面 Z=0.04, 模型底面 Z=0 -->
+      <!-- 内壁位于X=-0.239处，凹陷区在X>-0.239区域 -->
+
+      <!-- 1. 底面 box: 完整矩形底面 Z=0 到 Z=0.115 (高度0.115m) -->
+      <geom type="box" size="0.243 0.173 0.0575" pos="0 0 0.0575" class="collision"/>
+
+      <!-- 2. X负侧壁: 包含内外壁，厚度占X全长40% = 0.1944m -->
+      <geom type="box" size="0.0972 0.173 0.080" pos="-0.14528 0 0.120" class="collision"/>
+
+      <!-- 3. X正侧壁: 只有外壁，厚度占X全长10% = 0.0486m -->
+      <geom type="box" size="0.0243 0.173 0.080" pos="0.2757 0 0.120" class="collision"/>
+
+      <!-- 4. Y负侧壁: 完整侧壁，厚度占X全长10% = 0.0486m -->
+      <geom type="box" size="0.243 0.0243 0.080" pos="0 -0.2043 0.120" class="collision"/>
+
+      <!-- 5. Y正侧壁: 完整侧壁，厚度占X全长10% = 0.0486m -->
+      <geom type="box" size="0.243 0.0243 0.080" pos="0 0.2043 0.120" class="collision"/>
+
+      <!-- Sites -->
+      <site class="grasppoint" pos="0.0500 0.0000 0.120"/>
+      <site class="grasppoint" pos="0.0500 0.0000 0.160"/>
+      <site class="grasppoint" pos="0.0500 0.0000 0.190"/>
+      <site class="keypoint" pos="-0.245 -0.183 0.000"/>
+      <site class="keypoint" pos="0.240 0.163 0.200"/>
+      <!-- placepoint 在凹陷区域中央，Z=0.1375让烧杯坐在cavity底部 (Z=0.115) -->
+      <site class="placepoint" pos="0.05 0.00 0.1375"/>
+</body>
+  </worldbody>
+  <compiler boundmass="0.015" boundinertia="1e-05" angle="radian"/>
+  <default>
+    <default class="visual">
+      <geom group="2" type="mesh" contype="0" conaffinity="0" density="50"/>
+    </default>
+    <default class="collision">
+      <geom group="3" density="50" friction="1.5 0.1 0.1" solimp="0.9 0.95 0.001" solref="0.02 1"/>
+    </default>
+    <default class="keypoint">
+      <site type="sphere" size="0.01" group="3" rgba="1 0 0 1"/>
+    </default>
+    <default class="placepoint">
+      <site type="sphere" size="0.01" group="2" rgba="0 0 1 0"/>
+    </default>
+    <default class="grasppoint">
+      <site type="sphere" size="0.005" group="4" rgba="0 0 1 1"/>
+    </default>
+  </default>
+</mujoco>

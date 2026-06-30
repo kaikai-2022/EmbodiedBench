@@ -1,0 +1,19 @@
+{
+  "status": "PASS",
+  "xml_path": "/ssd/mkqin/workspace/VLABench/VLABench/assets/review/drying_box/drying_box/drying_box/drying_box.xml",
+  "checks": {
+    "xml_load": "PASS",
+    "physics_compile": "PASS",
+    "body_found": "PASS: drying_box/",
+    "stability": "PASS: final_z=0.300",
+    "xy_drift": "PASS: drift=0.000m",
+    "final_position": [
+      0.0,
+      0.0,
+      0.3
+    ],
+    "video": "PASS: 120 frames, 4.0s"
+  },
+  "preview_path": null,
+  "video_path": "/ssd/mkqin/workspace/VLABench/VLABench/assets/review/drying_box/drying_box/drying_box/validation.mp4"
+}

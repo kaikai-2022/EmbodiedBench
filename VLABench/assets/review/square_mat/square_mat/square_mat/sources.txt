@@ -1,0 +1,14 @@
+Model UID: square_mat
+Model Name: square_mat
+
+Source Information:
+============================================================
+Source: Local File
+Original Path: /tmp/square_mat_input/square_mat.glb
+File Name: square_mat.glb
+Keyword/Category: square_mat
+Rotation: 90.0° around X axis
+
+Processing:
+Pipeline: process_local_glb.py
+Steps: GLB->OBJ (trimesh) -> [rotate] -> MJCF (obj2mjcf) -> postprocess -> bottom-align -> validate -> size_fix

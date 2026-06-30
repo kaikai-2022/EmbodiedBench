@@ -1,0 +1,28 @@
+{
+  "uid": "water_bath",
+  "centered": false,
+  "scaled": false,
+  "scale_factor": null,
+  "orientation_warning": "模型最长轴为 X (0.100m)，Z轴为 0.041m，可能需要旋转",
+  "original_dims": {
+    "center": [
+      -0.00048633500000000093,
+      -0.001980614999999998,
+      0.0007953500000000002
+    ],
+    "ranges": [
+      0.09969695,
+      0.07101415,
+      0.04114058
+    ],
+    "max_dim": 0.09969695
+  },
+  "final_dims": {
+    "ranges": [
+      0.09969695,
+      0.07101415,
+      0.04114058
+    ],
+    "max_dim": 0.09969695
+  }
+}

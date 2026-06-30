@@ -1,0 +1,68 @@
+<?xml version="1.0" ?>
+<mujoco model="tripod">
+  <asset>
+    <texture type="2d" name="Material.001" file="Material.001.png"/>
+    <material name="Material.001" texture="Material.001" specular="0.4000000000000001" shininess="0.001"/>
+    <mesh file="tripod.obj" scale="0.20769179645096258 0.20769179645096258 0.20769179645096258"/>
+    <mesh file="tripod/tripod_collision_0.obj" scale="0.20769179645096258 0.20769179645096258 0.20769179645096258"/>
+    <mesh file="tripod/tripod_collision_1.obj" scale="0.20769179645096258 0.20769179645096258 0.20769179645096258"/>
+    <mesh file="tripod/tripod_collision_2.obj" scale="0.20769179645096258 0.20769179645096258 0.20769179645096258"/>
+    <mesh file="tripod/tripod_collision_3.obj" scale="0.20769179645096258 0.20769179645096258 0.20769179645096258"/>
+    <mesh file="tripod/tripod_collision_4.obj" scale="0.20769179645096258 0.20769179645096258 0.20769179645096258"/>
+    <mesh file="tripod/tripod_collision_5.obj" scale="0.20769179645096258 0.20769179645096258 0.20769179645096258"/>
+    <mesh file="tripod/tripod_collision_6.obj" scale="0.20769179645096258 0.20769179645096258 0.20769179645096258"/>
+    <mesh file="tripod/tripod_collision_7.obj" scale="0.20769179645096258 0.20769179645096258 0.20769179645096258"/>
+    <mesh file="tripod/tripod_collision_8.obj" scale="0.20769179645096258 0.20769179645096258 0.20769179645096258"/>
+    <mesh file="tripod/tripod_collision_9.obj" scale="0.20769179645096258 0.20769179645096258 0.20769179645096258"/>
+    <mesh file="tripod/tripod_collision_10.obj" scale="0.20769179645096258 0.20769179645096258 0.20769179645096258"/>
+    <mesh file="tripod/tripod_collision_11.obj" scale="0.20769179645096258 0.20769179645096258 0.20769179645096258"/>
+    <mesh file="tripod/tripod_collision_12.obj" scale="0.20769179645096258 0.20769179645096258 0.20769179645096258"/>
+    <mesh file="tripod/tripod_collision_13.obj" scale="0.20769179645096258 0.20769179645096258 0.20769179645096258"/>
+    <mesh file="tripod/tripod_collision_14.obj" scale="0.20769179645096258 0.20769179645096258 0.20769179645096258"/>
+    <mesh file="tripod/tripod_collision_15.obj" scale="0.20769179645096258 0.20769179645096258 0.20769179645096258"/>
+    <mesh file="tripod/tripod_collision_16.obj" scale="0.20769179645096258 0.20769179645096258 0.20769179645096258"/>
+  </asset>
+  <worldbody>
+    <body name="tripod">
+      <inertial pos="0 0 0.070721" mass="0.02" diaginertia="0.0008 0.0008 0.0005"/>
+      <geom material="Material.001" mesh="tripod" class="visual"/>
+      <geom mesh="tripod_collision_0"  class="collision"/>
+      <geom mesh="tripod_collision_1"  class="collision"/>
+      <geom mesh="tripod_collision_2"  class="collision"/>
+      <geom mesh="tripod_collision_3"  class="collision"/>
+      <geom mesh="tripod_collision_4"  class="collision"/>
+      <geom mesh="tripod_collision_5"  class="collision"/>
+      <geom mesh="tripod_collision_6"  class="collision"/>
+      <geom mesh="tripod_collision_7"  class="collision"/>
+      <geom mesh="tripod_collision_8"  class="collision"/>
+      <geom mesh="tripod_collision_9"  class="collision"/>
+      <geom mesh="tripod_collision_10"  class="collision"/>
+      <geom mesh="tripod_collision_11"  class="collision"/>
+      <geom mesh="tripod_collision_12"  class="collision"/>
+      <geom mesh="tripod_collision_13"  class="collision"/>
+      <geom mesh="tripod_collision_14"  class="collision"/>
+      <geom mesh="tripod_collision_15"  class="collision"/>
+      <geom mesh="tripod_collision_16"  class="collision"/>
+      <site class="grasppoint" pos="0.0000 0.0000 0.0849"/>
+      <site class="grasppoint" pos="0.0000 0.0000 0.1132"/>
+      <site class="grasppoint" pos="0.0000 0.0000 0.1344"/>
+          <site class="keypoint" pos="-0.3611 -0.3550 0.0000"/>
+      <site class="keypoint" pos="0.3611 0.3550 0.6810"/>
+      <site class="placepoint" pos="0.0000 0.0000 0.210"/>
+</body>
+  </worldbody>
+  <compiler boundmass="0.015" boundinertia="1e-05" angle="radian"/>
+  <default>
+    <default class="visual">
+      <geom group="2" type="mesh" contype="0" conaffinity="0" density="50"/>
+          <default class="keypoint"><site type="sphere" size="0.01" group="3" rgba="1 0 0 1"/></default>
+      <default class="placepoint"><site type="sphere" size="0.01" group="2" rgba="0 0 1 0"/></default>
+</default>
+    <default class="collision">
+      <geom group="3" type="mesh" density="50" friction="1.5 0.1 0.1" solimp="0.9 0.95 0.001" solref="0.02 1"/>
+    </default>
+    <default class="grasppoint">
+      <site type="sphere" size="0.005" group="4" rgba="0 0 1 1"/>
+    </default>
+  </default>
+</mujoco>

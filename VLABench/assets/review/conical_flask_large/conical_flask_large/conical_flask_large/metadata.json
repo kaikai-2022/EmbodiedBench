@@ -1,0 +1,14 @@
+{
+  "uid": "conical_flask_large",
+  "name": "conical_flask_large",
+  "source": "local",
+  "original_path": "/tmp/conical_large/conical_flask_large.glb",
+  "keyword": "conical_flask_large",
+  "tags": [],
+  "categories": [],
+  "description": "Local GLB model: conical_flask_large.glb",
+  "rotation": {
+    "axis": "x",
+    "degrees": 90.0
+  }
+}

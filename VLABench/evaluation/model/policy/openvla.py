@@ -53,8 +53,11 @@ class OpenVLA(Policy):
             low_cpu_mem_usage=True,
             trust_remote_code=True,
         )
-        peft_config = PeftConfig.from_pretrained(lora_ckpt)
-        model = PeftModel.from_pretrained(model, lora_ckpt, config=peft_config).to(device)
+        if lora_ckpt is not None and str(lora_ckpt).strip() not in ("", "None"):
+            peft_config = PeftConfig.from_pretrained(lora_ckpt)
+            model = PeftModel.from_pretrained(model, lora_ckpt, config=peft_config).to(device)
+        else:
+            model = model.to(device)
         self.device = device
         super().__init__(model)
         

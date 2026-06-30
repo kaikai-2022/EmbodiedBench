@@ -77,7 +77,7 @@ class Evaluator:
             for i in tqdm(range(self.n_episodes), desc=f"Evaluating {task} of {agent.name}"):
                 agent.reset()
                 kwargs = {
-                    "unnorm_key": 'primitive',
+                    "unnorm_key": task,
                     "max_episode_length": max_episode_length
                 }
                 try:

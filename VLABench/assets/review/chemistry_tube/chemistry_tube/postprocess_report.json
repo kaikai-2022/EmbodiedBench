@@ -1,0 +1,28 @@
+{
+  "uid": "chemistry_tube",
+  "centered": true,
+  "scaled": false,
+  "scale_factor": null,
+  "orientation_warning": "模型最长轴为 Y (0.150m)，Z轴为 0.016m，可能需要旋转",
+  "original_dims": {
+    "center": [
+      0.012,
+      -0.08537650499999999,
+      0.086
+    ],
+    "ranges": [
+      0.016082,
+      0.15022701,
+      0.016082
+    ],
+    "max_dim": 0.15022701
+  },
+  "final_dims": {
+    "ranges": [
+      0.016082,
+      0.150227,
+      0.016082
+    ],
+    "max_dim": 0.150227
+  }
+}

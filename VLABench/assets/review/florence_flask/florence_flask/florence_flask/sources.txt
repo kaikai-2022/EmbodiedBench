@@ -1,0 +1,14 @@
+Model UID: florence_flask
+Model Name: florence_flask
+
+Source Information:
+============================================================
+Source: Local File
+Original Path: /tmp/florence_flask_input/florence_flask.glb
+File Name: florence_flask.glb
+Keyword/Category: florence_flask
+Rotation: 90.0° around X axis
+
+Processing:
+Pipeline: process_local_glb.py
+Steps: GLB->OBJ (trimesh) -> [rotate] -> MJCF (obj2mjcf) -> postprocess -> bottom-align -> validate -> size_fix

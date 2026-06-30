@@ -24,4 +24,3 @@ from VLABench.tasks.hierarchical_tasks.primitive.pick_stir_series import *
 from VLABench.tasks.hierarchical_tasks.primitive.wait_for_object_lift_beaker_series import *
 from VLABench.tasks.hierarchical_tasks.primitive.pick_up_small_beaker_series import *
 from VLABench.tasks.hierarchical_tasks.primitive.lift_flask_series import *
-from VLABench.tasks.hierarchical_tasks.primitive.open_drawer import *

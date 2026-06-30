@@ -1,0 +1,14 @@
+{
+  "uid": "thermometer",
+  "name": "thermometer",
+  "source": "local",
+  "original_path": "/tmp/thermometer_input/thermometer.glb",
+  "keyword": "thermometer",
+  "tags": [],
+  "categories": [],
+  "description": "Local GLB model: thermometer.glb",
+  "rotation": {
+    "axis": "x",
+    "degrees": 90.0
+  }
+}

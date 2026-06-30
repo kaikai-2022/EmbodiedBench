@@ -1,0 +1,14 @@
+Model UID: magnetic_stir_plate
+Model Name: magnetic_stir_plate
+
+Source Information:
+============================================================
+Source: Local File
+Original Path: /ssd/mkqin/download/magnetic_stir_plate.glb
+File Name: magnetic_stir_plate.glb
+Keyword/Category: alcohol_lamp
+Rotation: 90.0° around X axis
+
+Processing:
+Pipeline: process_local_glb.py
+Steps: GLB->OBJ (trimesh) -> [rotate] -> MJCF (obj2mjcf) -> postprocess -> bottom-align -> validate -> size_fix

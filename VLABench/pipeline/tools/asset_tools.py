@@ -127,18 +127,18 @@ def download_asset(keyword: str, max_downloads: int = 3) -> Dict:
 
     try:
         # 将资产下载到 VLABench 包内的 assets 目录
-        # 因为 VLABench 会在 VLABENCH_ROOT/assets/ 下查找资产
+        # 因为 VLABench ���在 VLABENCH_ROOT/assets/ 下查找资产
         result = subprocess.run([
             "python", str(script_path),
             "--keyword", search_keyword,
             "--max_downloads", str(max_downloads),
-            "--output_dir", "./VLABench/assets/review",
+            "--output_dir", "./assets/review",
             "--skip_existing"
         ], capture_output=True, text=True, timeout=600, cwd=vlabench_root)  # 在 VLABench 目录运行
 
         if result.returncode == 0:
             # 解析输出,提取下载的资产信息
-            output_dir = Path(vlabench_root) / "VLABench" / "assets" / "review" / keyword.lower()
+            output_dir = Path(vlabench_root) / "assets" / "review" / keyword.lower()
 
             # 后处理：修复 XML 文件中的路径引用
             # obj2mjcf 生成的结构是: uuid/uuid.xml 和 uuid/uuid/*.obj

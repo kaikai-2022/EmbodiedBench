@@ -1,0 +1,14 @@
+Model UID: alcohol_lamp
+Model Name: alcohol_lamp
+
+Source Information:
+============================================================
+Source: Local File
+Original Path: /ssd/mkqin/download/alcohol_lamp.glb
+File Name: alcohol_lamp.glb
+Keyword/Category: alcohol_lamp
+Rotation: 90.0° around X axis
+
+Processing:
+Pipeline: process_local_glb.py
+Steps: GLB->OBJ (trimesh) -> [rotate] -> MJCF (obj2mjcf) -> postprocess -> bottom-align -> validate -> size_fix

@@ -1,0 +1,5 @@
+newmtl heat_device_2_mat
+Ka 0.4 0.4 0.4
+Kd 0.4 0.4 0.4
+Ks 0.0 0.0 0.0
+d 1.0

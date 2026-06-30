@@ -1,0 +1,83 @@
+<?xml version="1.0" ?>
+<mujoco model="universal_support">
+  <asset>
+    <texture type="2d" name="material_0" file="material_0.png"/>
+    <material name="material_0" texture="material_0" specular="0.4000000000000001" shininess="0.001"/>
+    <mesh file="universal_support.obj" scale="0.253 0.253 0.253"/>
+    <mesh file="universal_support/universal_support_collision_0.obj" scale="0.253 0.253 0.253"/>
+    <mesh file="universal_support/universal_support_collision_1.obj" scale="0.253 0.253 0.253"/>
+    <mesh file="universal_support/universal_support_collision_2.obj" scale="0.253 0.253 0.253"/>
+    <mesh file="universal_support/universal_support_collision_3.obj" scale="0.253 0.253 0.253"/>
+    <mesh file="universal_support/universal_support_collision_4.obj" scale="0.253 0.253 0.253"/>
+    <mesh file="universal_support/universal_support_collision_5.obj" scale="0.253 0.253 0.253"/>
+    <mesh file="universal_support/universal_support_collision_6.obj" scale="0.253 0.253 0.253"/>
+    <mesh file="universal_support/universal_support_collision_7.obj" scale="0.253 0.253 0.253"/>
+    <mesh file="universal_support/universal_support_collision_8.obj" scale="0.253 0.253 0.253"/>
+    <mesh file="universal_support/universal_support_collision_9.obj" scale="0.253 0.253 0.253"/>
+    <mesh file="universal_support/universal_support_collision_10.obj" scale="0.253 0.253 0.253"/>
+    <mesh file="universal_support/universal_support_collision_11.obj" scale="0.253 0.253 0.253"/>
+    <mesh file="universal_support/universal_support_collision_12.obj" scale="0.253 0.253 0.253"/>
+    <mesh file="universal_support/universal_support_collision_13.obj" scale="0.253 0.253 0.253"/>
+    <mesh file="universal_support/universal_support_collision_14.obj" scale="0.253 0.253 0.253"/>
+    <mesh file="universal_support/universal_support_collision_15.obj" scale="0.253 0.253 0.253"/>
+    <mesh file="universal_support/universal_support_collision_16.obj" scale="0.253 0.253 0.253"/>
+    <mesh file="universal_support/universal_support_collision_17.obj" scale="0.253 0.253 0.253"/>
+    <mesh file="universal_support/universal_support_collision_18.obj" scale="0.253 0.253 0.253"/>
+    <mesh file="universal_support/universal_support_collision_19.obj" scale="0.253 0.253 0.253"/>
+    <mesh file="universal_support/universal_support_collision_20.obj" scale="0.253 0.253 0.253"/>
+    <mesh file="universal_support/universal_support_collision_21.obj" scale="0.253 0.253 0.253"/>
+  </asset>
+  <worldbody>
+    <body name="universal_support">
+      <inertial pos="0 0 0.1750" mass="0.02" diaginertia="0.0008 0.0008 0.0005"/>
+      <geom material="material_0" mesh="universal_support" class="visual"/>
+      <geom mesh="universal_support_collision_0" class="collision"/>
+      <geom mesh="universal_support_collision_1" class="collision"/>
+      <geom mesh="universal_support_collision_2" class="collision"/>
+      <geom mesh="universal_support_collision_3" class="collision"/>
+      <geom mesh="universal_support_collision_4" class="collision"/>
+      <geom mesh="universal_support_collision_5" class="collision"/>
+      <geom mesh="universal_support_collision_6" class="collision"/>
+      <geom mesh="universal_support_collision_7" class="collision"/>
+      <geom mesh="universal_support_collision_8" class="collision"/>
+      <geom mesh="universal_support_collision_9" class="collision"/>
+      <geom mesh="universal_support_collision_10" class="collision"/>
+      <geom mesh="universal_support_collision_11" class="collision"/>
+      <geom mesh="universal_support_collision_12" class="collision"/>
+      <geom mesh="universal_support_collision_13" class="collision"/>
+      <geom mesh="universal_support_collision_14" class="collision"/>
+      <geom mesh="universal_support_collision_15" class="collision"/>
+      <geom mesh="universal_support_collision_16" class="collision"/>
+      <geom mesh="universal_support_collision_17" class="collision"/>
+      <geom mesh="universal_support_collision_18" class="collision"/>
+      <geom mesh="universal_support_collision_19" class="collision"/>
+      <geom mesh="universal_support_collision_20" class="collision"/>
+      <geom mesh="universal_support_collision_21" class="collision"/>
+      <!-- Keypoints for bounding box -->
+      <site class="keypoint" pos="-0.185 -0.077 0.0000"/>
+      <site class="keypoint" pos="0.185 0.077 0.0000"/>
+      <site class="keypoint" pos="-0.185 0.077 0.0000"/>
+      <site class="keypoint" pos="0.185 -0.077 0.0000"/>
+      <!-- Funnel placement position on the ring (at ~70% height = 0.35m) -->
+      <site class="placepoint" pos="-0.02 0.008 0.12" name="funnel_ring"/>
+</body>
+  </worldbody>
+  <compiler boundmass="0.015" boundinertia="1e-05" angle="radian"/>
+  <default>
+    <default class="visual">
+      <geom group="2" type="mesh" contype="0" conaffinity="0" density="50"/>
+    </default>
+    <default class="collision">
+      <geom group="3" type="mesh" density="50" friction="1.5 0.1 0.1" solimp="0.9 0.95 0.001" solref="0.02 1"/>
+    </default>
+    <default class="grasppoint">
+      <site type="sphere" size="0.005" group="4" rgba="0 0 1 1"/>
+    </default>
+    <default class="keypoint">
+      <site type="sphere" size="0.01" group="3" rgba="1 0 0 1"/>
+    </default>
+    <default class="placepoint">
+      <site type="sphere" size="0.01" group="2" rgba="0 0 1 0"/>
+    </default>
+  </default>
+</mujoco>
