@@ -35,7 +35,7 @@ class AgentConfig:
     # ==================== API 配置 ====================
 
     # API Key (已配置)
-    # ANTHROPIC_API_KEY: str = "sk-NdKNGm3YPJK9GSWA808f2c87Cb9e422c86858610972cE265"
+    # ANTHROPIC_API_KEY: str = "sk-7KXZc0k9wZ8pCWBH91E2Ac888555424d9f083c92A8A3660c"
     ANTHROPIC_API_KEY: str = "sk-bUVu80wi6nD0lMhBK7xYO2ZsJMFbHcZOGIOX9KuM8woHC3oM"
 
     # 自定义 API 端点 (去掉 /v1 后缀,库会自动添加)
