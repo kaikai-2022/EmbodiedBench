@@ -337,6 +337,7 @@ name2class_xml = {
     "thermometer": [components.CommonGraspedEntity, "review/thermometer/thermometer/thermometer.xml"],
     "heat_device": [components.CommonContainer, "review/heat_device/heat_device/heat_device/heat_device.xml"],
     "drying_box": [components.ContainerWithDoor, "review/drying_box/drying_box/drying_box/drying_box.xml"],
+    "lab_table": [components.FlatContainer, "review/lab_table/lab_table/lab_table/lab_table.xml"],
     "cylinder_large": [components.ChemistryBeaker, "review/cylinder_large/cylinder_large/cylinder_large/cylinder_large.xml"],
     "pipette": [components.CommonGraspedEntity, "review/pipette/pipette/pipette_-_laboratory_essential_tool/pipette_-_laboratory_essential_tool.xml"],
     "conical_flask_small": [components.ChemistryBeaker, "review/conical_flask_small/conical_flask_small/conical_flask_small/conical_flask_small.xml"],

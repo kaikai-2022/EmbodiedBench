@@ -1,0 +1,101 @@
+<mujoco model="minimalistic_modern_office">
+  <compiler angle="radian" eulerseq="xyz"/>
+  <default>
+    <default class="visual">
+      <geom group="2" type="mesh" contype="0" conaffinity="0"/>
+    </default>
+    <default class="collision">
+      <geom group="3" type="mesh"/>
+    </default>
+  </default>
+  <asset>
+    <texture type="2d" name="material_0" file="material_0.png"/>
+    <material name="material_0" texture="material_0" specular="0.4000000000000001" shininess="0.001"/>
+    <material name="material_1" specular="0.4000000000000001" shininess="0.001" rgba="0.80000000 0.80000000 0.80000000 1.0"/>
+    <texture type="2d" name="material_2" file="material_2.png"/>
+    <material name="material_2" texture="material_2" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_3" file="material_3.png"/>
+    <material name="material_3" texture="material_3" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_4" file="material_4.png"/>
+    <material name="material_4" texture="material_4" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_5" file="material_5.png"/>
+    <material name="material_5" texture="material_5" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_6" file="material_6.png"/>
+    <material name="material_6" texture="material_6" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_7" file="material_7.png"/>
+    <material name="material_7" texture="material_7" specular="0.4000000000000001" shininess="0.001"/>
+    <material name="material_8" specular="0.4000000000000001" shininess="0.001" rgba="0.80000000 0.80000000 0.80000000 1.0"/>
+    <mesh file="minimalistic_modern_office_0.obj"/>
+    <mesh file="minimalistic_modern_office_1.obj"/>
+    <mesh file="minimalistic_modern_office_2.obj"/>
+    <mesh file="minimalistic_modern_office_3.obj"/>
+    <mesh file="minimalistic_modern_office_4.obj"/>
+    <mesh file="minimalistic_modern_office_5.obj"/>
+    <mesh file="minimalistic_modern_office_6.obj"/>
+    <mesh file="minimalistic_modern_office_7.obj"/>
+    <mesh file="minimalistic_modern_office_8.obj"/>
+    <mesh file="minimalistic_modern_office_collision_0.obj"/>
+    <mesh file="minimalistic_modern_office_collision_1.obj"/>
+    <mesh file="minimalistic_modern_office_collision_2.obj"/>
+    <mesh file="minimalistic_modern_office_collision_3.obj"/>
+    <mesh file="minimalistic_modern_office_collision_4.obj"/>
+    <mesh file="minimalistic_modern_office_collision_5.obj"/>
+    <mesh file="minimalistic_modern_office_collision_6.obj"/>
+    <mesh file="minimalistic_modern_office_collision_7.obj"/>
+    <mesh file="minimalistic_modern_office_collision_8.obj"/>
+    <mesh file="minimalistic_modern_office_collision_9.obj"/>
+    <mesh file="minimalistic_modern_office_collision_10.obj"/>
+    <mesh file="minimalistic_modern_office_collision_11.obj"/>
+    <mesh file="minimalistic_modern_office_collision_12.obj"/>
+    <mesh file="minimalistic_modern_office_collision_13.obj"/>
+    <mesh file="minimalistic_modern_office_collision_14.obj"/>
+    <mesh file="minimalistic_modern_office_collision_15.obj"/>
+    <mesh file="minimalistic_modern_office_collision_16.obj"/>
+    <mesh file="minimalistic_modern_office_collision_17.obj"/>
+    <mesh file="minimalistic_modern_office_collision_18.obj"/>
+    <mesh file="minimalistic_modern_office_collision_19.obj"/>
+    <mesh file="minimalistic_modern_office_collision_20.obj"/>
+    <mesh file="minimalistic_modern_office_collision_21.obj"/>
+    <mesh file="minimalistic_modern_office_collision_22.obj"/>
+    <mesh file="minimalistic_modern_office_collision_23.obj"/>
+    <mesh file="minimalistic_modern_office_collision_24.obj"/>
+  </asset>
+  <worldbody>
+    <body name="minimalistic_modern_office" euler="1.57 0 0">
+      <geom mesh="minimalistic_modern_office_0" material="material_8" class="visual"/>
+      <geom mesh="minimalistic_modern_office_1" material="material_7" class="visual"/>
+      <geom mesh="minimalistic_modern_office_2" material="material_6" class="visual"/>
+      <geom mesh="minimalistic_modern_office_3" material="material_5" class="visual"/>
+      <geom mesh="minimalistic_modern_office_4" material="material_4" class="visual"/>
+      <geom mesh="minimalistic_modern_office_5" material="material_3" class="visual"/>
+      <geom mesh="minimalistic_modern_office_6" material="material_2" class="visual"/>
+      <geom mesh="minimalistic_modern_office_7" material="material_1" class="visual"/>
+      <geom mesh="minimalistic_modern_office_8" material="material_0" class="visual"/>
+      <geom mesh="minimalistic_modern_office_collision_0" rgba="0.8275357835889013 0.20294004920301256 0.692959279637698 1" class="collision"/>
+      <geom mesh="minimalistic_modern_office_collision_1" rgba="0.7998401455984216 0.8180859659149233 0.45512778395582076 1" class="collision"/>
+      <geom mesh="minimalistic_modern_office_collision_2" rgba="0.5829284831793196 0.2711302330485962 0.9322198399983849 1" class="collision"/>
+      <geom mesh="minimalistic_modern_office_collision_3" rgba="0.5669722276981861 0.9686705913355991 0.07995896589561846 1" class="collision"/>
+      <geom mesh="minimalistic_modern_office_collision_4" rgba="0.37597718847249195 0.3600247042205079 0.966773747288005 1" class="collision"/>
+      <geom mesh="minimalistic_modern_office_collision_5" rgba="0.1869953515604421 0.7057957238830913 0.7042123777900939 1" class="collision"/>
+      <geom mesh="minimalistic_modern_office_collision_6" rgba="0.190764038755032 0.1201327865432863 0.6121553046507677 1" class="collision"/>
+      <geom mesh="minimalistic_modern_office_collision_7" rgba="0.9188293643001973 0.4200814185614625 0.022205390239506517 1" class="collision"/>
+      <geom mesh="minimalistic_modern_office_collision_8" rgba="0.6999384707937172 0.9019767424854618 0.7072382786500667 1" class="collision"/>
+      <geom mesh="minimalistic_modern_office_collision_9" rgba="0.14055430721188567 0.43625907128037067 0.23515167387767633 1" class="collision"/>
+      <geom mesh="minimalistic_modern_office_collision_10" rgba="0.3770527406842422 0.33735383215582215 0.8396918514403295 1" class="collision"/>
+      <geom mesh="minimalistic_modern_office_collision_11" rgba="0.04560365013054912 0.9458913788422266 0.5843321755333402 1" class="collision"/>
+      <geom mesh="minimalistic_modern_office_collision_12" rgba="0.2621271974536856 0.7391131990684031 0.19463433122208562 1" class="collision"/>
+      <geom mesh="minimalistic_modern_office_collision_13" rgba="0.4058834880562475 0.9595548395249386 0.5518359546159765 1" class="collision"/>
+      <geom mesh="minimalistic_modern_office_collision_14" rgba="0.6176004846638391 0.3486572844494378 0.3372002083603427 1" class="collision"/>
+      <geom mesh="minimalistic_modern_office_collision_15" rgba="0.38077146553871644 0.6724376262250565 0.6812035203196178 1" class="collision"/>
+      <geom mesh="minimalistic_modern_office_collision_16" rgba="0.13642322191882417 0.30611058887738896 0.3031762202526619 1" class="collision"/>
+      <geom mesh="minimalistic_modern_office_collision_17" rgba="0.5109848524301737 0.10417968140365186 0.8079770897871896 1" class="collision"/>
+      <geom mesh="minimalistic_modern_office_collision_18" rgba="0.715143122895009 0.9527508815999056 0.21661924297240542 1" class="collision"/>
+      <geom mesh="minimalistic_modern_office_collision_19" rgba="0.9720989085024383 0.2413908699066778 0.4063965515214387 1" class="collision"/>
+      <geom mesh="minimalistic_modern_office_collision_20" rgba="0.22835503965834147 0.4151097785694373 0.8075772453740807 1" class="collision"/>
+      <geom mesh="minimalistic_modern_office_collision_21" rgba="0.3843112575768678 0.8784048567196837 0.668425987574271 1" class="collision"/>
+      <geom mesh="minimalistic_modern_office_collision_22" rgba="0.6791174501161747 0.02976916631621329 0.466136722609654 1" class="collision"/>
+      <geom mesh="minimalistic_modern_office_collision_23" rgba="0.7959178680071353 0.5728351889625001 0.8236755260041876 1" class="collision"/>
+      <geom mesh="minimalistic_modern_office_collision_24" rgba="0.18961773025641415 0.5449711919612333 0.820999155597745 1" class="collision"/>
+    </body>
+  </worldbody>
+</mujoco>

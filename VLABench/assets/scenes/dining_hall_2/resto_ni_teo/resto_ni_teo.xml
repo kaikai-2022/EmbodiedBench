@@ -1,0 +1,122 @@
+<mujoco model="resto_ni_teo">
+  <compiler angle="radian" eulerseq="xyz"/>
+  <default>
+    <default class="visual">
+      <geom group="2" type="mesh" contype="0" conaffinity="0"/>
+    </default>
+    <default class="collision">
+      <geom group="3" type="mesh"/>
+    </default>
+  </default>
+  <asset>
+    <texture type="2d" name="material_0" file="material_0.png"/>
+    <material name="material_0" texture="material_0" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_1" file="material_1.png"/>
+    <material name="material_1" texture="material_1" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_2" file="material_2.png"/>
+    <material name="material_2" texture="material_2" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_3" file="material_3.png"/>
+    <material name="material_3" texture="material_3" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_4" file="material_4.png"/>
+    <material name="material_4" texture="material_4" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_5" file="material_5.png"/>
+    <material name="material_5" texture="material_5" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_6" file="material_6.png"/>
+    <material name="material_6" texture="material_6" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_7" file="material_7.png"/>
+    <material name="material_7" texture="material_7" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_8" file="material_8.png"/>
+    <material name="material_8" texture="material_8" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_9" file="material_9.png"/>
+    <material name="material_9" texture="material_9" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_10" file="material_10.png"/>
+    <material name="material_10" texture="material_10" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_11" file="material_11.png"/>
+    <material name="material_11" texture="material_11" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_12" file="material_12.png"/>
+    <material name="material_12" texture="material_12" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_13" file="material_13.png"/>
+    <material name="material_13" texture="material_13" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_14" file="material_14.png"/>
+    <material name="material_14" texture="material_14" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_15" file="material_15.png"/>
+    <material name="material_15" texture="material_15" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_16" file="material_16.png"/>
+    <material name="material_16" texture="material_16" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_17" file="material_17.png"/>
+    <material name="material_17" texture="material_17" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_18" file="material_18.png"/>
+    <material name="material_18" texture="material_18" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_19" file="material_19.png"/>
+    <material name="material_19" texture="material_19" specular="0.4000000000000001" shininess="0.001"/>
+    <material name="material_20" specular="0.4000000000000001" shininess="0.001" rgba="1.00000000 0.33725490 0.01176471 1.0"/>
+    <texture type="2d" name="material_21" file="material_21.png"/>
+    <material name="material_21" texture="material_21" specular="0.4000000000000001" shininess="0.001"/>
+    <mesh file="resto_ni_teo_0.obj"/>
+    <mesh file="resto_ni_teo_1.obj"/>
+    <mesh file="resto_ni_teo_2.obj"/>
+    <mesh file="resto_ni_teo_3.obj"/>
+    <mesh file="resto_ni_teo_4.obj"/>
+    <mesh file="resto_ni_teo_5.obj"/>
+    <mesh file="resto_ni_teo_6.obj"/>
+    <mesh file="resto_ni_teo_7.obj"/>
+    <mesh file="resto_ni_teo_8.obj"/>
+    <mesh file="resto_ni_teo_9.obj"/>
+    <mesh file="resto_ni_teo_10.obj"/>
+    <mesh file="resto_ni_teo_11.obj"/>
+    <mesh file="resto_ni_teo_12.obj"/>
+    <mesh file="resto_ni_teo_13.obj"/>
+    <mesh file="resto_ni_teo_14.obj"/>
+    <mesh file="resto_ni_teo_15.obj"/>
+    <mesh file="resto_ni_teo_16.obj"/>
+    <mesh file="resto_ni_teo_17.obj"/>
+    <mesh file="resto_ni_teo_18.obj"/>
+    <mesh file="resto_ni_teo_19.obj"/>
+    <mesh file="resto_ni_teo_20.obj"/>
+    <mesh file="resto_ni_teo_21.obj"/>
+    <mesh file="resto_ni_teo_collision_0.obj"/>
+    <mesh file="resto_ni_teo_collision_1.obj"/>
+    <mesh file="resto_ni_teo_collision_2.obj"/>
+    <mesh file="resto_ni_teo_collision_3.obj"/>
+    <mesh file="resto_ni_teo_collision_4.obj"/>
+    <mesh file="resto_ni_teo_collision_5.obj"/>
+    <mesh file="resto_ni_teo_collision_6.obj"/>
+    <mesh file="resto_ni_teo_collision_7.obj"/>
+    <mesh file="resto_ni_teo_collision_8.obj"/>
+  </asset>
+  <worldbody>
+    <body name="resto_ni_teo" euler="1.57 0 0">
+      <geom mesh="resto_ni_teo_0" material="material_21" class="visual"/>
+      <geom mesh="resto_ni_teo_1" material="material_20" class="visual"/>
+      <geom mesh="resto_ni_teo_2" material="material_19" class="visual"/>
+      <geom mesh="resto_ni_teo_3" material="material_18" class="visual"/>
+      <geom mesh="resto_ni_teo_4" material="material_17" class="visual"/>
+      <geom mesh="resto_ni_teo_5" material="material_16" class="visual"/>
+      <geom mesh="resto_ni_teo_6" material="material_15" class="visual"/>
+      <geom mesh="resto_ni_teo_7" material="material_14" class="visual"/>
+      <geom mesh="resto_ni_teo_8" material="material_13" class="visual"/>
+      <geom mesh="resto_ni_teo_9" material="material_12" class="visual"/>
+      <geom mesh="resto_ni_teo_10" material="material_11" class="visual"/>
+      <geom mesh="resto_ni_teo_11" material="material_10" class="visual"/>
+      <geom mesh="resto_ni_teo_12" material="material_9" class="visual"/>
+      <geom mesh="resto_ni_teo_13" material="material_8" class="visual"/>
+      <geom mesh="resto_ni_teo_14" material="material_7" class="visual"/>
+      <geom mesh="resto_ni_teo_15" material="material_6" class="visual"/>
+      <geom mesh="resto_ni_teo_16" material="material_5" class="visual"/>
+      <geom mesh="resto_ni_teo_17" material="material_4" class="visual"/>
+      <geom mesh="resto_ni_teo_18" material="material_3" class="visual"/>
+      <geom mesh="resto_ni_teo_19" material="material_2" class="visual"/>
+      <geom mesh="resto_ni_teo_20" material="material_1" class="visual"/>
+      <geom mesh="resto_ni_teo_21" material="material_0" class="visual"/>
+      <geom mesh="resto_ni_teo_collision_0" rgba="0.21780854827323004 0.29251395008047165 0.0011575418104383672 1" class="collision"/>
+      <geom mesh="resto_ni_teo_collision_1" rgba="0.6822918929237399 0.45227021508834486 0.9845716661754207 1" class="collision"/>
+      <geom mesh="resto_ni_teo_collision_2" rgba="0.40159974477064464 0.43212472014321635 0.49937948409624733 1" class="collision"/>
+      <geom mesh="resto_ni_teo_collision_3" rgba="0.9531622163701082 0.47148362277774825 0.06014855197990787 1" class="collision"/>
+      <geom mesh="resto_ni_teo_collision_4" rgba="0.21003718054378573 0.17426904765525275 0.16492627655616932 1" class="collision"/>
+      <geom mesh="resto_ni_teo_collision_5" rgba="0.683503945082818 0.827249762779814 0.008402180641021495 1" class="collision"/>
+      <geom mesh="resto_ni_teo_collision_6" rgba="0.2007012484152949 0.7650831074367971 0.5396539706855654 1" class="collision"/>
+      <geom mesh="resto_ni_teo_collision_7" rgba="0.0026281361184082863 0.47343178661170615 0.7762831332753088 1" class="collision"/>
+      <geom mesh="resto_ni_teo_collision_8" rgba="0.3837449045816195 0.4504550944632897 0.19360745259175027 1" class="collision"/>
+    </body>
+  </worldbody>
+</mujoco>

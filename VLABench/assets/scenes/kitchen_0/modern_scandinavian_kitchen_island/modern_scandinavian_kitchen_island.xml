@@ -1,0 +1,195 @@
+<mujoco model="modern_scandinavian_kitchen_island">
+  <compiler angle="radian" eulerseq="xyz"/>
+  <default>
+    <default class="visual">
+      <geom group="2" type="mesh" contype="0" conaffinity="0"/>
+    </default>
+    <default class="collision">
+      <geom group="3" type="mesh"/>
+    </default>
+  </default>
+  <asset>
+    <texture type="2d" name="material_0" file="material_0.png"/>
+    <material name="material_0" texture="material_0" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_1" file="material_1.png"/>
+    <material name="material_1" texture="material_1" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_2" file="material_2.png"/>
+    <material name="material_2" texture="material_2" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_3" file="material_3.png"/>
+    <material name="material_3" texture="material_3" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_4" file="material_4.png"/>
+    <material name="material_4" texture="material_4" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_5" file="material_5.png"/>
+    <material name="material_5" texture="material_5" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_6" file="material_6.png"/>
+    <material name="material_6" texture="material_6" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_7" file="material_7.png"/>
+    <material name="material_7" texture="material_7" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_8" file="material_8.png"/>
+    <material name="material_8" texture="material_8" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_9" file="material_9.png"/>
+    <material name="material_9" texture="material_9" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_10" file="material_10.png"/>
+    <material name="material_10" texture="material_10" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_11" file="material_11.png"/>
+    <material name="material_11" texture="material_11" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_12" file="material_12.png"/>
+    <material name="material_12" texture="material_12" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_13" file="material_13.png"/>
+    <material name="material_13" texture="material_13" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_14" file="material_14.png"/>
+    <material name="material_14" texture="material_14" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_15" file="material_15.png"/>
+    <material name="material_15" texture="material_15" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_16" file="material_16.png"/>
+    <material name="material_16" texture="material_16" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_17" file="material_17.png"/>
+    <material name="material_17" texture="material_17" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_18" file="material_18.png"/>
+    <material name="material_18" texture="material_18" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_19" file="material_19.png"/>
+    <material name="material_19" texture="material_19" specular="0.4000000000000001" shininess="0.001"/>
+    <mesh file="modern_scandinavian_kitchen_island_0.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_1.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_2.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_3.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_4.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_5.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_6.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_7.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_8.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_9.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_10.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_11.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_12.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_13.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_14.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_15.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_16.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_17.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_18.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_19.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_collision_0.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_collision_1.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_collision_2.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_collision_3.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_collision_4.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_collision_5.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_collision_6.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_collision_7.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_collision_8.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_collision_9.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_collision_10.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_collision_11.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_collision_12.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_collision_13.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_collision_14.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_collision_15.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_collision_16.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_collision_17.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_collision_18.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_collision_19.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_collision_20.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_collision_21.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_collision_22.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_collision_23.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_collision_24.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_collision_25.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_collision_26.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_collision_27.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_collision_28.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_collision_29.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_collision_30.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_collision_31.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_collision_32.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_collision_33.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_collision_34.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_collision_35.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_collision_36.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_collision_37.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_collision_38.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_collision_39.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_collision_40.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_collision_41.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_collision_42.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_collision_43.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_collision_44.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_collision_45.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_collision_46.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_collision_47.obj"/>
+    <mesh file="modern_scandinavian_kitchen_island_collision_48.obj"/>
+  </asset>
+  <worldbody>
+    <body name="modern_scandinavian_kitchen_island" euler="1.57 0 0">
+      <geom mesh="modern_scandinavian_kitchen_island_0" material="material_19" class="visual"/>
+      <geom mesh="modern_scandinavian_kitchen_island_1" material="material_18" class="visual"/>
+      <geom mesh="modern_scandinavian_kitchen_island_2" material="material_17" class="visual"/>
+      <geom mesh="modern_scandinavian_kitchen_island_3" material="material_16" class="visual"/>
+      <geom mesh="modern_scandinavian_kitchen_island_4" material="material_15" class="visual"/>
+      <geom mesh="modern_scandinavian_kitchen_island_5" material="material_14" class="visual"/>
+      <geom mesh="modern_scandinavian_kitchen_island_6" material="material_13" class="visual"/>
+      <geom mesh="modern_scandinavian_kitchen_island_7" material="material_12" class="visual"/>
+      <geom mesh="modern_scandinavian_kitchen_island_8" material="material_11" class="visual"/>
+      <geom mesh="modern_scandinavian_kitchen_island_9" material="material_10" class="visual"/>
+      <geom mesh="modern_scandinavian_kitchen_island_10" material="material_9" class="visual"/>
+      <geom mesh="modern_scandinavian_kitchen_island_11" material="material_8" class="visual"/>
+      <geom mesh="modern_scandinavian_kitchen_island_12" material="material_7" class="visual"/>
+      <geom mesh="modern_scandinavian_kitchen_island_13" material="material_6" class="visual"/>
+      <geom mesh="modern_scandinavian_kitchen_island_14" material="material_5" class="visual"/>
+      <geom mesh="modern_scandinavian_kitchen_island_15" material="material_4" class="visual"/>
+      <geom mesh="modern_scandinavian_kitchen_island_16" material="material_3" class="visual"/>
+      <geom mesh="modern_scandinavian_kitchen_island_17" material="material_2" class="visual"/>
+      <geom mesh="modern_scandinavian_kitchen_island_18" material="material_1" class="visual"/>
+      <geom mesh="modern_scandinavian_kitchen_island_19" material="material_0" class="visual"/>
+      <geom mesh="modern_scandinavian_kitchen_island_collision_0" rgba="0.02049547743511604 0.9821416259018619 0.7870260099940235 1" class="collision"/>
+      <geom mesh="modern_scandinavian_kitchen_island_collision_1" rgba="0.3739912202806074 0.28257311729319 0.9488038417607944 1" class="collision"/>
+      <geom mesh="modern_scandinavian_kitchen_island_collision_2" rgba="0.8129871604492358 0.7527648124763313 0.9780496678595482 1" class="collision"/>
+      <geom mesh="modern_scandinavian_kitchen_island_collision_3" rgba="0.27261057243227993 0.6485446332707373 0.9464054900561335 1" class="collision"/>
+      <geom mesh="modern_scandinavian_kitchen_island_collision_4" rgba="0.09129206749429042 0.16561794131598495 0.7850740797340039 1" class="collision"/>
+      <geom mesh="modern_scandinavian_kitchen_island_collision_5" rgba="0.6796309702291591 0.3259805983605344 0.9209337270858526 1" class="collision"/>
+      <geom mesh="modern_scandinavian_kitchen_island_collision_6" rgba="0.7972625019789883 0.5435647456631177 0.06822350082358142 1" class="collision"/>
+      <geom mesh="modern_scandinavian_kitchen_island_collision_7" rgba="0.26904574324093344 0.3522435238572774 0.7867455717541587 1" class="collision"/>
+      <geom mesh="modern_scandinavian_kitchen_island_collision_8" rgba="0.9787163609141206 0.6018164005125565 0.8250012142158989 1" class="collision"/>
+      <geom mesh="modern_scandinavian_kitchen_island_collision_9" rgba="0.800067763719658 0.9832861452391188 0.9857535422359364 1" class="collision"/>
+      <geom mesh="modern_scandinavian_kitchen_island_collision_10" rgba="0.16302809855285483 0.25346788381684415 0.1238273029667829 1" class="collision"/>
+      <geom mesh="modern_scandinavian_kitchen_island_collision_11" rgba="0.25841578914548957 0.6594963787528285 0.12583904578142446 1" class="collision"/>
+      <geom mesh="modern_scandinavian_kitchen_island_collision_12" rgba="0.5084496104612874 0.8910443145072426 0.43984905046747247 1" class="collision"/>
+      <geom mesh="modern_scandinavian_kitchen_island_collision_13" rgba="0.8510616152819919 0.9761238009668722 0.3710803290441177 1" class="collision"/>
+      <geom mesh="modern_scandinavian_kitchen_island_collision_14" rgba="0.6879020347655169 0.8064935794957704 0.8581830539737266 1" class="collision"/>
+      <geom mesh="modern_scandinavian_kitchen_island_collision_15" rgba="0.362380639123721 0.1727563609063203 0.5053932044322921 1" class="collision"/>
+      <geom mesh="modern_scandinavian_kitchen_island_collision_16" rgba="0.5855367369375771 0.20601811766421252 0.2258747926913688 1" class="collision"/>
+      <geom mesh="modern_scandinavian_kitchen_island_collision_17" rgba="0.16168164357173098 0.24769774044008208 0.3790659516960264 1" class="collision"/>
+      <geom mesh="modern_scandinavian_kitchen_island_collision_18" rgba="0.08854406653178759 0.12094446620568955 0.3805805391186069 1" class="collision"/>
+      <geom mesh="modern_scandinavian_kitchen_island_collision_19" rgba="0.4877867698359212 0.8924451335942355 0.3177123658438956 1" class="collision"/>
+      <geom mesh="modern_scandinavian_kitchen_island_collision_20" rgba="0.5636796255502519 0.9640714740152967 0.7529076376792592 1" class="collision"/>
+      <geom mesh="modern_scandinavian_kitchen_island_collision_21" rgba="0.9566367343494909 0.92366948162331 0.9146220565594506 1" class="collision"/>
+      <geom mesh="modern_scandinavian_kitchen_island_collision_22" rgba="0.6278882890790024 0.7582954843409502 0.29867096484224076 1" class="collision"/>
+      <geom mesh="modern_scandinavian_kitchen_island_collision_23" rgba="0.34791005907684236 0.5130443986444047 0.49203491625504947 1" class="collision"/>
+      <geom mesh="modern_scandinavian_kitchen_island_collision_24" rgba="0.11536507036395482 0.04988416058734113 0.18049658525723933 1" class="collision"/>
+      <geom mesh="modern_scandinavian_kitchen_island_collision_25" rgba="0.5006801371878292 0.6611197952467566 0.6166107119850249 1" class="collision"/>
+      <geom mesh="modern_scandinavian_kitchen_island_collision_26" rgba="0.5627089275039013 0.7062675379791832 0.14369283699133284 1" class="collision"/>
+      <geom mesh="modern_scandinavian_kitchen_island_collision_27" rgba="0.3503385306511537 0.140831606580607 0.7895760975852246 1" class="collision"/>
+      <geom mesh="modern_scandinavian_kitchen_island_collision_28" rgba="0.665384024228772 0.30135060942478054 0.6736256655311122 1" class="collision"/>
+      <geom mesh="modern_scandinavian_kitchen_island_collision_29" rgba="0.13990514830465417 0.2988791966117157 0.386957928386666 1" class="collision"/>
+      <geom mesh="modern_scandinavian_kitchen_island_collision_30" rgba="0.5530703147607985 0.6968037696737657 0.49551188357757014 1" class="collision"/>
+      <geom mesh="modern_scandinavian_kitchen_island_collision_31" rgba="0.00655516069332529 0.2967126195455134 0.13327618977904765 1" class="collision"/>
+      <geom mesh="modern_scandinavian_kitchen_island_collision_32" rgba="0.4399565274789424 0.16855393066379454 0.19130156933859988 1" class="collision"/>
+      <geom mesh="modern_scandinavian_kitchen_island_collision_33" rgba="0.46449160129162337 0.9773948558569842 0.48694700728793205 1" class="collision"/>
+      <geom mesh="modern_scandinavian_kitchen_island_collision_34" rgba="0.2852324523726989 0.35136338990996785 0.36993859316340383 1" class="collision"/>
+      <geom mesh="modern_scandinavian_kitchen_island_collision_35" rgba="0.70665439812101 0.44964153306384325 0.19449574814627169 1" class="collision"/>
+      <geom mesh="modern_scandinavian_kitchen_island_collision_36" rgba="0.71350164245028 0.7723735830715186 0.9780831784624703 1" class="collision"/>
+      <geom mesh="modern_scandinavian_kitchen_island_collision_37" rgba="0.6780626654270137 0.46371422735635326 0.10017240261387672 1" class="collision"/>
+      <geom mesh="modern_scandinavian_kitchen_island_collision_38" rgba="0.5476609310098621 0.0396435928464014 0.2181190416235801 1" class="collision"/>
+      <geom mesh="modern_scandinavian_kitchen_island_collision_39" rgba="0.8709698467661053 0.7645387361374745 0.7178694761734006 1" class="collision"/>
+      <geom mesh="modern_scandinavian_kitchen_island_collision_40" rgba="0.04583513710451781 0.1539569191067438 0.8991672618531131 1" class="collision"/>
+      <geom mesh="modern_scandinavian_kitchen_island_collision_41" rgba="0.4533923650060322 0.6524646669437866 0.9214581364410064 1" class="collision"/>
+      <geom mesh="modern_scandinavian_kitchen_island_collision_42" rgba="0.004241760593624799 0.8579679405262374 0.9754458202518372 1" class="collision"/>
+      <geom mesh="modern_scandinavian_kitchen_island_collision_43" rgba="0.09320693055137552 0.7717071215179998 0.789629074722892 1" class="collision"/>
+      <geom mesh="modern_scandinavian_kitchen_island_collision_44" rgba="0.5280428543013567 0.6864912753695056 0.8855496714141626 1" class="collision"/>
+      <geom mesh="modern_scandinavian_kitchen_island_collision_45" rgba="0.7690684971813174 0.3410116448942565 0.7340249010984846 1" class="collision"/>
+      <geom mesh="modern_scandinavian_kitchen_island_collision_46" rgba="0.3518360721238908 0.27790348554490796 0.8579970919700627 1" class="collision"/>
+      <geom mesh="modern_scandinavian_kitchen_island_collision_47" rgba="0.6377956924957253 0.06696439864746329 0.4391809472122912 1" class="collision"/>
+      <geom mesh="modern_scandinavian_kitchen_island_collision_48" rgba="0.4047652084429365 0.5498098462978528 0.012676463487842238 1" class="collision"/>
+    </body>
+  </worldbody>
+</mujoco>

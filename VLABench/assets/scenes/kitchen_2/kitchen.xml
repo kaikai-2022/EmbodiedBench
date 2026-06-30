@@ -1,0 +1,87 @@
+<mujoco model="kitchen">
+    <compiler angle="radian" autolimits="true"/>
+    
+    <default>
+        <default class="visual">
+        <geom group="2" type="mesh" contype="0" conaffinity="0"/>
+        </default>
+        <default class="collision">
+        <geom group="3" type="mesh"/>
+        </default>
+    </default>
+    <asset>
+        <texture type="skybox" builtin="gradient" rgb1=".9 .9 .9" rgb2=".9 .9 .9" width="100" height="100"/>
+        <texture file="textures/tile_grigia_caldera_porcelain_floor.png" type="2d" name="texplane"/>
+        
+        <material name="floorplane" reflectance="0.0" shininess="0.0"
+	        specular="0.0" texrepeat="3 3" texture="texplane" texuniform="true"/>
+        <texture file="textures/smooth_light_gray_plaster.png" type="2d" name="tex-wall"/>
+        <material name="walls_mat" reflectance="0.0" shininess="0.1" specular="0.8" texrepeat="3 3" texture="tex-wall" texuniform="true" />
+        <material name="white" rgba="1 1 1 1"/>
+        <material name="gray" rgba="0.753 0.753 0.753 1"/>
+        <material name="black" rgba="0.149 0.149 0.149 1"/>
+    </asset>
+    <asset>
+        <material name="Material.001" specular="0.5" shininess="0.5" rgba="0.093350 0.093350 0.093350 1.000000"/>
+        <material name="Material.002" specular="0.5" shininess="0.5" rgba="0.390742 0.407995 0.438543 1.000000"/>
+        <material name="Material.003" specular="0.5" shininess="0.5" rgba="0.800000 0.800000 0.800000 1.000000"/>
+        <material name="Material.006" specular="0.5" shininess="0.5" rgba="0.303198 0.303198 0.303198 1.000000"/>
+        <material name="Material.007" specular="0.5" shininess="0.5" rgba="0.038914 0.038914 0.038914 1.000000"/>
+        <material name="Material.008" specular="0.5" shininess="0.5" rgba="0.396051 0.247552 0.152261 1.000000"/>
+        <material name="Material.010" specular="0.5" shininess="0.5" rgba="0.800000 0.800000 0.800000 1.000000"/>
+        <material name="Material.011" specular="0.5" shininess="0.5" rgba="0.800000 0.800000 0.800000 1.000000"/>
+        <material name="Material.013" specular="0.5" shininess="0.5" rgba="0.800000 0.800000 0.800000 1.000000"/>
+        <material name="Material.014" specular="0.5" shininess="0.5" rgba="0.800000 0.800000 0.800000 1.000000"/>
+        <material name="Material.015" specular="0.5" shininess="0.5" rgba="0.800000 0.800000 0.800000 1.000000"/>
+        <material name="Material.016" specular="0.5" shininess="0.5" rgba="0.800000 0.800000 0.800000 1.000000"/>
+        <material name="Material.017" specular="0.5" shininess="0.5" rgba="0.390742 0.407995 0.438543 1.000000"/>
+        <material name="Material2" specular="0.5" shininess="0.5" rgba="0.800000 0.800000 0.800000 1.000000"/>
+        <material name="Material3" specular="0.483333" shininess="0.5" rgba="0.800000 0.800000 0.800000 1.000000"/>
+        <material name="Material4" specular="0.5" shininess="0.5" rgba="0.800000 0.800000 0.800000 1.000000"/>
+        <material name="grey" specular="0.5" shininess="0.5" rgba="0.099558 0.099558 0.099558 1.000000"/>
+        <mesh file="dinningroom/dinning_room_0.obj"/>
+        <mesh file="dinningroom/dinning_room_1.obj"/>
+        <mesh file="dinningroom/dinning_room_2.obj"/>
+        <mesh file="dinningroom/dinning_room_3.obj"/>
+        <mesh file="dinningroom/dinning_room_4.obj"/>
+        <mesh file="dinningroom/dinning_room_5.obj"/>
+        <mesh file="dinningroom/dinning_room_6.obj"/>
+        <mesh file="dinningroom/dinning_room_7.obj"/>
+        <mesh file="dinningroom/dinning_room_8.obj"/>
+        <!-- <mesh file="dinningroom/dinning_room_9.obj"/> -->
+        <mesh file="dinningroom/dinning_room_10.obj"/>
+        <mesh file="dinningroom/dinning_room_11.obj"/>
+        <mesh file="dinningroom/dinning_room_12.obj"/>
+        <mesh file="dinningroom/dinning_room_13.obj"/>
+        <mesh file="dinningroom/dinning_room_14.obj"/>
+        <mesh file="dinningroom/dinning_room_15.obj"/>
+        <mesh file="dinningroom/dinning_room_16.obj"/>
+    </asset>
+    <worldbody>
+        <geom condim="3" group="1" material="floorplane" name="floor" pos="0 0 0" size="4 4 .125" type="plane"/>
+        <geom pos="0 4 1.5" quat="0.7071 0.7071 0 0" size="4 2 0.01" type="box" conaffinity="0" contype="0" group="1" name="wall_left_visual" material="walls_mat"/>
+        <geom pos="0 -4 1.5" quat="0.7071 -0.7071 0 0" size="4 2 0.01" type="box" conaffinity="0" contype="0" group="1" name="wall_right_visual" material="walls_mat"/>
+        <geom pos="-4 0 1.5" quat="0.5 0.5 0.5 0.5" size="4 2 0.01" type="box" conaffinity="0" contype="0" group="1" name="wall_rear_visual" material="walls_mat"/>
+        <geom pos="4 0 1.5" quat="0.5 0.5 -0.5 -0.5" size="4 2 0.01" type="box" conaffinity="0" contype="0" group="1" name="wall_front_visual" material="walls_mat"/>
+        <light pos="0 0 7" dir="0 0 -1" directional="true" ambient="0.2 0.2 0.2" diffuse="0.5 0.5 0.5" specular="0. 0. 0." castshadow="true"/>
+
+        <body name="dinning_room" euler="1.57 0 0">
+            <geom type="mesh" mesh="dinning_room_0" material="Material4" class="visual"/>
+            <geom type="mesh" mesh="dinning_room_1" material="Material3" class="visual"/>
+            <geom type="mesh" mesh="dinning_room_2" material="Material2" class="visual"/>
+            <geom type="mesh" mesh="dinning_room_3" material="Material.014" class="visual"/>
+            <geom type="mesh" mesh="dinning_room_4" material="Material.003" class="visual"/>
+            <geom type="mesh" mesh="dinning_room_5" material="Material.001" class="visual"/>
+            <geom type="mesh" mesh="dinning_room_6" material="Material.008" class="visual"/>
+            <geom type="mesh" mesh="dinning_room_7" material="Material.007" class="visual"/>
+            <geom type="mesh" mesh="dinning_room_8" material="Material.013" class="visual"/>
+            <geom type="mesh" mesh="dinning_room_10" material="Material.010" class="visual"/>
+            <geom type="mesh" mesh="dinning_room_11" material="grey" class="visual"/>
+            <geom type="mesh" mesh="dinning_room_12" material="Material.006" class="visual"/>
+            <geom type="mesh" mesh="dinning_room_13" material="Material.002" class="visual"/>
+            <geom type="mesh" mesh="dinning_room_14" material="Material.017" class="visual"/>
+            <geom type="mesh" mesh="dinning_room_15" material="Material.016" class="visual"/>
+            <geom type="mesh" mesh="dinning_room_16" material="Material.015" class="visual"/>
+        </body>
+    </worldbody>
+</mujoco>

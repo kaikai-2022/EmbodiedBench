@@ -1,0 +1,54 @@
+<mujoco model="bedroom">
+  <compiler angle="radian" autolimits="true"/>
+
+  <default>
+    <default class="visual">
+      <geom group="2" type="mesh" contype="0" conaffinity="0"/>
+    </default>
+    <default class="collision">
+      <geom group="3" type="mesh"/>
+    </default>
+    <default class="candidate_point">
+      <site type="sphere" size="0.03 0.03 0.03" rgba="1 0 0 1" group="4"/>
+    </default>
+  </default>
+  <asset>
+    <texture type="2d" name="Structure_Combined" file="bedroom/Structure_Combined.png"/>
+    <material name="Bedroom" texture="Structure_Combined" specular="0.5" shininess="0.25"/>
+    <texture type="2d" name="Carpet_Combined" file="bedroom/Carpet_Combined.png"/>
+    <material name="Carpet" texture="Carpet_Combined" specular="0.5" shininess="0.25"/>
+    <texture type="2d" name="Duvet_Combined" file="bedroom/Duvet_Combined.png"/>
+    <material name="Duvet" texture="Duvet_Combined" specular="0.5" shininess="0.25"/>
+    <material name="Windows" specular="0.5" shininess="0.25" rgba="0.800000 0.800000 0.800000 0.082707"/>
+    <mesh file="bedroom/bedroom_0.obj" scale="0.1 0.1 0.1"/>
+    <mesh file="bedroom/bedroom_1.obj" scale="0.1 0.1 0.1"/>
+    <mesh file="bedroom/bedroom_2.obj" scale="0.1 0.1 0.1"/>
+    <mesh file="bedroom/bedroom_3.obj" scale="0.1 0.1 0.1"/>
+    <texture type="skybox" builtin="gradient" rgb1=".9 .9 .9" rgb2=".9 .9 .9" width="100" height="100"/>
+    <texture file="textures/tile_grigia_caldera_porcelain_floor.png" type="2d" name="texplane"/>
+    
+    <material name="default_floor" reflectance="0.0" shininess="0.0"
+      specular="0.0" texrepeat="3 3" texture="texplane" texuniform="true"/>
+    <texture file="textures/smooth_light_gray_plaster.png" type="2d" name="tex-wall"/>
+    <material name="walls_mat" reflectance="0.0" shininess="0.1" specular="0.8" texrepeat="3 3" texture="tex-wall" texuniform="true" />
+    <material name="white" rgba="1 1 1 1"/>
+    <material name="gray" rgba="0.753 0.753 0.753 1"/>
+    <material name="black" rgba="0.149 0.149 0.149 1"/>
+  </asset>
+  <worldbody>
+    <light pos="0 0 2" dir="0 0 -1" directional="true" ambient="0.2 0.2 0.2" diffuse="0.5 0.5 0.5" specular="0. 0. 0." castshadow="true"/>
+    <geom name="floor" condim="3" group="1" material="default_floor" pos="0 0 0" size="6 6 .125" type="plane"/>
+    <body name="bedroom" euler="1.57 0 0" pos="0 0 1.81">
+      <geom type="mesh" mesh="bedroom_0" material="Windows" class="visual"/>
+      <geom type="mesh" mesh="bedroom_1" material="Carpet" class="visual"/>
+      <geom type="mesh" mesh="bedroom_2" material="Duvet" class="visual"/>
+      <geom type="mesh" mesh="bedroom_3" material="Bedroom" class="visual"/>
+    </body>
+    <site class="candidate_point" pos="0 -1 0"/>
+    <site class="candidate_point" pos="1 -1 0"/>
+    <site class="candidate_point" pos="-1 -1 0"/>
+    <site class="candidate_point" pos="0 -2 0"/>
+    <site class="candidate_point" pos="1 -2 0"/>
+    <site class="candidate_point" pos="-1 -2 0"/>
+  </worldbody>
+</mujoco>

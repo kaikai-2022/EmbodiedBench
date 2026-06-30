@@ -1,0 +1,50 @@
+<mujoco model="charite_university_hospital_-_operating_room">
+  <compiler angle="radian" eulerseq="xyz"/>
+  <default>
+    <default class="visual">
+      <geom group="2" type="mesh" contype="0" conaffinity="0"/>
+    </default>
+    <default class="collision">
+      <geom group="3" type="mesh"/>
+    </default>
+  </default>
+  <asset>
+    <material name="material_0" specular="0.4000000000000001" shininess="0.001" rgba="0.05098039 0.16470588 0.24705882 1.0"/>
+    <texture type="2d" name="material_1" file="material_1.png"/>
+    <material name="material_1" texture="material_1" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_2" file="material_2.png"/>
+    <material name="material_2" texture="material_2" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_3" file="material_3.png"/>
+    <material name="material_3" texture="material_3" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_4" file="material_4.png"/>
+    <material name="material_4" texture="material_4" specular="0.4000000000000001" shininess="0.001"/>
+    <mesh file="charite_university_hospital_-_operating_room_0.obj"/>
+    <mesh file="charite_university_hospital_-_operating_room_1.obj"/>
+    <mesh file="charite_university_hospital_-_operating_room_2.obj"/>
+    <mesh file="charite_university_hospital_-_operating_room_3.obj"/>
+    <mesh file="charite_university_hospital_-_operating_room_4.obj"/>
+    <mesh file="charite_university_hospital_-_operating_room_collision_0.obj"/>
+    <mesh file="charite_university_hospital_-_operating_room_collision_1.obj"/>
+    <mesh file="charite_university_hospital_-_operating_room_collision_2.obj"/>
+    <mesh file="charite_university_hospital_-_operating_room_collision_3.obj"/>
+    <mesh file="charite_university_hospital_-_operating_room_collision_4.obj"/>
+    <mesh file="charite_university_hospital_-_operating_room_collision_5.obj"/>
+    <mesh file="charite_university_hospital_-_operating_room_collision_6.obj"/>
+  </asset>
+  <worldbody>
+    <body name="charite_university_hospital_-_operating_room" euler="1.57 0 0">
+      <geom mesh="charite_university_hospital_-_operating_room_0" material="material_4" class="visual"/>
+      <geom mesh="charite_university_hospital_-_operating_room_1" material="material_3" class="visual"/>
+      <geom mesh="charite_university_hospital_-_operating_room_2" material="material_2" class="visual"/>
+      <geom mesh="charite_university_hospital_-_operating_room_3" material="material_1" class="visual"/>
+      <geom mesh="charite_university_hospital_-_operating_room_4" material="material_0" class="visual"/>
+      <geom mesh="charite_university_hospital_-_operating_room_collision_0" rgba="0.2792682527922832 0.12318861818646076 0.8747944538167339 1" class="collision"/>
+      <geom mesh="charite_university_hospital_-_operating_room_collision_1" rgba="0.7062261746820414 0.7566369212557152 0.019338823488351475 1" class="collision"/>
+      <geom mesh="charite_university_hospital_-_operating_room_collision_2" rgba="0.9513356452975158 0.747095488587192 0.9928231557749739 1" class="collision"/>
+      <geom mesh="charite_university_hospital_-_operating_room_collision_3" rgba="0.08549999116364193 0.7034601437721361 0.7741338577386097 1" class="collision"/>
+      <geom mesh="charite_university_hospital_-_operating_room_collision_4" rgba="0.15045658132040207 0.04659432532546559 0.630677315227884 1" class="collision"/>
+      <geom mesh="charite_university_hospital_-_operating_room_collision_5" rgba="0.3188759208327252 0.12433921269754034 0.9949336841718416 1" class="collision"/>
+      <geom mesh="charite_university_hospital_-_operating_room_collision_6" rgba="0.5883886473389217 0.00042628404539390985 0.00025707033071420415 1" class="collision"/>
+    </body>
+  </worldbody>
+</mujoco>

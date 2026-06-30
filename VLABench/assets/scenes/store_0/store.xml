@@ -1,0 +1,533 @@
+<mujoco model="store">
+
+  <compiler angle="radian" autolimits="true"/>
+
+  <default>
+    <default class="visual">
+      <geom group="2" type="mesh" contype="0" conaffinity="0"/>
+    </default>
+    <default class="collision">
+      <geom group="3" type="mesh"/>
+    </default>
+  </default>
+
+    <asset>
+        <texture type="skybox" builtin="gradient" rgb1=".9 .9 .9" rgb2=".9 .9 .9" width="100" height="100"/>
+        <texture file="textures/tile_grigia_caldera_porcelain_floor.png" type="2d" name="texplane"/>
+        
+        <material name="floorplane" reflectance="0.0" shininess="0.0"
+	        specular="0.0" texrepeat="3 3" texture="texplane" texuniform="true"/>
+        <texture file="textures/smooth_light_gray_plaster.png" type="2d" name="tex-wall"/>
+        <material name="walls_mat" reflectance="0.0" shininess="0.1" specular="0.8" texrepeat="3 3" texture="tex-wall" texuniform="true" />
+        <material name="white" rgba="1 1 1 1"/>
+        <material name="gray" rgba="0.753 0.753 0.753 1"/>
+        <material name="black" rgba="0.149 0.149 0.149 1"/>
+    </asset>
+  <asset>
+    <texture type="2d" name="2-stack-wp1DiffuseMap" file="store/2-stack-wp1DiffuseMap.png"/>
+    <material name="2_stack_wp1" texture="2-stack-wp1DiffuseMap" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="2-stack-wp3DiffuseMap" file="store/2-stack-wp3DiffuseMap.png"/>
+    <material name="2_stack_wp3" texture="2-stack-wp3DiffuseMap" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="2-wp-1DiffuseMap" file="store/2-wp-1DiffuseMap.png"/>
+    <material name="2_wp_1" texture="2-wp-1DiffuseMap" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="2-wp-2DiffuseMap" file="store/2-wp-2DiffuseMap.png"/>
+    <material name="2_wp_2" texture="2-wp-2DiffuseMap" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="711-D-GEDiffuseMap" file="store/711-D-GEDiffuseMap.png"/>
+    <material name="711_D_GE" texture="711-D-GEDiffuseMap" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="711-Stacks-1DiffuseMap" file="store/711-Stacks-1DiffuseMap.png"/>
+    <material name="711_Stacks_1" texture="711-Stacks-1DiffuseMap" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="711-Stacks-2DiffuseMap" file="store/711-Stacks-2DiffuseMap.png"/>
+    <material name="711_Stacks_2" texture="711-Stacks-2DiffuseMap" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="711-Stacks-3DiffuseMap" file="store/711-Stacks-3DiffuseMap.png"/>
+    <material name="711_Stacks_3" texture="711-Stacks-3DiffuseMap" specular="0.0" shininess="0.010000005"/>
+    <!-- <texture type="2d" name="711-Stacks-Bake-05_VB" file="store/711-Stacks-Bake-05_VB.tga"/>
+    <material name="711_Stacks_Bake_05_VB" texture="711-Stacks-Bake-05_VB" specular="0.0" shininess="0.010000005"/> -->
+    <texture type="2d" name="711-Stacks-Bake-1DiffuseMap" file="store/711-Stacks-Bake-1DiffuseMap.png"/>
+    <material name="711_Stacks_Bake_1" texture="711-Stacks-Bake-1DiffuseMap" specular="0.0" shininess="0.010000005"/>
+    <!-- <texture type="2d" name="711-Stacks-Bake-12_VB" file="store/711-Stacks-Bake-12_VB.tga"/>
+    <material name="711_Stacks_Bake_12_VB" texture="711-Stacks-Bake-12_VB" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="711-Stacks-Bake-13_VB" file="store/711-Stacks-Bake-13_VB.tga"/>
+    <material name="711_Stacks_Bake_13_VB" texture="711-Stacks-Bake-13_VB" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="711-Stacks-Bake-14_VB" file="store/711-Stacks-Bake-14_VB.tga"/>
+    <material name="711_Stacks_Bake_14_VB" texture="711-Stacks-Bake-14_VB" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="711-Stacks-Bake-15_VB" file="store/711-Stacks-Bake-15_VB.tga"/>
+    <material name="711_Stacks_Bake_15_VB" texture="711-Stacks-Bake-15_VB" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="711-Stacks-Bake-16_VB" file="store/711-Stacks-Bake-16_VB.tga"/>
+    <material name="711_Stacks_Bake_16_VB" texture="711-Stacks-Bake-16_VB" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="711-Stacks-Bake-17_VB" file="store/711-Stacks-Bake-17_VB.tga"/> -->
+    <!-- <material name="711_Stacks_Bake_17_VB" texture="711-Stacks-Bake-17_VB" specular="0.0" shininess="0.010000005"/> -->
+    <texture type="2d" name="711-Stacks-ICEDiffuseMap" file="store/711-Stacks-ICEDiffuseMap.png"/>
+    <material name="711_Stacks_ICE" texture="711-Stacks-ICEDiffuseMap" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="711-Stacks-fastfoodDiffuseMap" file="store/711-Stacks-fastfoodDiffuseMap.png"/>
+    <material name="711_Stacks_fastfood" texture="711-Stacks-fastfoodDiffuseMap" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="Glass-Blue" file="store/Glass-Blue.png"/>
+    <material name="711_wps_007456" texture="Glass-Blue" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="Glass-Blue-2" file="store/Glass-Blue-2.png"/>
+    <material name="711_wps_007456ccv" texture="Glass-Blue-2" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="Stacks-unbrella-04" file="store/Stacks-unbrella-04.png"/>
+    <material name="722_Stacks_Unbake_302_VB" texture="Stacks-unbrella-04" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="722-Stacks-cashier-03DiffuseMap" file="store/722-Stacks-cashier-03DiffuseMap.png"/>
+    <material name="722_Stacks_cashier_03" texture="722-Stacks-cashier-03DiffuseMap" specular="0.0" shininess="0.010000005"/>
+    <!-- <texture type="2d" name="A-freezer01_VB" file="store/A-freezer01_VB.tga"/>
+    <material name="A_freezer01_VB" texture="A-freezer01_VB" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="A-freezer02_VB" file="store/A-freezer02_VB.tga"/>
+    <material name="A_freezer02_VB" texture="A-freezer02_VB" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="Arch-00020_VB" file="store/Arch-00020_VB.tga"/>
+    <material name="Arch_00020_VB" texture="Arch-00020_VB" specular="0.0" shininess="0.010000005"/> -->
+    <texture type="2d" name="Bz-x1" file="store/Bz-x1.png"/>
+    <material name="BZ_x01" texture="Bz-x1" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="B-Stack02DiffuseMap" file="store/B-Stack02DiffuseMap.png"/>
+    <material name="B_Stack022" texture="B-Stack02DiffuseMap" specular="0.0" shininess="0.010000005"/>
+    <!-- <texture type="2d" name="B-Stack06_VB" file="store/B-Stack06_VB.tga"/>
+    <material name="B_Stack06_VB" texture="B-Stack06_VB" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="B-Stack07_VB" file="store/B-Stack07_VB.tga"/>
+    <material name="B_Stack07_VB" texture="B-Stack07_VB" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="B-Stack08_VB" file="store/B-Stack08_VB.tga"/>
+    <material name="B_Stack08_VB" texture="B-Stack08_VB" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="B-stack01-01_VB" file="store/B-stack01-01_VB.tga"/>
+    <material name="B_stack01_01_VB" texture="B-stack01-01_VB" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="B-stack01-02_VB" file="store/B-stack01-02_VB.tga"/>
+    <material name="B_stack01_02_VB" texture="B-stack01-02_VB" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="B-stack01-03_VB" file="store/B-stack01-03_VB.tga"/>
+    <material name="B_stack01_03_VB" texture="B-stack01-03_VB" specular="0.0" shininess="0.010000005"/> -->
+    <material name="COcola" specular="0.0" shininess="0.010000005" rgba="0.086300 0.086300 0.086300 1.000000"/>
+    <texture type="2d" name="Glass-White" file="store/Glass-White.png"/>
+    <material name="COcolasc" texture="Glass-White" specular="0.0" shininess="0.010000005"/>
+    <material name="Cashier_glass" texture="Glass-Blue" specular="0.0" shininess="0.010000005"/>
+    <material name="Cashier_glasssss" texture="Glass-Blue-2" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="Ceiling-01DiffuseMap" file="store/Ceiling-01DiffuseMap.png"/>
+    <material name="Ceiling_01" texture="Ceiling-01DiffuseMap" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="Cocola3" file="store/Cocola3.png"/>
+    <material name="Cocola_alpha" texture="Cocola3" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="Stacks-unbrella-05" file="store/Stacks-unbrella-05.png"/>
+    <material name="Cocola_alphassrt" texture="Stacks-unbrella-05" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="Stacks-unbrella-07" file="store/Stacks-unbrella-07.png"/>
+    <material name="Cocola_alphassty" texture="Stacks-unbrella-07" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="Stacks-Water-02-004" file="store/Stacks-Water-02-004.png"/>
+    <material name="Cocola_alphaww" texture="Stacks-Water-02-004" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="Cocola3-3" file="store/Cocola3-3.png"/>
+    <material name="Cocola_alphawwre" texture="Cocola3-3" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="Stacks-Water-02-0055" file="store/Stacks-Water-02-0055.png"/>
+    <material name="Cocola_alphawwress" texture="Stacks-Water-02-0055" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="711-wps-009" file="store/711-wps-009.png"/>
+    <material name="D_wp_002oo" texture="711-wps-009" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="FSU5-01DiffuseMap" file="store/FSU5-01DiffuseMap.png"/>
+    <material name="FSU5_01" texture="FSU5-01DiffuseMap" specular="0.0" shininess="0.010000005"/>
+    <material name="FZ_t_04sglass" texture="Glass-Blue" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="Stacks-FZ-11" file="store/Stacks-FZ-11.png"/>
+    <material name="FZ_t_07" texture="Stacks-FZ-11" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="Stacks-FZ-12" file="store/Stacks-FZ-12.png"/>
+    <material name="FZ_t_07ss" texture="Stacks-FZ-12" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="Floor-1DiffuseMap" file="store/Floor-1DiffuseMap.png"/>
+    <material name="Floor_1" texture="Floor-1DiffuseMap" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="Floor-2DiffuseMap" file="store/Floor-2DiffuseMap.png"/>
+    <material name="Floor_2" texture="Floor-2DiffuseMap" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="white" file="store/white.png"/>
+    <material name="Material__180" texture="white" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="darkgrey" file="store/darkgrey.png"/>
+    <material name="Material__181" texture="darkgrey" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="711-wps-013" file="store/711-wps-013.png"/>
+    <material name="Material__19522eert" texture="711-wps-013" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="711-wps-015" file="store/711-wps-015.png"/>
+    <material name="Material__19522eert3" texture="711-wps-015" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="711-wps-014" file="store/711-wps-014.png"/>
+    <material name="Material__19522eert3f" texture="711-wps-014" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="wooden-floor01" file="store/wooden-floor01.png"/>
+    <material name="Material__19523" texture="wooden-floor01" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="shop-01" file="store/shop-01.png"/>
+    <material name="Material__19526" texture="shop-01" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="shop-02" file="store/shop-02.png"/>
+    <material name="Material__19527" texture="shop-02" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="shop-03" file="store/shop-03.png"/>
+    <material name="Material__19539" texture="shop-03" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="enviornment001" file="store/enviornment001.png"/>
+    <material name="Material__19541" texture="enviornment001" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="enviornment002" file="store/enviornment002.png"/>
+    <material name="Material__19542" texture="enviornment002" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="enviornment003" file="store/enviornment003.png"/>
+    <material name="Material__19543" texture="enviornment003" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="Window03-T-01" file="store/Window03-T-01.png"/>
+    <material name="Material__19546" texture="Window03-T-01" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="door-signage01" file="store/door-signage01.png"/>
+    <material name="Material__19547" texture="door-signage01" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="light01" file="store/light01.png"/>
+    <material name="Material__19551" texture="light01" specular="0.0" shininess="0.010000005"/>
+    <material name="Material__24463" texture="door-signage01" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="sign-002" file="store/sign-002.png"/>
+    <material name="Material__24464" texture="sign-002" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="Window-sign01" file="store/Window-sign01.png"/>
+    <material name="Material__24465" texture="Window-sign01" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="Pull01" file="store/Pull01.png"/>
+    <material name="Material__24466" texture="Pull01" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="Glass-darkgreen" file="store/Glass-darkgreen.png"/>
+    <material name="Material__24470" texture="Glass-darkgreen" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="sign-01-r" file="store/sign-01-r.png"/>
+    <material name="Material__24528" texture="sign-01-r" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="sign-01" file="store/sign-01.png"/>
+    <material name="Material__24529" texture="sign-01" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="sign-01-b" file="store/sign-01-b.png"/>
+    <material name="Material__24530" texture="sign-01-b" specular="0.0" shininess="0.010000005"/>
+    <material name="Material__24543" texture="sign-01" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="B-product01DiffuseMap" file="store/B-product01DiffuseMap.png"/>
+    <material name="Material__25495" texture="B-product01DiffuseMap" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="711-Stacks-cashierDiffuseMap" file="store/711-Stacks-cashierDiffuseMap.png"/>
+    <material name="Material__25885" texture="711-Stacks-cashierDiffuseMap" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="2-stack-wp2DiffuseMap" file="store/2-stack-wp2DiffuseMap.png"/>
+    <material name="Material__26731" texture="2-stack-wp2DiffuseMap" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="711-Stacks-cashier2DiffuseMap" file="store/711-Stacks-cashier2DiffuseMap.png"/>
+    <material name="Material__26825" texture="711-Stacks-cashier2DiffuseMap" specular="0.0" shininess="0.010000005"/>
+    <material name="Material__272" texture="white" specular="0.0" shininess="0.010000005"/>
+    <material name="Material__354" texture="white" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="B-bakery-01-glass-01" file="store/B-bakery-01-glass-01.png"/>
+    <material name="Material__355" texture="B-bakery-01-glass-01" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="Arch-board01" file="store/Arch-board01.png"/>
+    <material name="Material__3563" texture="Arch-board01" specular="0.0" shininess="0.010000005"/>
+    <material name="Material__368" texture="white" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="B-bakery-darkglass" file="store/B-bakery-darkglass.png"/>
+    <material name="Material__370" texture="B-bakery-darkglass" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="refrigerator-darkgreen" file="store/refrigerator-darkgreen.png"/>
+    <material name="Material__404" texture="refrigerator-darkgreen" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="floor-brown" file="store/floor-brown.png"/>
+    <material name="Material__691" texture="floor-brown" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="Exit01" file="store/Exit01.png"/>
+    <material name="Plane051_VB" texture="Exit01" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="Stacks-Cashier-A3-001" file="store/Stacks-Cashier-A3-001.png"/>
+    <material name="Stacks_A3_001" texture="Stacks-Cashier-A3-001" specular="0.0" shininess="0.010000005"/>
+    <material name="Stacks_A5_003vv" specular="0.0" shininess="0.010000005" rgba="0.282400 0.282400 0.282400 1.000000"/>
+    <texture type="2d" name="Stacks-Cashier-02-016" file="store/Stacks-Cashier-02-016.png"/>
+    <material name="Stacks_Chahier_03_006" texture="Stacks-Cashier-02-016" specular="0.0" shininess="0.010000005"/>
+    <material name="Stacks_Chshier_06_001" specular="0.0" shininess="0.010000005" rgba="0.960800 0.960800 0.960800 1.000000"/>
+    <texture type="2d" name="Stacks-Cashier-06-001" file="store/Stacks-Cashier-06-001.png"/>
+    <material name="Stacks_Chshier_06_001q" texture="Stacks-Cashier-06-001" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="Stacks-Cashier-06-002" file="store/Stacks-Cashier-06-002.png"/>
+    <material name="Stacks_Chshier_06_001qx" texture="Stacks-Cashier-06-002" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="Stacks-T-BZ-02" file="store/Stacks-T-BZ-02.png"/>
+    <material name="Stacks_bz_x1" texture="Stacks-T-BZ-02" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="Wall-03DiffuseMap" file="store/Wall-03DiffuseMap.png"/>
+    <material name="Wall_03" texture="Wall-03DiffuseMap" specular="0.0" shininess="0.010000005"/>
+    <!-- <texture type="2d" name="Window-01-02_VB" file="store/Window-01-02_VB.tga"/>
+    <material name="Window_01_02_VB" texture="Window-01-02_VB" specular="0.0" shininess="0.010000005"/> -->
+    <texture type="2d" name="aircondition-01DiffuseMap" file="store/aircondition-01DiffuseMap.png"/>
+    <material name="aircondition_01" texture="aircondition-01DiffuseMap" specular="0.0" shininess="0.010000005"/>
+    <!-- <texture type="2d" name="board-01_VB" file="store/board-01_VB.tga"/>
+    <material name="board_01_VB" texture="board-01_VB" specular="0.0" shininess="0.010000005"/> -->
+    <texture type="2d" name="board-1DiffuseMap" file="store/board-1DiffuseMap.png"/>
+    <material name="board_1" texture="board-1DiffuseMap" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="711-Stacks-Bake-01DiffuseMap" file="store/711-Stacks-Bake-01DiffuseMap.png"/>
+    <material name="chair" texture="711-Stacks-Bake-01DiffuseMap" specular="0.0" shininess="0.010000005"/>
+    <texture type="2d" name="dangaoDiffuseMap" file="store/dangaoDiffuseMap.png"/>
+    <material name="dangao" texture="dangaoDiffuseMap" specular="0.0" shininess="0.010000005"/>
+    <mesh file="store/store_0.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_1.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_2.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_3.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_4.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_5.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_6.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_7.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_8.obj" scale="0.01 0.01 0.01"/>
+    <!-- <mesh file="store/store_9.obj" scale="0.01 0.01 0.01"/> -->
+    <!-- <mesh file="store/store_10.obj" scale="0.01 0.01 0.01"/> -->
+    <!-- <mesh file="store/store_11.obj" scale="0.01 0.01 0.01"/> -->
+    <mesh file="store/store_12.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_13.obj" scale="0.01 0.01 0.01"/>
+    <!-- <mesh file="store/store_14.obj" scale="0.01 0.01 0.01"/> -->
+    <mesh file="store/store_15.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_16.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_17.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_18.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_19.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_20.obj" scale="0.01 0.01 0.01"/>
+    <!-- <mesh file="store/store_21.obj" scale="0.01 0.01 0.01"/> -->
+    <mesh file="store/store_22.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_23.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_24.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_25.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_26.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_27.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_28.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_29.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_30.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_31.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_32.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_33.obj" scale="0.01 0.01 0.01"/>
+    <!-- <mesh file="store/store_34.obj" scale="0.01 0.01 0.01"/> -->
+    <mesh file="store/store_35.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_36.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_37.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_38.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_39.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_40.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_41.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_42.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_43.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_44.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_45.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_46.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_47.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_48.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_49.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_50.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_51.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_52.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_53.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_54.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_55.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_56.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_57.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_58.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_59.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_60.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_61.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_62.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_63.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_64.obj" scale="0.01 0.01 0.01"/>
+    <!-- <mesh file="store/store_65.obj" scale="0.01 0.01 0.01"/> -->
+    <mesh file="store/store_66.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_67.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_68.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_69.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_70.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_71.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_72.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_73.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_74.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_75.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_76.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_77.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_78.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_79.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_80.obj" scale="0.01 0.01 0.01"/>
+    <!-- <mesh file="store/store_81.obj" scale="0.01 0.01 0.01"/> -->
+    <!-- <mesh file="store/store_82.obj" scale="0.01 0.01 0.01"/> -->
+    <mesh file="store/store_83.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_84.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_85.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_86.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_87.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_88.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_89.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_90.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_91.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_92.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_93.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_94.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_95.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_96.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_97.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_98.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_99.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_100.obj" scale="0.01 0.01 0.01"/>
+    <mesh file="store/store_101.obj" scale="0.01 0.01 0.01"/>
+  </asset>
+  <worldbody>
+    <geom condim="3" group="1" material="floorplane" name="floor" pos="0 0 0" size="10 10 .125" type="plane"/>
+    <light pos="0 0 7" dir="0 0 -1" directional="true" ambient="0.2 0.2 0.2" diffuse="0.5 0.5 0.5" specular="0. 0. 0." castshadow="true"/>
+    <body name="store" euler="1.57 0 0" pos="0 0 0.3">
+      <!-- <geom type="mesh" mesh="store_0" material="Window_01_02_VB" class="visual"/> -->
+      <geom type="mesh" mesh="store_1" material="Material__3563" class="visual"/>
+      <geom type="mesh" mesh="store_2" material="Wall_03" class="visual"/>
+      <geom type="mesh" mesh="store_3" material="Material__370" class="visual"/>
+      <geom type="mesh" mesh="store_4" material="Material__404" class="visual"/>
+      <geom type="mesh" mesh="store_5" material="Material__368" class="visual"/>
+      <geom type="mesh" mesh="store_6" material="Material__355" class="visual"/>
+      <geom type="mesh" mesh="store_7" material="Material__354" class="visual"/>
+      <geom type="mesh" mesh="store_8" material="Material__24466" class="visual"/>
+      <!-- <geom type="mesh" mesh="store_9" material="Material__24465" class="visual"/> -->
+      <!-- <geom type="mesh" mesh="store_10" material="Material__24464" class="visual"/> -->
+      <!-- <geom type="mesh" mesh="store_11" material="Material__24463" class="visual"/> -->
+      <geom type="mesh" mesh="store_12" material="Material__19547" class="visual"/>
+      <geom type="mesh" mesh="store_13" material="Material__19546" class="visual"/>
+      <!-- <geom type="mesh" mesh="store_14" material="Plane051_VB" class="visual"/> -->
+      <geom type="mesh" mesh="store_15" material="Material__19543" class="visual"/>
+      <geom type="mesh" mesh="store_16" material="Material__19542" class="visual"/>
+      <geom type="mesh" mesh="store_17" material="Material__19527" class="visual"/>
+      <geom type="mesh" mesh="store_18" material="Material__19526" class="visual"/>
+      <geom type="mesh" mesh="store_19" material="Material__181" class="visual"/>
+      <geom type="mesh" mesh="store_20" material="Material__180" class="visual"/>
+      <!-- <geom type="mesh" mesh="store_21" material="Material__272" class="visual"/> -->
+      <geom type="mesh" mesh="store_22" material="FSU5_01" class="visual"/>
+      <geom type="mesh" mesh="store_23" material="Floor_2" class="visual"/>
+      <geom type="mesh" mesh="store_24" material="Floor_1" class="visual"/>
+      <geom type="mesh" mesh="store_25" material="dangao" class="visual"/>
+      <geom type="mesh" mesh="store_26" material="Material__24543" class="visual"/>
+      <geom type="mesh" mesh="store_27" material="Material__19551" class="visual"/>
+      <geom type="mesh" mesh="store_28" material="chair" class="visual"/>
+      <geom type="mesh" mesh="store_29" material="Ceiling_01" class="visual"/>
+      <geom type="mesh" mesh="store_30" material="Material__24528" class="visual"/>
+      <geom type="mesh" mesh="store_31" material="Material__24529" class="visual"/>
+      <geom type="mesh" mesh="store_32" material="Material__24530" class="visual"/>
+      <geom type="mesh" mesh="store_33" material="Material__24470" class="visual"/>
+      <!-- <geom type="mesh" mesh="store_34" material="Material__19541" class="visual"/> -->
+      <geom type="mesh" mesh="store_35" material="Material__691" class="visual"/>
+      <geom type="mesh" mesh="store_36" material="Material__19539" class="visual"/>
+      <geom type="mesh" mesh="store_37" material="Material__19523" class="visual"/>
+      <geom type="mesh" mesh="store_38" material="board_1" class="visual"/>
+      <!-- <geom type="mesh" mesh="store_39" material="board_01_VB" class="visual"/>
+      <geom type="mesh" mesh="store_40" material="B_Stack08_VB" class="visual"/>
+      <geom type="mesh" mesh="store_41" material="B_Stack07_VB" class="visual"/>
+      <geom type="mesh" mesh="store_42" material="B_Stack06_VB" class="visual"/> -->
+      <geom type="mesh" mesh="store_43" material="B_Stack022" class="visual"/>
+      <!-- <geom type="mesh" mesh="store_44" material="B_stack01_03_VB" class="visual"/>
+      <geom type="mesh" mesh="store_45" material="B_stack01_02_VB" class="visual"/>
+      <geom type="mesh" mesh="store_46" material="B_stack01_01_VB" class="visual"/> -->
+      <geom type="mesh" mesh="store_47" material="Material__25495" class="visual"/>
+      <!-- <geom type="mesh" mesh="store_48" material="Arch_00020_VB" class="visual"/> -->
+      <geom type="mesh" mesh="store_49" material="aircondition_01" class="visual"/>
+      <!-- <geom type="mesh" mesh="store_50" material="A_freezer02_VB" class="visual"/>
+      <geom type="mesh" mesh="store_51" material="A_freezer01_VB" class="visual"/> -->
+      <geom type="mesh" mesh="store_52" material="Material__19522eert3f" class="visual"/>
+      <geom type="mesh" mesh="store_53" material="Material__19522eert3" class="visual"/>
+      <geom type="mesh" mesh="store_54" material="Material__19522eert" class="visual"/>
+      <geom type="mesh" mesh="store_55" material="D_wp_002oo" class="visual"/>
+      <geom type="mesh" mesh="store_56" material="711_wps_007456ccv" class="visual"/>
+      <geom type="mesh" mesh="store_57" material="711_wps_007456" class="visual"/>
+      <geom type="mesh" mesh="store_58" material="Cocola_alphawwress" class="visual"/>
+      <geom type="mesh" mesh="store_59" material="BZ_x01" class="visual"/>
+      <geom type="mesh" mesh="store_60" material="COcolasc" class="visual"/>
+      <geom type="mesh" mesh="store_61" material="Cocola_alpha" class="visual"/>
+      <!-- <geom type="mesh" mesh="store_62" material="722_Stacks_Unbake_302_VB" class="visual"/> -->
+      <geom type="mesh" mesh="store_63" material="Cocola_alphassty" class="visual"/>
+      <geom type="mesh" mesh="store_64" material="Cocola_alphassrt" class="visual"/>
+      <!-- <geom type="mesh" mesh="store_65" material="Stacks_Chahier_03_006" class="visual"/> -->
+      <geom type="mesh" mesh="store_66" material="Cocola_alphaww" class="visual"/>
+      <geom type="mesh" mesh="store_67" material="Stacks_Chshier_06_001q" class="visual"/>
+      <geom type="mesh" mesh="store_68" material="Cocola_alphawwre" class="visual"/>
+      <geom type="mesh" mesh="store_69" material="Stacks_Chshier_06_001qx" class="visual"/>
+      <geom type="mesh" mesh="store_70" material="Cashier_glass" class="visual"/>
+      <geom type="mesh" mesh="store_71" material="Cashier_glasssss" class="visual"/>
+      <geom type="mesh" mesh="store_72" material="FZ_t_04sglass" class="visual"/>
+      <geom type="mesh" mesh="store_73" material="722_Stacks_cashier_03" class="visual"/>
+      <geom type="mesh" mesh="store_74" material="711_Stacks_ICE" class="visual"/>
+      <geom type="mesh" mesh="store_75" material="711_Stacks_fastfood" class="visual"/>
+      <geom type="mesh" mesh="store_76" material="Material__26825" class="visual"/>
+      <geom type="mesh" mesh="store_77" material="Material__25885" class="visual"/>
+      <geom type="mesh" mesh="store_78" material="Stacks_A5_003vv" class="visual"/>
+      <geom type="mesh" mesh="store_79" material="Stacks_A3_001" class="visual"/>
+      <geom type="mesh" mesh="store_80" material="Stacks_Chshier_06_001" class="visual"/>
+      <!-- <geom type="mesh" mesh="store_81" material="FZ_t_07ss" class="visual"/> -->
+      <!-- <geom type="mesh" mesh="store_82" material="FZ_t_07" class="visual"/> -->
+      <!-- <geom type="mesh" mesh="store_83" material="711_Stacks_Bake_17_VB" class="visual"/>
+      <geom type="mesh" mesh="store_84" material="711_Stacks_Bake_16_VB" class="visual"/>
+      <geom type="mesh" mesh="store_85" material="711_Stacks_Bake_15_VB" class="visual"/>
+      <geom type="mesh" mesh="store_86" material="711_Stacks_Bake_14_VB" class="visual"/>
+      <geom type="mesh" mesh="store_87" material="711_Stacks_Bake_13_VB" class="visual"/>
+      <geom type="mesh" mesh="store_88" material="711_Stacks_Bake_12_VB" class="visual"/> -->
+      <geom type="mesh" mesh="store_89" material="711_Stacks_Bake_1" class="visual"/>
+      <geom type="mesh" mesh="store_90" material="COcola" class="visual"/>
+      <!-- <geom type="mesh" mesh="store_91" material="711_Stacks_Bake_05_VB" class="visual"/> -->
+      <geom type="mesh" mesh="store_92" material="Stacks_bz_x1" class="visual"/>
+      <geom type="mesh" mesh="store_93" material="711_Stacks_3" class="visual"/>
+      <geom type="mesh" mesh="store_94" material="711_Stacks_2" class="visual"/>
+      <geom type="mesh" mesh="store_95" material="711_Stacks_1" class="visual"/>
+      <geom type="mesh" mesh="store_96" material="711_D_GE" class="visual"/>
+      <geom type="mesh" mesh="store_97" material="2_wp_2" class="visual"/>
+      <geom type="mesh" mesh="store_98" material="2_wp_1" class="visual"/>
+      <geom type="mesh" mesh="store_99" material="2_stack_wp3" class="visual"/>
+      <geom type="mesh" mesh="store_100" material="Material__26731" class="visual"/>
+      <geom type="mesh" mesh="store_101" material="2_stack_wp1" class="visual"/>
+      <!-- <geom type="mesh" mesh="store_0" class="collision"/>
+      <geom type="mesh" mesh="store_1" class="collision"/>
+      <geom type="mesh" mesh="store_2" class="collision"/>
+      <geom type="mesh" mesh="store_3" class="collision"/>
+      <geom type="mesh" mesh="store_4" class="collision"/>
+      <geom type="mesh" mesh="store_5" class="collision"/>
+      <geom type="mesh" mesh="store_6" class="collision"/>
+      <geom type="mesh" mesh="store_7" class="collision"/>
+      <geom type="mesh" mesh="store_8" class="collision"/>
+      <geom type="mesh" mesh="store_9" class="collision"/>
+      <geom type="mesh" mesh="store_10" class="collision"/>
+      <geom type="mesh" mesh="store_11" class="collision"/>
+      <geom type="mesh" mesh="store_12" class="collision"/>
+      <geom type="mesh" mesh="store_13" class="collision"/>
+      <geom type="mesh" mesh="store_14" class="collision"/>
+      <geom type="mesh" mesh="store_15" class="collision"/>
+      <geom type="mesh" mesh="store_16" class="collision"/>
+      <geom type="mesh" mesh="store_17" class="collision"/>
+      <geom type="mesh" mesh="store_18" class="collision"/>
+      <geom type="mesh" mesh="store_19" class="collision"/>
+      <geom type="mesh" mesh="store_20" class="collision"/>
+      <geom type="mesh" mesh="store_21" class="collision"/>
+      <geom type="mesh" mesh="store_22" class="collision"/>
+      <geom type="mesh" mesh="store_23" class="collision"/>
+      <geom type="mesh" mesh="store_24" class="collision"/>
+      <geom type="mesh" mesh="store_25" class="collision"/>
+      <geom type="mesh" mesh="store_26" class="collision"/>
+      <geom type="mesh" mesh="store_27" class="collision"/>
+      <geom type="mesh" mesh="store_28" class="collision"/>
+      <geom type="mesh" mesh="store_29" class="collision"/>
+      <geom type="mesh" mesh="store_30" class="collision"/>
+      <geom type="mesh" mesh="store_31" class="collision"/>
+      <geom type="mesh" mesh="store_32" class="collision"/>
+      <geom type="mesh" mesh="store_33" class="collision"/>
+      <geom type="mesh" mesh="store_34" class="collision"/>
+      <geom type="mesh" mesh="store_35" class="collision"/>
+      <geom type="mesh" mesh="store_36" class="collision"/>
+      <geom type="mesh" mesh="store_37" class="collision"/>
+      <geom type="mesh" mesh="store_38" class="collision"/>
+      <geom type="mesh" mesh="store_39" class="collision"/>
+      <geom type="mesh" mesh="store_40" class="collision"/>
+      <geom type="mesh" mesh="store_41" class="collision"/>
+      <geom type="mesh" mesh="store_42" class="collision"/>
+      <geom type="mesh" mesh="store_43" class="collision"/>
+      <geom type="mesh" mesh="store_44" class="collision"/>
+      <geom type="mesh" mesh="store_45" class="collision"/>
+      <geom type="mesh" mesh="store_46" class="collision"/>
+      <geom type="mesh" mesh="store_47" class="collision"/>
+      <geom type="mesh" mesh="store_48" class="collision"/>
+      <geom type="mesh" mesh="store_49" class="collision"/>
+      <geom type="mesh" mesh="store_50" class="collision"/>
+      <geom type="mesh" mesh="store_51" class="collision"/>
+      <geom type="mesh" mesh="store_52" class="collision"/>
+      <geom type="mesh" mesh="store_53" class="collision"/>
+      <geom type="mesh" mesh="store_54" class="collision"/>
+      <geom type="mesh" mesh="store_55" class="collision"/>
+      <geom type="mesh" mesh="store_56" class="collision"/>
+      <geom type="mesh" mesh="store_57" class="collision"/>
+      <geom type="mesh" mesh="store_58" class="collision"/>
+      <geom type="mesh" mesh="store_59" class="collision"/>
+      <geom type="mesh" mesh="store_60" class="collision"/>
+      <geom type="mesh" mesh="store_61" class="collision"/>
+      <geom type="mesh" mesh="store_62" class="collision"/>
+      <geom type="mesh" mesh="store_63" class="collision"/>
+      <geom type="mesh" mesh="store_64" class="collision"/>
+      <geom type="mesh" mesh="store_65" class="collision"/>
+      <geom type="mesh" mesh="store_66" class="collision"/>
+      <geom type="mesh" mesh="store_67" class="collision"/>
+      <geom type="mesh" mesh="store_68" class="collision"/>
+      <geom type="mesh" mesh="store_69" class="collision"/>
+      <geom type="mesh" mesh="store_70" class="collision"/>
+      <geom type="mesh" mesh="store_71" class="collision"/>
+      <geom type="mesh" mesh="store_72" class="collision"/>
+      <geom type="mesh" mesh="store_73" class="collision"/>
+      <geom type="mesh" mesh="store_74" class="collision"/>
+      <geom type="mesh" mesh="store_75" class="collision"/>
+      <geom type="mesh" mesh="store_76" class="collision"/>
+      <geom type="mesh" mesh="store_77" class="collision"/>
+      <geom type="mesh" mesh="store_78" class="collision"/>
+      <geom type="mesh" mesh="store_79" class="collision"/>
+      <geom type="mesh" mesh="store_80" class="collision"/>
+      <geom type="mesh" mesh="store_81" class="collision"/>
+      <geom type="mesh" mesh="store_82" class="collision"/>
+      <geom type="mesh" mesh="store_83" class="collision"/>
+      <geom type="mesh" mesh="store_84" class="collision"/>
+      <geom type="mesh" mesh="store_85" class="collision"/>
+      <geom type="mesh" mesh="store_86" class="collision"/>
+      <geom type="mesh" mesh="store_87" class="collision"/>
+      <geom type="mesh" mesh="store_88" class="collision"/>
+      <geom type="mesh" mesh="store_89" class="collision"/>
+      <geom type="mesh" mesh="store_90" class="collision"/>
+      <geom type="mesh" mesh="store_91" class="collision"/>
+      <geom type="mesh" mesh="store_92" class="collision"/>
+      <geom type="mesh" mesh="store_93" class="collision"/>
+      <geom type="mesh" mesh="store_94" class="collision"/>
+      <geom type="mesh" mesh="store_95" class="collision"/>
+      <geom type="mesh" mesh="store_96" class="collision"/>
+      <geom type="mesh" mesh="store_97" class="collision"/>
+      <geom type="mesh" mesh="store_98" class="collision"/>
+      <geom type="mesh" mesh="store_99" class="collision"/>
+      <geom type="mesh" mesh="store_100" class="collision"/>
+      <geom type="mesh" mesh="store_101" class="collision"/> -->
+    </body>
+  </worldbody>
+</mujoco>

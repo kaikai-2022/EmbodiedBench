@@ -1,0 +1,145 @@
+<mujoco model="futuristic_room">
+  <compiler angle="radian" eulerseq="xyz"/>
+  <default>
+    <default class="visual">
+      <geom group="2" type="mesh" contype="0" conaffinity="0"/>
+    </default>
+    <default class="collision">
+      <geom group="3" type="mesh"/>
+    </default>
+  </default>
+  <asset>
+    <texture type="2d" name="material_0" file="material_0.png"/>
+    <material name="material_0" texture="material_0" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_1" file="material_1.png"/>
+    <material name="material_1" texture="material_1" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_2" file="material_2.png"/>
+    <material name="material_2" texture="material_2" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_3" file="material_3.png"/>
+    <material name="material_3" texture="material_3" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_4" file="material_4.png"/>
+    <material name="material_4" texture="material_4" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_5" file="material_5.png"/>
+    <material name="material_5" texture="material_5" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_6" file="material_6.png"/>
+    <material name="material_6" texture="material_6" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_7" file="material_7.png"/>
+    <material name="material_7" texture="material_7" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_8" file="material_8.png"/>
+    <material name="material_8" texture="material_8" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_9" file="material_9.png"/>
+    <material name="material_9" texture="material_9" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_10" file="material_10.png"/>
+    <material name="material_10" texture="material_10" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_11" file="material_11.png"/>
+    <material name="material_11" texture="material_11" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_12" file="material_12.png"/>
+    <material name="material_12" texture="material_12" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_13" file="material_13.png"/>
+    <material name="material_13" texture="material_13" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_14" file="material_14.png"/>
+    <material name="material_14" texture="material_14" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_15" file="material_15.png"/>
+    <material name="material_15" texture="material_15" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_16" file="material_16.png"/>
+    <material name="material_16" texture="material_16" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_17" file="material_17.png"/>
+    <material name="material_17" texture="material_17" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_18" file="material_18.png"/>
+    <material name="material_18" texture="material_18" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_19" file="material_19.png"/>
+    <material name="material_19" texture="material_19" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_20" file="material_20.png"/>
+    <material name="material_20" texture="material_20" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_21" file="material_21.png"/>
+    <material name="material_21" texture="material_21" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_22" file="material_22.png"/>
+    <material name="material_22" texture="material_22" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_23" file="material_23.png"/>
+    <material name="material_23" texture="material_23" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_24" file="material_24.png"/>
+    <material name="material_24" texture="material_24" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_25" file="material_25.png"/>
+    <material name="material_25" texture="material_25" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_26" file="material_26.png"/>
+    <material name="material_26" texture="material_26" specular="0.4000000000000001" shininess="0.001"/>
+    <mesh file="futuristic_room_0.obj"/>
+    <mesh file="futuristic_room_1.obj"/>
+    <mesh file="futuristic_room_2.obj"/>
+    <mesh file="futuristic_room_3.obj"/>
+    <mesh file="futuristic_room_4.obj"/>
+    <mesh file="futuristic_room_5.obj"/>
+    <mesh file="futuristic_room_6.obj"/>
+    <mesh file="futuristic_room_7.obj"/>
+    <mesh file="futuristic_room_8.obj"/>
+    <mesh file="futuristic_room_9.obj"/>
+    <mesh file="futuristic_room_10.obj"/>
+    <mesh file="futuristic_room_11.obj"/>
+    <mesh file="futuristic_room_12.obj"/>
+    <mesh file="futuristic_room_13.obj"/>
+    <mesh file="futuristic_room_14.obj"/>
+    <mesh file="futuristic_room_15.obj"/>
+    <mesh file="futuristic_room_16.obj"/>
+    <mesh file="futuristic_room_17.obj"/>
+    <mesh file="futuristic_room_18.obj"/>
+    <mesh file="futuristic_room_19.obj"/>
+    <mesh file="futuristic_room_20.obj"/>
+    <mesh file="futuristic_room_21.obj"/>
+    <mesh file="futuristic_room_22.obj"/>
+    <mesh file="futuristic_room_23.obj"/>
+    <mesh file="futuristic_room_24.obj"/>
+    <mesh file="futuristic_room_25.obj"/>
+    <mesh file="futuristic_room_26.obj"/>
+    <mesh file="futuristic_room_collision_0.obj"/>
+    <mesh file="futuristic_room_collision_1.obj"/>
+    <mesh file="futuristic_room_collision_2.obj"/>
+    <mesh file="futuristic_room_collision_3.obj"/>
+    <mesh file="futuristic_room_collision_4.obj"/>
+    <mesh file="futuristic_room_collision_5.obj"/>
+    <mesh file="futuristic_room_collision_6.obj"/>
+    <mesh file="futuristic_room_collision_7.obj"/>
+    <mesh file="futuristic_room_collision_8.obj"/>
+    <mesh file="futuristic_room_collision_9.obj"/>
+  </asset>
+  <worldbody>
+    <body name="futuristic_room" euler="1.57 0 0">
+      <geom mesh="futuristic_room_0" material="material_26" class="visual"/>
+      <geom mesh="futuristic_room_1" material="material_25" class="visual"/>
+      <geom mesh="futuristic_room_2" material="material_24" class="visual"/>
+      <geom mesh="futuristic_room_3" material="material_23" class="visual"/>
+      <geom mesh="futuristic_room_4" material="material_22" class="visual"/>
+      <geom mesh="futuristic_room_5" material="material_21" class="visual"/>
+      <geom mesh="futuristic_room_6" material="material_20" class="visual"/>
+      <geom mesh="futuristic_room_7" material="material_19" class="visual"/>
+      <geom mesh="futuristic_room_8" material="material_18" class="visual"/>
+      <geom mesh="futuristic_room_9" material="material_17" class="visual"/>
+      <geom mesh="futuristic_room_10" material="material_16" class="visual"/>
+      <geom mesh="futuristic_room_11" material="material_15" class="visual"/>
+      <geom mesh="futuristic_room_12" material="material_14" class="visual"/>
+      <geom mesh="futuristic_room_13" material="material_13" class="visual"/>
+      <geom mesh="futuristic_room_14" material="material_12" class="visual"/>
+      <geom mesh="futuristic_room_15" material="material_11" class="visual"/>
+      <geom mesh="futuristic_room_16" material="material_10" class="visual"/>
+      <geom mesh="futuristic_room_17" material="material_9" class="visual"/>
+      <geom mesh="futuristic_room_18" material="material_8" class="visual"/>
+      <geom mesh="futuristic_room_19" material="material_7" class="visual"/>
+      <geom mesh="futuristic_room_20" material="material_6" class="visual"/>
+      <geom mesh="futuristic_room_21" material="material_5" class="visual"/>
+      <geom mesh="futuristic_room_22" material="material_4" class="visual"/>
+      <geom mesh="futuristic_room_23" material="material_3" class="visual"/>
+      <geom mesh="futuristic_room_24" material="material_2" class="visual"/>
+      <geom mesh="futuristic_room_25" material="material_1" class="visual"/>
+      <geom mesh="futuristic_room_26" material="material_0" class="visual"/>
+      <geom mesh="futuristic_room_collision_0" rgba="0.2940771742061977 0.7552858754060235 0.6800621837179639 1" class="collision"/>
+      <geom mesh="futuristic_room_collision_1" rgba="0.9775260668533312 0.21060870848520497 0.19252274439353378 1" class="collision"/>
+      <geom mesh="futuristic_room_collision_2" rgba="0.38825437964816334 0.33765850855572677 0.3611931609291389 1" class="collision"/>
+      <geom mesh="futuristic_room_collision_3" rgba="0.8223065851995667 0.6035480073544675 0.44614146348489236 1" class="collision"/>
+      <geom mesh="futuristic_room_collision_4" rgba="0.10340114759094099 0.04354669093779817 0.8746040101969308 1" class="collision"/>
+      <geom mesh="futuristic_room_collision_5" rgba="0.06035246203712563 0.25318351757286506 0.3184399287046412 1" class="collision"/>
+      <geom mesh="futuristic_room_collision_6" rgba="0.5894085616801131 0.4038353129094089 0.19726038355435038 1" class="collision"/>
+      <geom mesh="futuristic_room_collision_7" rgba="0.5237475168767949 0.22306686448624935 0.921748227673486 1" class="collision"/>
+      <geom mesh="futuristic_room_collision_8" rgba="0.0941228562424975 0.5130674945832139 0.06217023026909496 1" class="collision"/>
+      <geom mesh="futuristic_room_collision_9" rgba="0.6146981638400555 0.8647079296205775 0.08229348594936148 1" class="collision"/>
+    </body>
+  </worldbody>
+</mujoco>

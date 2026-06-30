@@ -1,0 +1,189 @@
+<mujoco model="simple_house_-_kitchen">
+  <compiler angle="radian" eulerseq="xyz"/>
+  <default>
+    <default class="visual">
+      <geom group="2" type="mesh" contype="0" conaffinity="0"/>
+    </default>
+    <default class="collision">
+      <geom group="3" type="mesh"/>
+    </default>
+  </default>
+  <asset>
+    <texture type="2d" name="material_0" file="material_0.png"/>
+    <material name="material_0" texture="material_0" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_1" file="material_1.png"/>
+    <material name="material_1" texture="material_1" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_2" file="material_2.png"/>
+    <material name="material_2" texture="material_2" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_3" file="material_3.png"/>
+    <material name="material_3" texture="material_3" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_4" file="material_4.png"/>
+    <material name="material_4" texture="material_4" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_5" file="material_5.png"/>
+    <material name="material_5" texture="material_5" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_6" file="material_6.png"/>
+    <material name="material_6" texture="material_6" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_7" file="material_7.png"/>
+    <material name="material_7" texture="material_7" specular="0.4000000000000001" shininess="0.001"/>
+    <mesh file="simple_house_-_kitchen_0.obj"/>
+    <mesh file="simple_house_-_kitchen_1.obj"/>
+    <mesh file="simple_house_-_kitchen_2.obj"/>
+    <mesh file="simple_house_-_kitchen_3.obj"/>
+    <mesh file="simple_house_-_kitchen_4.obj"/>
+    <mesh file="simple_house_-_kitchen_5.obj"/>
+    <mesh file="simple_house_-_kitchen_6.obj"/>
+    <mesh file="simple_house_-_kitchen_7.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_0.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_1.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_2.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_3.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_4.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_5.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_6.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_7.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_8.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_9.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_10.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_11.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_12.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_13.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_14.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_15.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_16.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_17.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_18.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_19.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_20.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_21.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_22.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_23.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_24.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_25.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_26.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_27.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_28.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_29.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_30.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_31.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_32.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_33.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_34.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_35.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_36.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_37.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_38.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_39.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_40.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_41.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_42.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_43.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_44.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_45.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_46.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_47.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_48.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_49.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_50.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_51.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_52.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_53.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_54.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_55.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_56.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_57.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_58.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_59.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_60.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_61.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_62.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_63.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_64.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_65.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_66.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_67.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_68.obj"/>
+    <mesh file="simple_house_-_kitchen_collision_69.obj"/>
+  </asset>
+  <worldbody>
+    <body name="simple_house_-_kitchen" euler="1.57 0 0">
+      <geom mesh="simple_house_-_kitchen_0" material="material_7" class="visual"/>
+      <geom mesh="simple_house_-_kitchen_1" material="material_6" class="visual"/>
+      <geom mesh="simple_house_-_kitchen_2" material="material_5" class="visual"/>
+      <geom mesh="simple_house_-_kitchen_3" material="material_4" class="visual"/>
+      <geom mesh="simple_house_-_kitchen_4" material="material_3" class="visual"/>
+      <geom mesh="simple_house_-_kitchen_5" material="material_2" class="visual"/>
+      <geom mesh="simple_house_-_kitchen_6" material="material_1" class="visual"/>
+      <geom mesh="simple_house_-_kitchen_7" material="material_0" class="visual"/>
+      <geom mesh="simple_house_-_kitchen_collision_0" rgba="0.131426607267649 0.6914758634395906 0.26210425170015017 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_1" rgba="0.7898033039131572 0.4839872165220731 0.9460588861698123 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_2" rgba="0.3543509636100134 0.8881027549159393 0.36297734011131544 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_3" rgba="0.5615452530399861 0.19421607542478292 0.30136994396100714 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_4" rgba="0.29134244197129866 0.688655548542995 0.9514895141484847 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_5" rgba="0.6471740062257166 0.19673473036602795 0.4007406592509817 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_6" rgba="0.026115977198532647 0.5389617829041438 0.6466348509168036 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_7" rgba="0.4984985016359923 0.3134694892741531 0.46028672743491716 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_8" rgba="0.7954827881646608 0.8692452075530682 0.6149799372177598 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_9" rgba="0.33399638992363323 0.8024379367065215 0.7360762838688082 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_10" rgba="0.005711490576466027 0.6412145091310137 0.6265295215480843 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_11" rgba="0.8696778927323101 0.36437061204173493 0.24827217880396069 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_12" rgba="0.1196967394483931 0.5339691747587264 0.0133887049480933 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_13" rgba="0.026882123251428247 0.3263260722243073 0.4384081713297139 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_14" rgba="0.9925913774802957 0.4096570168774112 0.5310525465459621 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_15" rgba="0.21839604370154875 0.08849261904594152 0.6032326374002669 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_16" rgba="0.9520507701305183 0.20367064445776428 0.24211883673524803 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_17" rgba="0.1454054005388109 0.12117460542119207 0.16068881923010758 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_18" rgba="0.7690869735536463 0.7465261479271771 0.6793874796051278 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_19" rgba="0.5328883082126481 0.9817901874114241 0.3736446583178489 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_20" rgba="0.9761155819579486 0.7426602707116904 0.4694173471263 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_21" rgba="0.25240767967361477 0.3268613166016151 0.9575284448538993 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_22" rgba="0.518466105563983 0.09142767107534822 0.13760493233968263 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_23" rgba="0.37367149654992793 0.8739253824977014 0.1821829870348416 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_24" rgba="0.20046734294665836 0.34484162203813384 0.030020656686095104 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_25" rgba="0.16315945539244392 0.376053679333175 0.9537245442280602 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_26" rgba="0.5503447757721608 0.23767267279081328 0.6336158276759479 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_27" rgba="0.592407541300605 0.9047865783005791 0.8084429888044072 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_28" rgba="0.8560888910691333 0.10630829449094348 0.03271766746289573 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_29" rgba="0.5116258967328153 0.26142248965521886 0.06812933665240728 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_30" rgba="0.2737929804843223 0.25103812380899726 0.6254994839112367 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_31" rgba="0.6083833024432009 0.5849443242012415 0.5317607232701619 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_32" rgba="0.1284028665687078 0.49928981316486254 0.09485941369462969 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_33" rgba="0.24427620713357134 0.5695097340363188 0.6623199910332278 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_34" rgba="0.4564532078455098 0.9539220018601566 0.31051388299706584 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_35" rgba="0.17711113114409938 0.7929448643916895 0.00706049410411369 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_36" rgba="0.3774944972984753 0.45836061504859316 0.8702653954203377 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_37" rgba="0.3860311859836937 0.786289357904192 0.6333303729881437 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_38" rgba="0.2608586784530509 0.6292960698588397 0.24482395869724605 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_39" rgba="0.34673316346217575 0.7322530733195604 0.0690181146747667 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_40" rgba="0.6944198860755997 0.2542071637672577 0.09860207148529021 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_41" rgba="0.5003675747896169 0.43883572287291406 0.6021715171009235 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_42" rgba="0.13115254048930625 0.12942465693996763 0.5137862309268907 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_43" rgba="0.3177120518563057 0.45752733779556864 0.9447080129666203 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_44" rgba="0.593549860063024 0.8972887663193378 0.914456710641145 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_45" rgba="0.3864845551170306 0.4565413094032824 0.831788973968506 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_46" rgba="0.09513139669547022 0.7309941881221977 0.29100833075516086 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_47" rgba="0.7064386250199937 0.86415852572514 0.7123857704020756 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_48" rgba="0.900712632281448 0.3090150349109274 0.6012389731774882 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_49" rgba="0.9230513118337155 0.7007384145232807 0.6723977945192022 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_50" rgba="0.08553295993097165 0.26447064284844757 0.21764517096916258 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_51" rgba="0.7426304676193272 0.5348490161618474 0.007282391312475767 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_52" rgba="0.6953552779970984 0.19673264886986142 0.2628678105549479 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_53" rgba="0.9565957369463135 0.9689175861658837 0.4527110849735184 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_54" rgba="0.8060078019178978 0.3139012566734417 0.5934711237164843 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_55" rgba="0.9992312537498346 0.6703034632257295 0.7509226205974722 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_56" rgba="0.3855801376315824 0.3053377598975098 0.09997950584889437 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_57" rgba="0.3574321344460043 0.2127371712461319 0.6729386063945652 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_58" rgba="0.16093895850467244 0.15694039616172517 0.9935498673455203 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_59" rgba="0.4574066732037123 0.953785051247973 0.4544375133639722 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_60" rgba="0.770703696420993 0.7352436246945677 0.8351956216324842 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_61" rgba="0.540709391533098 0.8469763941869555 0.49640506541838403 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_62" rgba="0.5253394917412803 0.9553156951406218 0.9500523955156972 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_63" rgba="0.40276507112803384 0.586908007436978 0.36272745783393545 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_64" rgba="0.847331335570531 0.6864335225133474 0.5904745749037529 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_65" rgba="0.006654584032215527 0.8240673136122498 0.24194594391642665 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_66" rgba="0.5744942344708225 0.4122423910454347 0.5926830867287761 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_67" rgba="0.19153673039869634 0.29185446846471763 0.20135997288612373 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_68" rgba="0.06020143959604107 0.7677831146515555 0.07943431525518252 1" class="collision"/>
+      <geom mesh="simple_house_-_kitchen_collision_69" rgba="0.05187837176621013 0.20361717789830847 0.9170973531861623 1" class="collision"/>
+    </body>
+  </worldbody>
+</mujoco>

@@ -1,0 +1,147 @@
+<mujoco model="livingroom">
+  <compiler angle="radian" autolimits="true"/>
+  <default>
+    <default class="visual">
+      <geom group="2" type="mesh" contype="0" conaffinity="0"/>
+    </default>
+  </default>
+  <asset>
+    <texture type="skybox" builtin="gradient" rgb1=".9 .9 .9" rgb2=".9 .9 .9" width="100" height="100"/>
+    <texture file="textures/tile_grigia_caldera_porcelain_floor.png" type="2d" name="texplane"/>
+    
+    <material name="floorplane" reflectance="0.0" shininess="0.0"
+      specular="0.0" texrepeat="3 3" texture="texplane" texuniform="true"/>
+    <texture file="textures/smooth_light_gray_plaster.png" type="2d" name="tex-wall"/>
+    <material name="walls_mat" reflectance="0.0" shininess="0.1" specular="0.8" texrepeat="3 3" texture="tex-wall" texuniform="true" />
+    <material name="white" rgba="1 1 1 1"/>
+    <material name="gray" rgba="0.753 0.753 0.753 1"/>
+    <material name="black" rgba="0.149 0.149 0.149 1"/>
+    
+    <material name="BhoLamp.002" specular="0.0" shininess="0.5" rgba="1.000000 1.000000 1.000000 1.000000"/>
+    <texture type="2d" name="COM_Vehicle_CarD_Bicycle01_S01" file="livingroom/COM_Vehicle_CarD_Bicycle01_S01.png"/>
+    <material name="Bici.002" texture="COM_Vehicle_CarD_Bicycle01_S01" specular="0.0" shininess="0.5"/>
+    <texture type="2d" name="BodyVRayCompleteMap" file="livingroom/BodyVRayCompleteMap.png"/>
+    <material name="Body.002" texture="BodyVRayCompleteMap" specular="0.0" shininess="0.5"/>
+    <texture type="2d" name="CoffeTableVRayCompleteMap" file="livingroom/CoffeTableVRayCompleteMap.png"/>
+    <material name="CoffeTable.002" texture="CoffeTableVRayCompleteMap" specular="0.0" shininess="0.5"/>
+    <material name="CoffeTableVetro.002" specular="1.233" shininess="0.5" rgba="0.011765 0.517647 0.070588 0.200000"/>
+    <texture type="2d" name="ComoVRayCompleteMap" file="livingroom/ComoVRayCompleteMap.png"/>
+    <material name="Como.002" texture="ComoVRayCompleteMap" specular="0.0" shininess="0.5"/>
+    <texture type="2d" name="CondottoVRayCompleteMap" file="livingroom/CondottoVRayCompleteMap.png"/>
+    <material name="Condotto.002" texture="CondottoVRayCompleteMap" specular="0.0" shininess="0.5"/>
+    <texture type="2d" name="CornixPicturesVRayCompleteMap" file="livingroom/CornixPicturesVRayCompleteMap.png"/>
+    <material name="CornixPictures.002" texture="CornixPicturesVRayCompleteMap" specular="0.0" shininess="0.5"/>
+    <texture type="2d" name="CucininoVRayCompleteMap" file="livingroom/CucininoVRayCompleteMap.png"/>
+    <material name="Cucinino.002" texture="CucininoVRayCompleteMap" specular="0.0" shininess="0.5"/>
+    <texture type="2d" name="DondoloVRayCompleteMap" file="livingroom/DondoloVRayCompleteMap.png"/>
+    <material name="Dondolo.002" texture="DondoloVRayCompleteMap" specular="0.0" shininess="0.5"/>
+    <material name="Dustbin.002" specular="0.0" shininess="0.5" rgba="0.000000 0.000000 0.000000 1.000000"/>
+    <material name="Finestre.002" specular="0.0" shininess="0.5" rgba="0.000000 0.035294 0.058824 1.000000"/>
+    <material name="FinestreTelaio.002" specular="0.0" shininess="0.5" rgba="1.000000 1.000000 1.000000 1.000000"/>
+    <texture type="2d" name="FrridgeVRayCompleteMap" file="livingroom/FrridgeVRayCompleteMap.png"/>
+    <material name="Frridge.002" texture="FrridgeVRayCompleteMap" specular="0.0" shininess="0.5"/>
+    <texture type="2d" name="GamlaGialla_A01VRayCompleteMap" file="livingroom/GamlaGialla_A01VRayCompleteMap.png"/>
+    <material name="GamlaGialla.002" texture="GamlaGialla_A01VRayCompleteMap" specular="0.0" shininess="0.5"/>
+    <texture type="2d" name="Gamla_Tonda_Red_A1VRayCompleteMap" file="livingroom/Gamla_Tonda_Red_A1VRayCompleteMap.png"/>
+    <material name="Gamla_Tonda_Red.002" texture="Gamla_Tonda_Red_A1VRayCompleteMap" specular="0.0" shininess="0.5"/>
+    <material name="Lamp.002" specular="0.0" shininess="0.5" rgba="0.250980 0.250980 0.250980 1.000000"/>
+    <material name="LampDark.002" specular="0.0" shininess="0.5" rgba="0.078431 0.078431 0.078431 1.000000"/>
+    <texture type="2d" name="LibriVRayCompleteMap" file="livingroom/LibriVRayCompleteMap.png"/>
+    <material name="Libri.002" texture="LibriVRayCompleteMap" specular="0.0" shininess="0.5"/>
+    <material name="Out.002" specular="0.0" shininess="0.5" rgba="0.588000 0.588000 0.588000 1.000000"/>
+    <texture type="2d" name="Room-Color-A01VRayTotalLightingMap" file="livingroom/Room-Color-A01VRayTotalLightingMap.png"/>
+    <material name="Room_Dirt.002" texture="Room-Color-A01VRayTotalLightingMap" specular="0.0" shininess="0.5"/>
+    <texture type="2d" name="RoundTableVRayCompleteMap" file="livingroom/RoundTableVRayCompleteMap.png"/>
+    <material name="RoundTable.002" texture="RoundTableVRayCompleteMap" specular="0.0" shininess="0.5"/>
+    <texture type="2d" name="ScaffaleLibriVRayCompleteMap" file="livingroom/ScaffaleLibriVRayCompleteMap.png"/>
+    <material name="ScaffaleLibri.002" texture="ScaffaleLibriVRayCompleteMap" specular="0.0" shininess="0.5"/>
+    <texture type="2d" name="Sgabellotto001VRayCompleteMap" file="livingroom/Sgabellotto001VRayCompleteMap.png"/>
+    <material name="Sgabellotto.002" texture="Sgabellotto001VRayCompleteMap" specular="0.0" shininess="0.5"/>
+    <texture type="2d" name="SofaVRayCompleteMap" file="livingroom/SofaVRayCompleteMap.png"/>
+    <material name="Sofa.002" texture="SofaVRayCompleteMap" specular="0.0" shininess="0.5"/>
+    <texture type="2d" name="StandLampVRayCompleteMap" file="livingroom/StandLampVRayCompleteMap.png"/>
+    <material name="StandLamp.002" texture="StandLampVRayCompleteMap" specular="0.0" shininess="0.5"/>
+    <texture type="2d" name="TelaioSgabello-VRayTotalLightingMap" file="livingroom/TelaioSgabello-VRayTotalLightingMap.png"/>
+    <material name="Standardmaterial.002" texture="TelaioSgabello-VRayTotalLightingMap" specular="0.0" shininess="0.5"/>
+    <material name="Supportube.002" specular="0.0" shininess="0.5" rgba="0.376471 0.376471 0.376471 1.000000"/>
+    <texture type="2d" name="TablelongVRayCompleteMap" file="livingroom/TablelongVRayCompleteMap.png"/>
+    <material name="TablelongDirt.002" texture="TablelongVRayCompleteMap" specular="0.0" shininess="0.5"/>
+    <material name="TelaioSgabello.002" texture="TelaioSgabello-VRayTotalLightingMap" specular="0.0" shininess="0.5"/>
+    <material name="wire_086086086.002" specular="0.3499999999999999" shininess="0.5" rgba="0.337255 0.337255 0.337255 1.000000"/>
+    <material name="wire_184228153.002" specular="0.3499999999999999" shininess="0.5" rgba="0.721569 0.894118 0.600000 1.000000"/>
+    <mesh scale="0.02 0.02 0.02" file="livingroom/livingroom_0.obj"/>
+    <mesh scale="0.02 0.02 0.02" file="livingroom/livingroom_1.obj"/>
+    <mesh scale="0.02 0.02 0.02" file="livingroom/livingroom_2.obj"/>
+    <mesh scale="0.02 0.02 0.02" file="livingroom/livingroom_3.obj"/>
+    <mesh scale="0.02 0.02 0.02" file="livingroom/livingroom_4.obj"/>
+    <mesh scale="0.02 0.02 0.02" file="livingroom/livingroom_5.obj"/>
+    <mesh scale="0.02 0.02 0.02" file="livingroom/livingroom_6.obj"/>
+    <mesh scale="0.02 0.02 0.02" file="livingroom/livingroom_7.obj"/>
+    <mesh scale="0.02 0.02 0.02" file="livingroom/livingroom_8.obj"/>
+    <mesh scale="0.02 0.02 0.02" file="livingroom/livingroom_9.obj"/>
+    <mesh scale="0.02 0.02 0.02" file="livingroom/livingroom_10.obj"/>
+    <mesh scale="0.02 0.02 0.02" file="livingroom/livingroom_11.obj"/>
+    <mesh scale="0.02 0.02 0.02" file="livingroom/livingroom_12.obj"/>
+    <mesh scale="0.02 0.02 0.02" file="livingroom/livingroom_13.obj"/>
+    <mesh scale="0.02 0.02 0.02" file="livingroom/livingroom_14.obj"/>
+    <mesh scale="0.02 0.02 0.02" file="livingroom/livingroom_15.obj"/>
+    <mesh scale="0.02 0.02 0.02" file="livingroom/livingroom_16.obj"/>
+    <mesh scale="0.02 0.02 0.02" file="livingroom/livingroom_17.obj"/>
+    <mesh scale="0.02 0.02 0.02" file="livingroom/livingroom_18.obj"/>
+    <mesh scale="0.02 0.02 0.02" file="livingroom/livingroom_19.obj"/>
+    <mesh scale="0.02 0.02 0.02" file="livingroom/livingroom_20.obj"/>
+    <mesh scale="0.02 0.02 0.02" file="livingroom/livingroom_21.obj"/>
+    <mesh scale="0.02 0.02 0.02" file="livingroom/livingroom_22.obj"/>
+    <mesh scale="0.02 0.02 0.02" file="livingroom/livingroom_23.obj"/>
+    <mesh scale="0.02 0.02 0.02" file="livingroom/livingroom_24.obj"/>
+    <mesh scale="0.02 0.02 0.02" file="livingroom/livingroom_25.obj"/>
+    <mesh scale="0.02 0.02 0.02" file="livingroom/livingroom_26.obj"/>
+    <mesh scale="0.02 0.02 0.02" file="livingroom/livingroom_27.obj"/>
+    <mesh scale="0.02 0.02 0.02" file="livingroom/livingroom_28.obj"/>
+    <mesh scale="0.02 0.02 0.02" file="livingroom/livingroom_29.obj"/>
+    <mesh scale="0.02 0.02 0.02" file="livingroom/livingroom_30.obj"/>
+    <mesh scale="0.02 0.02 0.02" file="livingroom/livingroom_31.obj"/>
+  </asset>
+    <worldbody>
+        <geom condim="3" group="1" material="floorplane" name="floor" pos="0 0 0.012" size="7 6 .125" type="plane"/>
+        <!-- <geom pos="0 4 1.5" quat="0.7071 0.7071 0 0" size="4 2 0.01" type="box" conaffinity="0" contype="0" group="1" name="wall_left_visual" material="walls_mat"/>
+        <geom pos="0 -4 1.5" quat="0.7071 -0.7071 0 0" size="4 2 0.01" type="box" conaffinity="0" contype="0" group="1" name="wall_right_visual" material="walls_mat"/>
+        <geom pos="-4 0 1.5" quat="0.5 0.5 0.5 0.5" size="4 2 0.01" type="box" conaffinity="0" contype="0" group="1" name="wall_rear_visual" material="walls_mat"/>
+        <geom pos="4 0 1.5" quat="0.5 0.5 -0.5 -0.5" size="4 2 0.01" type="box" conaffinity="0" contype="0" group="1" name="wall_front_visual" material="walls_mat"/> -->
+        <light pos="0 0 2" dir="0 0 -1" directional="true" ambient="0.2 0.2 0.2" diffuse="0.5 0.5 0.5" specular="0. 0. 0." castshadow="true"/>
+        <body name="livingroom" euler="1.57 0 0" pos="0 0 1">
+            <geom type="mesh" mesh="livingroom_0" material="Body.002" class="visual"/>
+            <geom type="mesh" mesh="livingroom_1" material="wire_086086086.002" class="visual"/>
+            <geom type="mesh" mesh="livingroom_2" material="BhoLamp.002" class="visual"/>
+            <geom type="mesh" mesh="livingroom_3" material="Lamp.002" class="visual"/>
+            <geom type="mesh" mesh="livingroom_4" material="LampDark.002" class="visual"/>
+            <geom type="mesh" mesh="livingroom_5" material="CoffeTableVetro.002" class="visual"/>
+            <geom type="mesh" mesh="livingroom_6" material="CoffeTable.002" class="visual"/>
+            <geom type="mesh" mesh="livingroom_7" material="Dustbin.002" class="visual"/>
+            <geom type="mesh" mesh="livingroom_8" material="Libri.002" class="visual"/>
+            <geom type="mesh" mesh="livingroom_9" material="Cucinino.002" class="visual"/>
+            <geom type="mesh" mesh="livingroom_10" material="Sgabellotto.002" class="visual"/>
+            <geom type="mesh" mesh="livingroom_11" material="ScaffaleLibri.002" class="visual"/>
+            <geom type="mesh" mesh="livingroom_12" material="wire_184228153.002" class="visual"/>
+            <geom type="mesh" mesh="livingroom_13" material="Standardmaterial.002" class="visual"/>
+            <geom type="mesh" mesh="livingroom_14" material="TablelongDirt.002" class="visual"/>
+            <geom type="mesh" mesh="livingroom_15" material="TelaioSgabello.002" class="visual"/>
+            <geom type="mesh" mesh="livingroom_16" material="GamlaGialla.002" class="visual"/>
+            <geom type="mesh" mesh="livingroom_17" material="Gamla_Tonda_Red.002" class="visual"/>
+            <geom type="mesh" mesh="livingroom_18" material="Bici.002" class="visual"/>
+            <geom type="mesh" mesh="livingroom_19" material="Frridge.002" class="visual"/>
+            <geom type="mesh" mesh="livingroom_20" material="Condotto.002" class="visual"/>
+            <geom type="mesh" mesh="livingroom_21" material="StandLamp.002" class="visual"/>
+            <geom type="mesh" mesh="livingroom_22" material="RoundTable.002" class="visual"/>
+            <geom type="mesh" mesh="livingroom_23" material="Como.002" class="visual"/>
+            <geom type="mesh" mesh="livingroom_24" material="Sofa.002" class="visual"/>
+            <geom type="mesh" mesh="livingroom_25" material="Dondolo.002" class="visual"/>
+            <geom type="mesh" mesh="livingroom_26" material="CornixPictures.002" class="visual"/>
+            <!-- <geom type="mesh" mesh="livingroom_27" material="Out.002" class="visual"/> -->
+            <geom type="mesh" mesh="livingroom_28" material="Supportube.002" class="visual"/>
+            <geom type="mesh" mesh="livingroom_29" material="Room_Dirt.002" class="visual"/>
+            <geom type="mesh" mesh="livingroom_30" material="Finestre.002" class="visual"/>
+            <geom type="mesh" mesh="livingroom_31" material="FinestreTelaio.002" class="visual"/>
+        </body>
+    </worldbody>
+</mujoco>

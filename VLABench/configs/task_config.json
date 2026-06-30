@@ -4195,5 +4195,82 @@
         }
       ]
     }
+  },
+  "pick_florence_flask_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "florence_flask"
+        ],
+        "unseen_object": [
+          "florence_flask"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "pick_small_beaker_place_small_beaker_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "small_beaker",
+          "square_mat"
+        ],
+        "unseen_object": [
+          "small_beaker",
+          "square_mat"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "review/lab_table/lab_table/lab_table/lab_table.xml",
+          "class": "FlatContainer",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "pick_conical_flask_small_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "conical_flask_small"
+        ],
+        "unseen_object": [
+          "conical_flask_small"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
   }
 }

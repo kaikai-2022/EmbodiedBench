@@ -12,8 +12,9 @@
       0.0,
       0.3
     ],
+    "render": "PASS",
     "video": "PASS: 90 frames, 3.0s"
   },
-  "preview_path": null,
+  "preview_path": "/ssd/mkqin/workspace/VLABench/VLABench/assets/review/lab_table/lab_table/lab_table/validation_preview.png",
   "video_path": "/ssd/mkqin/workspace/VLABench/VLABench/assets/review/lab_table/lab_table/lab_table/validation.mp4"
 }

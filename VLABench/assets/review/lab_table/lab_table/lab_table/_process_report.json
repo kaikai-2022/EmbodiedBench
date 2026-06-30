@@ -1,0 +1,34 @@
+{
+  "groups": {
+    "surface": {
+      "type": "textured",
+      "n_meshes": 1,
+      "material_sig": "('textured',)"
+    },
+    "panel_dark": {
+      "type": "vcol",
+      "n_meshes": 1,
+      "material_sig": "('vcol', (102, 102, 102))"
+    },
+    "leg_light": {
+      "type": "pbr",
+      "n_meshes": 1,
+      "material_sig": "('pbr', (204, 204, 204, 255))"
+    }
+  },
+  "centering": {
+    "tx": -0.014914278046524565,
+    "ty": 0.37738875083523205,
+    "tz": 0.14453911917619483
+  },
+  "obj_bounds_min": [
+    -0.750002,
+    -2.25,
+    0.0
+  ],
+  "obj_bounds_max": [
+    0.750002,
+    2.25,
+    0.856925
+  ]
+}

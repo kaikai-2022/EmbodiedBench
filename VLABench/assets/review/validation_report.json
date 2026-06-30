@@ -1,0 +1,9 @@
+{
+  "status": "FAIL",
+  "xml_path": "/ssd/mkqin/workspace/VLABench/VLABench/assets/review/lab_table",
+  "checks": {
+    "xml_load": "FAIL: [Errno 21] Is a directory: 'lab_table'"
+  },
+  "preview_path": null,
+  "video_path": null
+}

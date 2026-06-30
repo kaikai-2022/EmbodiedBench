@@ -1,0 +1,67 @@
+<mujoco model="an_old_cheap_room_in_chinatown">
+  <compiler angle="radian" eulerseq="xyz"/>
+  <default>
+    <default class="visual">
+      <geom group="2" type="mesh" contype="0" conaffinity="0"/>
+    </default>
+    <default class="collision">
+      <geom group="3" type="mesh"/>
+    </default>
+  </default>
+  <asset>
+    <texture type="2d" name="material_0" file="material_0.png"/>
+    <material name="material_0" texture="material_0" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_1" file="material_1.png"/>
+    <material name="material_1" texture="material_1" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_2" file="material_2.png"/>
+    <material name="material_2" texture="material_2" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_3" file="material_3.png"/>
+    <material name="material_3" texture="material_3" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_4" file="material_4.png"/>
+    <material name="material_4" texture="material_4" specular="0.4000000000000001" shininess="0.001"/>
+    <texture type="2d" name="material_5" file="material_5.png"/>
+    <material name="material_5" texture="material_5" specular="0.4000000000000001" shininess="0.001"/>
+    <mesh file="an_old_cheap_room_in_chinatown_0.obj"/>
+    <mesh file="an_old_cheap_room_in_chinatown_1.obj"/>
+    <mesh file="an_old_cheap_room_in_chinatown_2.obj"/>
+    <mesh file="an_old_cheap_room_in_chinatown_3.obj"/>
+    <mesh file="an_old_cheap_room_in_chinatown_4.obj"/>
+    <mesh file="an_old_cheap_room_in_chinatown_5.obj"/>
+    <mesh file="an_old_cheap_room_in_chinatown_collision_0.obj"/>
+    <mesh file="an_old_cheap_room_in_chinatown_collision_1.obj"/>
+    <mesh file="an_old_cheap_room_in_chinatown_collision_2.obj"/>
+    <mesh file="an_old_cheap_room_in_chinatown_collision_3.obj"/>
+    <mesh file="an_old_cheap_room_in_chinatown_collision_4.obj"/>
+    <mesh file="an_old_cheap_room_in_chinatown_collision_5.obj"/>
+    <mesh file="an_old_cheap_room_in_chinatown_collision_6.obj"/>
+    <mesh file="an_old_cheap_room_in_chinatown_collision_7.obj"/>
+    <mesh file="an_old_cheap_room_in_chinatown_collision_8.obj"/>
+    <mesh file="an_old_cheap_room_in_chinatown_collision_9.obj"/>
+    <mesh file="an_old_cheap_room_in_chinatown_collision_10.obj"/>
+    <mesh file="an_old_cheap_room_in_chinatown_collision_11.obj"/>
+    <mesh file="an_old_cheap_room_in_chinatown_collision_12.obj"/>
+  </asset>
+  <worldbody>
+    <body name="an_old_cheap_room_in_chinatown" euler="1.57 0 0">
+      <geom mesh="an_old_cheap_room_in_chinatown_0" material="material_5" class="visual"/>
+      <geom mesh="an_old_cheap_room_in_chinatown_1" material="material_4" class="visual"/>
+      <geom mesh="an_old_cheap_room_in_chinatown_2" material="material_3" class="visual"/>
+      <geom mesh="an_old_cheap_room_in_chinatown_3" material="material_2" class="visual"/>
+      <geom mesh="an_old_cheap_room_in_chinatown_4" material="material_1" class="visual"/>
+      <geom mesh="an_old_cheap_room_in_chinatown_5" material="material_0" class="visual"/>
+      <geom mesh="an_old_cheap_room_in_chinatown_collision_0" rgba="0.24842451241198005 0.41256290989286826 0.4498938104240743 1" class="collision"/>
+      <geom mesh="an_old_cheap_room_in_chinatown_collision_1" rgba="0.6033740913298343 0.28730279979076634 0.43051081733152274 1" class="collision"/>
+      <geom mesh="an_old_cheap_room_in_chinatown_collision_2" rgba="0.707382313853643 0.28965155797229547 0.32059618530302025 1" class="collision"/>
+      <geom mesh="an_old_cheap_room_in_chinatown_collision_3" rgba="0.16711993451153495 0.0801378897084466 0.014627330912109215 1" class="collision"/>
+      <geom mesh="an_old_cheap_room_in_chinatown_collision_4" rgba="0.3406844582032673 0.9357945249913642 0.38809557876136525 1" class="collision"/>
+      <geom mesh="an_old_cheap_room_in_chinatown_collision_5" rgba="0.8949223142288069 0.7377641615149871 0.6385029934668318 1" class="collision"/>
+      <geom mesh="an_old_cheap_room_in_chinatown_collision_6" rgba="0.12791716843799272 0.2208802701445074 0.45363759155789274 1" class="collision"/>
+      <geom mesh="an_old_cheap_room_in_chinatown_collision_7" rgba="0.28807595876006276 0.7436069119826197 0.5232780681584285 1" class="collision"/>
+      <geom mesh="an_old_cheap_room_in_chinatown_collision_8" rgba="0.7633260849467223 0.31230250112049596 0.9522119985095042 1" class="collision"/>
+      <geom mesh="an_old_cheap_room_in_chinatown_collision_9" rgba="0.98538645106099 0.2733645472300845 0.5975343856786409 1" class="collision"/>
+      <geom mesh="an_old_cheap_room_in_chinatown_collision_10" rgba="0.5814012380595662 0.9482326055182129 0.19715639191477496 1" class="collision"/>
+      <geom mesh="an_old_cheap_room_in_chinatown_collision_11" rgba="0.5585674390360226 0.9170711231198513 0.3641171736257883 1" class="collision"/>
+      <geom mesh="an_old_cheap_room_in_chinatown_collision_12" rgba="0.6026223899231574 0.6151145418914323 0.22541957991386208 1" class="collision"/>
+    </body>
+  </worldbody>
+</mujoco>
