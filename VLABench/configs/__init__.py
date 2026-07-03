@@ -48,4 +48,5 @@ name2config = {
     "stir_beaker_series":["stir_beaker"],
     "place_beaker_on_the_mat_series":["place_beaker_on_the_mat"],
     "pick_funnel":["pick_funnel"],
+    "two_tube_pour_stir_series":["two_tube_pour_stir"],
 }

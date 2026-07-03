@@ -4272,5 +4272,36 @@
         }
       ]
     }
+  },
+  "two_tube_pour_stir_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "tube",
+          "large_beaker",
+          "chemistry_tube_stand",
+          "glass_stirring_rod"
+        ],
+        "unseen_object": [
+          "tube",
+          "large_beaker",
+          "chemistry_tube_stand",
+          "glass_stirring_rod"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
   }
 }

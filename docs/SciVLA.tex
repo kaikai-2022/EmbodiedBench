@@ -261,22 +261,12 @@ Leveraging this pipeline, we distill protocols from frontier literature to const
 
 
 \section{Introduction}
-ACM's consolidated article template, introduced in 2017, provides a
-consistent \LaTeX\ style for use across ACM publications, and
-incorporates accessibility and metadata-extraction functionality
-necessary for future Digital Library endeavors. Numerous ACM and
-SIG-specific \LaTeX\ templates have been examined, and their unique
-features incorporated into this single new template.
 
-If you are new to publishing with ACM, this document is a valuable
-guide to the process of preparing your work for publication. If you
-have published with ACM before, this document provides insight and
-instruction into more recent changes to the article template.
+Scientific embodied agents have emerged as a promising paradigm for accelerating modern scientific discovery. By integrating advanced reasoning capabilities with physical interaction, these agents can autonomously design and conduct experiments, analyze results, and iterate on hypotheses---fundamentally transforming how scientific research is performed. However, developing capable scientific agents requires substantial amounts of training data and rigorous evaluation methodologies, both of which depend on high-fidelity simulation platforms that accurately capture the complexity of real-world laboratory environments.
 
-The ``\verb|acmart|'' document class can be used to prepare articles
-for any ACM publication --- conference or journal, and for any stage
-of publication, from review to final ``camera-ready'' copy, to the
-author's own version, with {\itshape very} few changes to the source.
+Building physics-aligned embodied simulation platforms for scientific scenarios presents unique challenges compared to general robotics simulation. Laboratory environments involve complex manipulations of specialized instruments, precise chemical and physical interactions, and often require multi-step reasoning under uncertainty. Existing lab-oriented simulation platforms predominantly rely on domain experts to manually orchestrate environments and tasks based on idealized assumptions. This heuristic design approach suffers from several critical limitations: (1) it restricts the scale and scalability of evaluation tasks due to the high cost of manual creation; (2) it lacks effective modeling of dynamic human interventions and environmental changes that are pervasive in real laboratory settings; and (3) it often fails to capture the full spectrum of physical constraints and noise present in experimental procedures. Consequently, there exists a substantial gap between current simulation benchmarks and the complexities agents face in real-world laboratory conditions.
+
+To address these fundamental limitations, we propose \textbf{SciVLABench}, a data-driven Real-to-Sim task compilation framework and comprehensive scientific benchmark for robotic manipulation in laboratory environments. Unlike traditional approaches that require manual task engineering, SciVLABench automatically translates real-world experimental protocols into executable simulation code through a sophisticated neuro-symbolic pipeline. Our key insight is that by combining the semantic understanding capabilities of large language models (LLMs) with deterministic code synthesis and physics-based verification, we can create a scalable system that captures both the complexity and physical realism of laboratory work.
 
 \section{Template Overview}
 As noted in the introduction, the ``\verb|acmart|'' document class can
@@ -292,7 +282,82 @@ class. For further information, the {\itshape \LaTeX\ User's Guide} is
 available from
 \url{https://www.acm.org/publications/proceedings-template}.
 
-\subsection{Template Styles}
+\subsection{Neuro-Symbolic AST Parsing}
+
+At the core of SciVLABench is a novel parser that converts raw experimental instructions into entity-bound neuro-symbolic Abstract Syntax Trees (ASTs). This approach strictly decouples semantic understanding from action execution, allowing the framework to ground natural language instructions to physical entities while maintaining clear separation between high-level reasoning and low-level control. The AST representation serves as an intermediate formalism that enables systematic translation of protocols into simulation code.
+
+\subsection{Parallel Dual-Planner Architecture}
+
+SciVLABench introduces a parallel Dual-Planner compilation strategy that addresses the long-horizon reasoning challenge. While a state-based Chain-of-Thought (CoT) planner orchestrates continuous actions by tracking pre- and post-conditions for each step, a condition planner concurrently generates low-level physical verification criteria. This fan-in architecture enables efficient planning while ensuring that each action is associated with concrete, physically-verifiable success conditions---a critical feature for rigorous evaluation.
+
+\subsection{Dynamic Human Intervention Modeling}
+
+A key innovation of SciVLABench is its explicit modeling of dynamic human interventions, which are ubiquitous in real laboratory settings but absent from most simulation benchmarks. Our framework approximates human-robot interaction by injecting programmatic environmental alterations---such as instrument state toggles, reagent additions, and equipment reconfigurations---directly into the experimental equipment. This capability allows SciVLABench to evaluate agent performance under realistic conditions where external factors can modify task dynamics mid-execution.
+
+\subsection{Comprehensive Benchmark}
+
+Leveraging this automated pipeline, we have distilled protocols from frontier scientific literature to construct a benchmark containing over 100 core test tasks, including 20+ dynamic interference scenarios. These tasks cover more than 20 typical robotic manipulations and involve over 100 experimental instruments drawn from chemistry, biology, and materials science. Backed by the MuJoCo physics engine, our dataset generates a massive number of evaluation episodes featuring topological scene changes and realistic rigid-body physical noise, enabling thorough assessment of agent generalization capabilities.
+
+\subsection{Rigorous Evaluation Methodology}
+
+SciVLABench employs a multi-dimensional evaluation framework that goes beyond traditional binary success metrics. Our step-by-step physical state verification exposes the overestimation inherent in coarse-grained evaluation approaches. Preliminary evaluations on mainstream policy models (ACT, Diffusion Policy, $\pi_0$) demonstrate the significant challenge posed by SciVLABench, with state-of-the-art models showing precipitous drops in success rates when rigorous physical and state validation is applied. This highlights the severe compounding error bottleneck that current models face in long-horizon manipulation tasks.
+
+\subsection{Contributions}
+
+Our main contributions are:
+\begin{itemize}
+    \item We propose SciVLABench, a novel data-driven Real-to-Sim framework that automatically compiles real-world experimental protocols into physics-based simulation tasks, dramatically reducing the manual effort required for benchmark creation.
+    \item We introduce a neuro-symbolic AST parsing approach combined with a parallel Dual-Planner architecture, enabling systematic translation of natural language instructions into executable code with physically-verifiable success conditions.
+    \item We present dynamic human intervention modeling through programmatic environmental alterations, bringing simulation benchmarks closer to real-world laboratory complexity.
+    \item We construct a comprehensive benchmark with 100+ tasks covering diverse scientific manipulations, with multi-dimensional evaluation revealing significant limitations in current state-of-the-art models.
+    \item We open-source the complete pipeline code, benchmark dataset, and expert demonstration trajectories to enable community-wide advancement in scientific embodied AI.
+\end{itemize}
+
+The remainder of this paper is organized as follows. Section~\ref{sec:related} reviews related work in robotics simulation, language-conditioned manipulation, and scientific automation. Section~\ref{sec:framework} presents the SciVLABench framework architecture and technical components. Section~\ref{sec:benchmark} describes the benchmark design, task coverage, and evaluation infrastructure. Section~\ref{sec:experiments} presents experimental results and analysis. Section~\ref{sec:conclusion} concludes with future directions.
+
+% ==================== PLACEHOLDER SECTIONS ====================
+\section{Related Work}
+\label{sec:related}
+
+\textbf{[TO BE COMPLETED: Related Work Section - approximately 1.5 pages covering:]}
+\begin{itemize}
+    \item \textbf{2.1 Embodied AI and Robotics Simulation}: Physics-based simulators (MuJoCo, PyBullet, Isaac Gym), robotics benchmarks (ManiSkill, RoboNet, CALVIN)
+    \item \textbf{2.2 Language-Conditioned Manipulation}: VLA models (OpenVLA, RT-series), language grounding, instruction-following benchmarks
+    \item \textbf{2.3 Scientific and Lab Automation}: Existing lab automation platforms, scientific experimentation benchmarks, gap analysis
+    \item \textbf{2.4 Data-Driven Task Generation}: LLM-based task generation, neuro-symbolic approaches, Real-to-Sim methodologies
+\end{itemize}
+\textbf{[End of Related Work placeholder]}
+
+\section{The SciVLABench Framework}
+\label{sec:framework}
+
+\textbf{[TO BE COMPLETED: Framework Section - approximately 3 pages covering technical architecture and components]}
+
+\section{The SciVLABench Benchmark}
+\label{sec:benchmark}
+
+\textbf{[TO BE COMPLETED: Benchmark Section - approximately 2.5 pages covering task design, evaluation dimensions, data generation, and infrastructure]}
+
+\section{Experiments}
+\label{sec:experiments}
+
+\textbf{[TO BE COMPLETED: Experiments Section - approximately 3 pages covering experimental setup, main results, analysis, and ablation studies]}
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+\textbf{[TO BE COMPLETED: Conclusion and Future Work - approximately 0.5 pages]}
+
+% ==================== ACKNOWLEDGMENTS ====================
+\begin{acks}
+% TODO: Add acknowledgments, funding sources, etc.
+\end{acks}
+
+% ==================== BIBLIOGRAPHY ====================
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{references}  % TODO: Create references.bib file
+
+\end{document}
 
 The primary parameter given to the ``\verb|acmart|'' document class is
 the {\itshape template style} which corresponds to the kind of publication

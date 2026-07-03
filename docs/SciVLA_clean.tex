@@ -1,0 +1,310 @@
+%%
+%% ACM SIGCONF Conference Paper Template for SciVLABench
+%%
+
+\documentclass[sigconf]{acmart}
+
+%% BibTeX command to typeset BibTeX logo in the docs
+\AtBeginDocument{%
+  \providecommand\BibTeX{{%
+    Bib\TeX}}}
+
+%% Rights management information
+\setcopyright{acmlicensed}
+\copyrightyear{2025}
+\acmYear{2025}
+\acmDOI{XXXXXXX.XXXXXXX}
+
+%% Conference information (TODO: Update with actual conference details)
+\acmConference[Conference acronym 'XX]{Conference Title}{Month 00--00, 2025}{City, Country}
+
+%%
+%% The start of the document source.
+\begin{document}
+
+%%
+%% Title
+\title[SciVLABench]{SciVLABench: A Large-Scale Scientific Vision-Language-Action Benchmark}
+
+%%
+%% Authors (TODO: Update with real authors and affiliations)
+\author{First Author}
+\affiliation{
+  \institution{Institution Name}
+  \city{City}
+  \state{State/Province}
+  \country{Country}
+}
+\email{email@example.com}
+
+\author{Second Author}
+\affiliation{
+  \institution{Institution Name}
+  \city{City}
+  \state{State/Province}
+  \country{Country}
+}
+\email{email@example.com}
+
+%% Short authors for page header
+\renewcommand{\shortauthors}{Author et al.}
+
+%%
+%% Abstract
+\begin{abstract}
+Scientific embodied agents have demonstrated tremendous potential in accelerating modern scientific discovery. Building physics-aligned embodied simulation platforms and benchmarks for scientific scenarios is foundational for low-cost agent training and rigorous evaluation. However, existing lab-oriented simulation platforms predominantly rely on experts manually orchestrating environments based on idealized assumptions. This heuristic design not only restricts the scale and scalability of evaluation tasks but also lacks effective modeling of dynamic human interventions, resulting in a substantial gap compared to real-world laboratory conditions.
+
+To address these limitations, we propose SciVLABench, a data-driven Real-to-Sim task compilation framework and scientific benchmark. This framework translates real-world experimental protocols into simulation code. First, a parser converts raw instructions into entity-bound neuro-symbolic Abstract Syntax Trees (ASTs), strictly decoupling semantics from actions. Scenes are then automatically constructed via asset retrieval. The core compilation framework utilizes a parallel Dual-Planner. While employing a state-based Chain-of-Thought (CoT) to orchestrate continuous actions, it concurrently deploys a condition planner to dispatch low-level verification criteria. Specifically, to introduce the complexity of human interventions into the simulation, the framework approximates human-robot interaction by injecting programmatic environmental alterations (e.g., instrument state toggles, reagent additions) into the experimental equipment. This automated pipeline significantly simplifies task creation and enhances benchmark scalability.
+
+Leveraging this pipeline, we distill protocols from frontier literature to construct a benchmark containing over 100 core test tasks (including 20+ dynamic interference scenarios), covering over 20 typical robotic manipulations and 100+ experimental instruments. Backed by the underlying physics engine, the dataset derives a massive number of evaluation episodes featuring topological changes and rigid-body physical noise. Preliminary evaluations on mainstream policy models (ACT, Diffusion Policy, $\pi_0$) demonstrate the significant challenge posed by SciVLABench. Step-by-step physical state verification exposes the overestimation issues inherent in traditional binary evaluation metrics. Current evaluation trends indicate a precipitous drop in the success rates of state-of-the-art models upon the introduction of rigorous physical and state validation, highlighting the severe compounding error bottleneck in long-horizon tasks. The pipeline code, benchmark dataset, and expert demonstration trajectories have been open-sourced.
+\end{abstract}
+
+%%
+%% CCS Concepts and Keywords (TODO: Generate proper CCS concepts from https://dl.acm.org/ccs/ccs.cfm)
+\begin{CCSXML}
+<ccs2012>
+ <concept>
+  <concept_id>00000000.0000000.0000000</concept_id>
+  <concept_desc>Computing methodologies</concept_desc>
+  <concept_significance>500</concept_significance>
+ </concept>
+ <concept>
+  <concept_id>00000000.00000000.00000000</concept_id>
+  <concept_desc>Artificial intelligence</concept_desc>
+  <concept_significance>300</concept_significance>
+ </concept>
+ <concept>
+  <concept_id>00000000.00000000.00000000</concept_id>
+  <concept_desc>Robotics</concept_desc>
+  <concept_significance>300</concept_significance>
+ </concept>
+</ccs2012>
+\end{CCSXML}
+
+\ccsdesc[500]{Computing methodologies}
+\ccsdesc[300]{Artificial intelligence}
+\ccsdesc[300]{Robotics}
+
+%%
+%% Keywords
+\keywords{Scientific embodied agents, robotics benchmark, neuro-symbolic AI, vision-language-action models}
+
+%%
+%% Generate title page
+\maketitle
+
+%%
+%% ==================== MAIN CONTENT ====================
+\section{Introduction}
+
+Scientific embodied agents have emerged as a promising paradigm for accelerating modern scientific discovery. By integrating advanced reasoning capabilities with physical interaction, these agents can autonomously design and conduct experiments, analyze results, and iterate on hypotheses---fundamentally transforming how scientific research is performed. However, developing capable scientific agents requires substantial amounts of training data and rigorous evaluation methodologies, both of which depend on high-fidelity simulation platforms that accurately capture the complexity of real-world laboratory environments.
+
+Building physics-aligned embodied simulation platforms for scientific scenarios presents unique challenges compared to general robotics simulation. Laboratory environments involve complex manipulations of specialized instruments, precise chemical and physical interactions, and often require multi-step reasoning under uncertainty. Existing lab-oriented simulation platforms predominantly rely on domain experts to manually orchestrate environments and tasks based on idealized assumptions. This heuristic design approach suffers from several critical limitations: (1) it restricts the scale and scalability of evaluation tasks due to the high cost of manual creation; (2) it lacks effective modeling of dynamic human interventions and environmental changes that are pervasive in real laboratory settings; and (3) it often fails to capture the full spectrum of physical constraints and noise present in experimental procedures. Consequently, there exists a substantial gap between current simulation benchmarks and the complexities agents face in real-world laboratory conditions.
+
+To address these fundamental limitations, we propose \textbf{SciVLABench}, a data-driven Real-to-Sim task compilation framework and comprehensive scientific benchmark for robotic manipulation in laboratory environments. Unlike traditional approaches that require manual task engineering, SciVLABench automatically translates real-world experimental protocols into executable simulation code through a sophisticated neuro-symbolic pipeline. Our key insight is that by combining the semantic understanding capabilities of large language models (LLMs) with deterministic code synthesis and physics-based verification, we can create a scalable system that captures both the complexity and physical realism of laboratory work.
+
+\subsection{Neuro-Symbolic AST Parsing}
+
+At the core of SciVLABench is a novel parser that converts raw experimental instructions into entity-bound neuro-symbolic Abstract Syntax Trees (ASTs). This approach strictly decouples semantic understanding from action execution, allowing the framework to ground natural language instructions to physical entities while maintaining clear separation between high-level reasoning and low-level control. The AST representation serves as an intermediate formalism that enables systematic translation of protocols into simulation code.
+
+\subsection{Parallel Dual-Planner Architecture}
+
+SciVLABench introduces a parallel Dual-Planner compilation strategy that addresses the long-horizon reasoning challenge. While a state-based Chain-of-Thought (CoT) planner orchestrates continuous actions by tracking pre- and post-conditions for each step, a condition planner concurrently generates low-level physical verification criteria. This fan-in architecture enables efficient planning while ensuring that each action is associated with concrete, physically-verifiable success conditions---a critical feature for rigorous evaluation.
+
+\subsection{Dynamic Human Intervention Modeling}
+
+A key innovation of SciVLABench is its explicit modeling of dynamic human interventions, which are ubiquitous in real laboratory settings but absent from most simulation benchmarks. Our framework approximates human-robot interaction by injecting programmatic environmental alterations---such as instrument state toggles, reagent additions, and equipment reconfigurations---directly into the experimental equipment. This capability allows SciVLABench to evaluate agent performance under realistic conditions where external factors can modify task dynamics mid-execution.
+
+\subsection{Comprehensive Benchmark}
+
+Leveraging this automated pipeline, we have distilled protocols from frontier scientific literature to construct a benchmark containing over 100 core test tasks, including 20+ dynamic interference scenarios. These tasks cover more than 20 typical robotic manipulations and involve over 100 experimental instruments drawn from chemistry, biology, and materials science. Backed by the MuJoCo physics engine, our dataset generates a massive number of evaluation episodes featuring topological scene changes and realistic rigid-body physical noise, enabling thorough assessment of agent generalization capabilities.
+
+\subsection{Rigorous Evaluation Methodology}
+
+SciVLABench employs a multi-dimensional evaluation framework that goes beyond traditional binary success metrics. Our step-by-step physical state verification exposes the overestimation inherent in coarse-grained evaluation approaches. Preliminary evaluations on mainstream policy models (ACT, Diffusion Policy, $\pi_0$) demonstrate the significant challenge posed by SciVLABench, with state-of-the-art models showing precipitous drops in success rates when rigorous physical and state validation is applied. This highlights the severe compounding error bottleneck that current models face in long-horizon manipulation tasks.
+
+\subsection{Contributions}
+
+Our main contributions are:
+\begin{itemize}
+    \item We propose SciVLABench, a novel data-driven Real-to-Sim framework that automatically compiles real-world experimental protocols into physics-based simulation tasks, dramatically reducing the manual effort required for benchmark creation.
+    \item We introduce a neuro-symbolic AST parsing approach combined with a parallel Dual-Planner architecture, enabling systematic translation of natural language instructions into executable code with physically-verifiable success conditions.
+    \item We present dynamic human intervention modeling through programmatic environmental alterations, bringing simulation benchmarks closer to real-world laboratory complexity.
+    \item We construct a comprehensive benchmark with 100+ tasks covering diverse scientific manipulations, with multi-dimensional evaluation revealing significant limitations in current state-of-the-art models.
+    \item We open-source the complete pipeline code, benchmark dataset, and expert demonstration trajectories to enable community-wide advancement in scientific embodied AI.
+\end{itemize}
+
+The remainder of this paper is organized as follows. Section~\ref{sec:related} reviews related work in robotics simulation, language-conditioned manipulation, and scientific automation. Section~\ref{sec:framework} presents the SciVLABench framework architecture and technical components. Section~\ref{sec:benchmark} describes the benchmark design, task coverage, and evaluation infrastructure. Section~\ref{sec:experiments} presents experimental results and analysis. Section~\ref{sec:conclusion} concludes with future directions.
+
+%%
+%% ==================== PLACEHOLDER SECTIONS ====================
+\section{Related Work}
+\label{sec:related}
+
+\textbf{[TO BE COMPLETED: Related Work Section - approximately 1.5 pages covering:]}
+
+\begin{itemize}
+    \item \textbf{2.1 Embodied AI and Robotics Simulation}: Physics-based simulators (MuJoCo, PyBullet, Isaac Gym), robotics benchmarks (ManiSkill, RoboNet, CALVIN)
+    \item \textbf{2.2 Language-Conditioned Manipulation}: VLA models (OpenVLA, RT-series), language grounding, instruction-following benchmarks
+    \item \textbf{2.3 Scientific and Lab Automation}: Existing lab automation platforms, scientific experimentation benchmarks, gap analysis
+    \item \textbf{2.4 Data-Driven Task Generation}: LLM-based task generation, neuro-symbolic approaches, Real-to-Sim methodologies
+\end{itemize}
+
+\textbf{[End of Related Work placeholder]}
+
+\section{The SciVLABench Framework}
+\label{sec:framework}
+
+This section presents the technical architecture of SciVLABench, a data-driven Real-to-Sim task compilation framework. We describe the overall pipeline design and detail each major component, from instruction parsing to physics-based simulation execution.
+
+\subsection{Overview}
+
+SciVLABench employs a directed acyclic graph (DAG) pipeline architecture consisting of nine specialized nodes, as illustrated in Figure~\ref{fig:framework_overview}. The pipeline follows a strict data flow from natural language instructions to executable simulation tasks:
+
+\begin{enumerate}
+    \item \textbf{Analyzer}: Parses raw instructions into entity-bound neuro-symbolic ASTs
+    \item \textbf{Normalizer}: Cleans data and assigns global unique identifiers (UIDs) to entities
+    \item \textbf{Asset Manager}: Retrieves 3D models and binds them to physical instances
+    \item \textbf{Skill Planner}: Orchestrates long-horizon action sequences via state-based Chain-of-Thought reasoning
+    \item \textbf{Condition Planner}: Generates per-step physical verification criteria in parallel
+    \item \textbf{Code Generator}: Synthesizes deterministic Python task files from templates
+    \item \textbf{Registration}: Dynamically registers generated tasks into the VLABench framework
+    \item \textbf{Simulation}: Executes tasks in MuJoCo physics engine with real-time condition checking
+    \item \textbf{Reviewer}: Validates simulation outcomes via vision-based multimodal assessment
+\end{enumerate}
+
+This architecture embodies the principle of \textit{neuro-symbolic separation}: neural components (Analyzer, Skill Planner, Condition Planner) handle semantic understanding and reasoning, while symbolic components (Normalizer, Asset Manager, Code Generator, Simulation) ensure deterministic, physically-accurate execution.
+
+\subsection{Neuro-Symbolic AST Parser}
+
+The Analyzer node serves as the natural language understanding frontend of SciVLABench. Given a raw experimental instruction such as ``Pick up the beaker from the water bath and pour its contents into the test tube rack,'' the Analyzer produces a structured neuro-symbolic AST that captures both semantic intent and entity relationships.
+
+\textbf{Entity Extraction.} The Analyzer employs a large language model to identify physical objects and their semantic attributes from the instruction. Each entity is assigned a placeholder identifier (e.g., \texttt{<beaker\_0>}, \texttt{<test\_tube\_0>}) and associated with attribute tags including object type, spatial relations, and functional properties. The extraction follows the principle of \textit{explicit intent only}: the analyzer does not infer implicit actions not stated in the instruction, ensuring faithful representation of the user's intent.
+
+\textbf{Step Grounding.} The instruction is decomposed into a sequence of grounded steps, where each step references concrete entity identifiers. This creates a preliminary action graph where nodes represent entities and edges represent relationships (spatial, functional, or causal). For example, the pouring instruction yields steps such as: (1) approach \texttt{<beaker\_0>}, (2) grasp \texttt{<beaker\_0>}, (3) lift \texttt{<beaker\_0>} to height $h$, (4) tilt and pour into \texttt{<test\_tube\_0>}.
+
+\textbf{Abstract Syntax Tree.} The grounded steps are organized into an AST structure that maintains the hierarchical and sequential dependencies between actions. Each AST node contains: (i) the semantic operation type, (ii) references to input/output entities, (iii) pre-conditions, and (iv) post-conditions. This formal representation serves as the canonical intermediate format consumed by subsequent pipeline stages.
+
+\subsection{Automatic Scene Construction}
+
+The Normalizer and Asset Manager nodes collaborate to transform the abstract AST into a concrete physical scene instantiation.
+
+\textbf{Normalization and UID Assignment.} The Normalizer receives the AST with placeholder entity identifiers and performs several essential transformations: (1) \textit{Data cleaning}: standardizes entity names, resolves synonyms, and filters non-physical entities (powders, liquids) that cannot be directly manipulated; (2) \textit{Global UID assignment}: replaces placeholder identifiers with globally unique IDs that persist across pipeline stages; (3) \textit{Asset routing}: determines whether each entity should be retrieved from local cache, constant definitions, or the Objaverse asset library; and (4) \textit{Parameter translation}: converts semantic attributes into physical initialization parameters (positions, orientations, masses).
+
+\textbf{Asset Retrieval and Binding.} The Asset Manager handles the physical instantiation of entities by: (1) querying the multi-tier asset cache (local files $\rightarrow$ constant definitions $\rightarrow$ Objaverse download); (2) performing dynamic class inference for entities with ambiguous types (e.g., distinguishing chemistry containers from common graspable objects); (3) injecting surgical XML modifications into MuJoCo model files to support specialized physics (e.g., adding solution sites to containers); and (4) performing fail-fast validation to ensure all required assets are available before proceeding to planning.
+
+This separation of concerns---Normalizer handles semantic-to-physical translation while Asset Manager handles physical instantiation---enables clean modularity and facilitates error handling. The design principle of \textit{issuing commands, not performing manual labor} ensures that the Asset Manager never engages in LLM-based reasoning, but rather executes strongly-typed parameter-driven operations.
+
+\subsection{Dual-Planner Compilation}
+
+The core compilation intelligence resides in the parallel Dual-Planner, which consists of two cooperating planners that receive identical normalized context and asset status information.
+
+\begin{figure*}[t]
+\centering
+% TODO: Insert framework architecture diagram
+% \includegraphics[width=0.95\textwidth]{figures/framework_overview}
+\caption{SciVLABench Pipeline Architecture. The framework consists of nine specialized nodes arranged in a DAG. The Analyzer parses instructions into neuro-symbolic ASTs, the Normalizer and Asset Manager construct physical scenes, and the Dual-Planner (Skill Planner + Condition Planner) operates in parallel to generate action sequences and verification criteria. Code Generator synthesizes deterministic task files, which are registered and executed in the Simulation node with real-time condition checking.}
+\label{fig:framework_overview}
+\end{figure*}
+
+\subsubsection{Skill Planner: State-based Chain-of-Thought Reasoning}
+
+The Skill Planner addresses the challenge of long-horizon manipulation by employing a state-based Chain-of-Thought (CoT) planning approach. Unlike traditional planning systems that rely on hardcoded rules or iterative refinement loops, our planner operates as a \textit{stateful one-shot planner}:
+
+\textbf{Pre/Post State Assertions.} For each action in the planned sequence, the Skill Planner explicitly specifies both the pre-state (conditions that must hold before execution) and post-state (conditions that result from execution). This enables precise tracking of entity states throughout the task. For example, before grasping a beaker: pre-state asserts that the robot end-effector is empty and the beaker is at its initial position; post-state asserts that the beaker is now constrained to the gripper and its position has changed.
+
+\textbf{Skill Library Integration.} The planner draws from a library of primitive skills including: \texttt{pick}, \texttt{place}, \texttt{lift}, \texttt{drop}, \texttt{pour\_to\_entity}, \texttt{stir\_entity\_with\_tool}, \texttt{shake}, \texttt{insert\_to\_entity}, \texttt{unscrew\_cap}, \texttt{open\_drawer}, \texttt{wait\_for}. Each skill is parameterized with entity references and physical targets (heights, angles, durations).
+
+\textbf{Zero Hardcoded Rules.} The planning process is entirely LLM-driven, with no hardcoded domain-specific rules. The planner's reasoning is guided solely by the state assertions and the skill library specifications, enabling generalization to novel task combinations.
+
+\subsubsection{Condition Planner: Physical Verification Criteria}
+
+In parallel with skill planning, the Condition Planner generates per-step physical verification criteria that enable rigorous task evaluation. This addresses a critical limitation of traditional benchmarks that rely on coarse-grained binary success metrics.
+
+\textbf{Per-Step Condition Generation.} For each action step, the Condition Planner generates specific, physically-verifiable conditions. Rather than evaluating only final task completion, conditions are attached to intermediate states. For example, for a pouring task: (1) grasp condition verifies contact between gripper and beaker; (2) lift condition verifies beaker height exceeds threshold; (3) pour condition verifies liquid mass transfer between containers; (4) release condition verifies beaker placement at target location.
+
+\textbf{Condition Types.} The condition library includes: \texttt{is\_grasped} (entity constrained to gripper), \texttt{lift} (entity at or above specified height), \texttt{on} (entity in contact with specified surface), \texttt{contain} (entity volume occupied by target substance), \texttt{pour\_into} (mass transfer between containers), \texttt{stir} (rotational motion applied), \texttt{cap\_open} (container lid state), \texttt{wait\_for} (state change after duration).
+
+\textbf{Fan-in Architecture.} The parallel execution of Skill Planner and Condition Planner constitutes a \textit{fan-in} architecture: both planners receive identical inputs and operate independently, with their outputs merged at the Code Generator. This design maximizes efficiency by enabling concurrent processing while maintaining coherence through shared context.
+
+\subsection{Dynamic Human Intervention Modeling}
+
+A distinguishing feature of SciVLABench is its explicit modeling of dynamic human interventions, which are ubiquitous in real laboratory settings but absent from most simulation benchmarks. We introduce a mechanism for approximating human-robot interaction through \textit{programmatic environmental alterations}.
+
+\textbf{Intervention Types.} SciVLABench supports several categories of interventions: (1) \textit{Instrument state toggles}: opening/closing valves, switching heaters on/off, activating stirrers; (2) \textit{Reagent additions}: introducing additional substances mid-task that may affect reaction dynamics; (3) \textit{Equipment reconfiguration}: repositioning support structures, changing container arrangements; and (4) \textit{External perturbations}: applying forces or disturbances to objects during execution.
+
+\textbf{Implementation.} Interventions are specified as state modifications that alter the environmental conditions during task execution. They are injected programmatically through the Simulation node, which modifies entity states, adds or removes substances, or applies forces according to predefined intervention scripts. Each intervention is associated with timing information (when to trigger) and effect parameters (magnitude, duration).
+
+\textbf{Evaluation Impact.} By introducing interventions, SciVLABench creates dynamic interference scenarios that evaluate an agent's ability to: (i) detect and respond to unexpected changes, (ii) adapt plans in response to altered conditions, and (iii) maintain task coherence despite external perturbations. These scenarios reveal robustness issues that would be hidden in static evaluation settings.
+
+\subsection{Code Generation and Simulation}
+
+The final stages of the pipeline transform the planned skill sequences and verification conditions into executable simulation code.
+
+\textbf{Deterministic Code Synthesis.} The Code Generator operates as a deterministic template filler: given the normalized entity list, skill sequence, and condition specifications, it produces a Python task file with identical structure regardless of the specific task content. This deterministic property ensures \textit{reproducibility}: the same inputs always produce bit-identical outputs, facilitating debugging and result replication.
+
+The generated code follows the VLABench task structure, defining: (i) a \texttt{ConfigManager} class that specifies entity configurations, initial conditions, and instruction text; (ii) a \texttt{Task} class that implements the \texttt{get\_expert\_skill\_sequence()} method returning the planned skill chain; and (iii) condition bindings that connect verification criteria to physics engine observations.
+
+\textbf{Dynamic Registration.} The Registration node makes newly generated tasks discoverable by the VLABench framework without requiring process restart. It performs module cleanup, updates the dual name-to-config registry, and persists task configurations to enable retrieval by the evaluation infrastructure.
+
+\textbf{Physics Simulation and Verification.} The Simulation node loads the registered task, initializes the MuJoCo physics environment with the configured scene, and executes the expert skill sequence. During execution, per-step conditions are evaluated against physics engine state observations. The simulation supports: (i) early termination upon condition failure, (ii) timeout protection for unbounded execution, (iii) HDF5-format data logging for observation/action trajectories, and (iv) video recording for visual inspection.
+
+\textbf{Vision-based Review.} The Reviewer node provides an additional validation layer by employing a vision-language model to assess simulation outcomes. It extracts frames from simulation videos and prompts the VLM to verify whether conditions were satisfied according to visual evidence. This addresses cases where physics engine state may not fully capture task success (e.g., liquid spillage, object deformation).
+
+\section{The SciVLABench Benchmark}
+\label{sec:benchmark}
+
+\textbf{[TO BE COMPLETED: Benchmark Section - approximately 2.5 pages covering task design, evaluation dimensions, data generation, and infrastructure]}
+
+\textbf{Content to include:}
+\begin{itemize}
+    \item 4.1 Task Design and Coverage
+    \item 4.2 Evaluation Dimensions (M\&T, Spatial, CommonSense, Semantic, PhysicalLaw, Complex)
+    \item 4.3 Data Generation and Asset Pipeline
+    \item 4.4 Evaluation Infrastructure
+\end{itemize}
+
+\section{Experiments}
+\label{sec:experiments}
+
+\textbf{[TO BE COMPLETED: Experiments Section - approximately 3 pages covering experimental setup, main results, analysis, and ablation studies]}
+
+\textbf{Content to include:}
+\begin{itemize}
+    \item 5.1 Experimental Setup
+    \item 5.2 Main Results (Policy Model Performance, VLM Evaluation)
+    \item 5.3 Analysis and Discussion (Physical Verification, Long-Horizon Reasoning, Dynamic Intervention Challenges)
+    \item 5.4 Ablation Studies
+\end{itemize}
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+\textbf{[TO BE COMPLETED: Conclusion and Future Work - approximately 0.5 pages]}
+
+\textbf{Content to include:}
+\begin{itemize}
+    \item Summary of contributions
+    \item Key findings and takeaways
+    \item Future directions (expanding task coverage, enhanced intervention modeling, additional robot platforms, real-world validation)
+    \item Broader impact statement
+\end{itemize}
+
+%%
+%% ==================== ACKNOWLEDGMENTS ====================
+\begin{acks}
+% TODO: Add acknowledgments, funding sources, institutional support
+% Example:
+% This work was supported by [Funding Agency] under grant [Number].
+% We thank [Name] for helpful discussions and [Name] for technical assistance.
+\end{acks}
+
+%%
+%% ==================== BIBLIOGRAPHY ====================
+\bibliographystyle{ACM-Reference-Format}
+
+% TODO: Create references.bib file with your citations
+% For now using placeholder - replace 'sample-base' with your bibliography filename
+\bibliography{sample-base}
+
+\end{document}
