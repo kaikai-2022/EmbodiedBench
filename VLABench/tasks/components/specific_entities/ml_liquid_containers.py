@@ -64,7 +64,7 @@ class SolutionMixin:
             physics.bind(geom).rgba = rgba
         else:
             physics.bind(geom).rgba = [1, 1, 1, 0]
-        self._current_solution_rgba = physics.bind(geom).rgba
+        self._current_solution_rgba = list(physics.bind(geom).rgba)
 
     def get_solution(self):
         """Return the current solvent name."""
@@ -89,13 +89,10 @@ class SolutionMixin:
                               缺省时 fallback 到 [1, 1, 1, 0.3]（默认无色溶液）。
         """
         geom = self.mjcf_model.worldbody.find("geom", self._solution_geom_name)
-        print(f"[DEBUG fill_solution] entity={getattr(self, 'name', '?')}, geom found={geom}")
         if geom is None:
-            print("[DEBUG fill_solution] geom is None, returning")
             return
-        rgba = source_solution_rgba if source_solution_rgba is not None else [1, 1, 1, 0.3]
+        rgba = list(source_solution_rgba) if source_solution_rgba is not None else [1, 1, 1, 0.3]
         physics.bind(geom).rgba = rgba
-        print(f"[DEBUG fill_solution] set rgba={rgba}, physics.bind result={physics.bind(geom).rgba}")
         self._current_solution_rgba = rgba
         self.solution_rgba = rgba  # 保证重放时 set_solution_rgba 走 self.solution_rgba 分支
 

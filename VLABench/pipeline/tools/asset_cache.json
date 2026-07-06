@@ -288,5 +288,25 @@
     "spec": "florence_flask",
     "source_type": "local",
     "is_physical": true
+  },
+  "beaker_small": {
+    "spec": "small_beaker",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "petri_dish_lid": {
+    "spec": "petri_dish_lid",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "petri_dish": {
+    "spec": "petri_dish",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "mid_flask": {
+    "spec": "conical_flask_mid",
+    "source_type": "local",
+    "is_physical": true
   }
 }

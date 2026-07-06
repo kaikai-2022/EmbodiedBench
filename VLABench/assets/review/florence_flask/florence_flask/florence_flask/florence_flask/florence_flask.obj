@@ -1,7 +1,7 @@
 # https://github.com/mikedh/trimesh
 mtllib material.mtl
 
-o Sphere
+o Object_0
 usemtl Material
 v -0.00000121 0.84357685 6.47351279
 v -0.00000121 0.84357685 6.47351279

@@ -48,7 +48,7 @@
       <site class="grasppoint" pos="0.0000 0.0000 0.1344"/>
           <site class="keypoint" pos="-0.3611 -0.3550 0.0000"/>
       <site class="keypoint" pos="0.3611 0.3550 0.6810"/>
-      <site class="placepoint" pos="0.0000 0.0000 0.210"/>
+      <site class="placepoint" pos="-0.02500 0.0000 0.210"/>
 </body>
   </worldbody>
   <compiler boundmass="0.015" boundinertia="1e-05" angle="radian"/>

@@ -307,17 +307,12 @@ class PourIntoCondition(Condition):
         """
         target = self.receiver_container
         if not hasattr(target, "fill_solution"):
-            print(f"[DEBUG _transfer] target {getattr(target, 'name', '?')} has no fill_solution, returning")
             return
         source = self.target_entity
         src_rgba = getattr(source, "_current_solution_rgba", None)
-        print(f"[DEBUG _transfer] source={getattr(source, 'name', '?')} _current_solution_rgba={src_rgba}")
-        print(f"[DEBUG _transfer] target={getattr(target, 'name', '?')}")
         target.fill_solution(physics, source_solution_rgba=src_rgba)
-        print(f"[DEBUG _transfer] after fill: target._current_solution_rgba={getattr(target, '_current_solution_rgba', None)}")
         if hasattr(source, "clear_solution"):
             source.clear_solution(physics)
-            print(f"[DEBUG _transfer] source cleared, now _current_solution_rgba={getattr(source, '_current_solution_rgba', None)}")
 
     def is_met(self, physics):
         if self._met:
