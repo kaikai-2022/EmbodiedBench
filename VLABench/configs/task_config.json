@@ -3571,11 +3571,11 @@
       "asset": {
         "seen_object": [
           "small_beaker",
-          "large_beaker"
+          "petri_dish"
         ],
         "unseen_object": [
           "small_beaker",
-          "large_beaker"
+          "petri_dish"
         ]
       },
       "scene": {
@@ -4423,6 +4423,33 @@
         "unseen_object": [
           "small_beaker",
           "conical_flask_mid",
+          "large_beaker"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "pick_small_beaker_pour_small_beaker_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "small_beaker",
+          "large_beaker"
+        ],
+        "unseen_object": [
+          "small_beaker",
           "large_beaker"
         ]
       },

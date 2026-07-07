@@ -308,5 +308,15 @@
     "spec": "conical_flask_mid",
     "source_type": "local",
     "is_physical": true
+  },
+  "FeCl3": {
+    "spec": "FeCl3",
+    "source_type": "local",
+    "is_physical": false
+  },
+  "NaOH solution": {
+    "spec": "NaOH solution",
+    "source_type": "local",
+    "is_physical": false
   }
 }

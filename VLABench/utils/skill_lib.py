@@ -487,7 +487,7 @@ class SkillLib:
     @staticmethod
     def _find_free_drop_position(env, grasped_entity, drop_height=0.05):
         """
-        在桌面 XY 范围 [-0.3, 0.3] 内搜索空位，放置被抓取的物体。
+        在桌面 XY 范围 [-0.25, 0.25] 内搜索空位，放置被抓取的物体。
 
         筛选条件：
         1. 候选点距其他任务物体中心 X/Y > 0.10m（避开已有物体）
@@ -536,8 +536,8 @@ class SkillLib:
 
         # 网格搜索
         candidates = []
-        for x in np.arange(-0.3, 0.301, 0.05):
-            for y in np.arange(-0.3, 0.301, 0.05):
+        for x in np.arange(-0.25, 0.251, 0.05):
+            for y in np.arange(-0.25, 0.251, 0.05):
                 pt = np.array([x, y])
                 # 条件 1: 距其他物体足够远
                 if object_xy.size > 0 and np.any(np.linalg.norm(object_xy - pt, axis=1) < MARGIN_OBJECT):
@@ -568,7 +568,7 @@ class SkillLib:
         - drop() 适用于放到桌面/平台等平坦表面
         - place() 用于精确放置到容器内部（不需要 ee_offset）
 
-        当 target_surface_pos 为 None 时，会在桌面 XY 范围 [-0.3, 0.3] 内搜索空位放置物体，
+        当 target_surface_pos 为 None 时，会在桌面 XY 范围 [-0.25, 0.25] 内搜索空位放置物体，
         优先选择距被抓取物当前位置最远的空位。
 
         param:

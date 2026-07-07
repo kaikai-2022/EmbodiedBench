@@ -419,28 +419,23 @@ def _code_liquid(plan: EntityLoadPlan, flags: Dict) -> List[str]:
     solution_rgba = plan.properties.get("solution_rgba")
     solution = plan.properties.get("solution", plan.uid)
     pos_range = ENTITY_POSITION_RANGES[plan.position_index % len(ENTITY_POSITION_RANGES)]
+    # 始终同时传递 solution（物质名）和 solution_rgba（LLM 颜色）
+    # solution 用于从 SOLUTE2RGBA 表查权威颜色（优先）
+    # solution_rgba 用于 LLM 明确指定的颜色覆盖（如 CuSO4 的特征蓝）
+    lines = [
+        f'        obj_config = dict(',
+        f'            name="{plan.uid}",',
+        f'            xml_path=name2class_xml["{plan.spec}"][-1],',
+        f'            position=[random.uniform({pos_range[0][0]}, {pos_range[0][1]}), random.uniform({pos_range[1][0]}, {pos_range[1][1]}), 0.8],',
+        f'            solution="{solution}",',
+    ]
     if solution_rgba:
-        lines = [
-            f'        obj_config = dict(',
-            f'            name="{plan.uid}",',
-            f'            xml_path=name2class_xml["{plan.spec}"][-1],',
-            f'            position=[random.uniform({pos_range[0][0]}, {pos_range[0][1]}), random.uniform({pos_range[1][0]}, {pos_range[1][1]}), 0.8],',
-            f'            solution_rgba={solution_rgba},',
-            f'        )',
-            f'        obj_config["class"] = "{plan.class_name}"',
-            f'        obj_config["randomness"] = dict(pos=[0.02, 0.02, 0], quat=[0, 0, 0.05])',
-        ]
-    else:
-        lines = [
-            f'        obj_config = dict(',
-            f'            name="{plan.uid}",',
-            f'            xml_path=name2class_xml["{plan.spec}"][-1],',
-            f'            position=[random.uniform({pos_range[0][0]}, {pos_range[0][1]}), random.uniform({pos_range[1][0]}, {pos_range[1][1]}), 0.8],',
-            f'            solution="{solution}",',
-            f'        )',
-            f'        obj_config["class"] = "{plan.class_name}"',
-            f'        obj_config["randomness"] = dict(pos=[0.02, 0.02, 0], quat=[0, 0, 0.05])',
-        ]
+        lines.append(f'            solution_rgba={solution_rgba},')
+    lines.append(f'        )')
+    lines += [
+        f'        obj_config["class"] = "{plan.class_name}"',
+        f'        obj_config["randomness"] = dict(pos=[0.02, 0.02, 0], quat=[0, 0, 0.05])',
+    ]
     if plan.attach_to_arena:
         lines.append(f'        obj_config["attach_to_arena"] = True')
     lines += [

@@ -2,6 +2,9 @@ import numpy as np
 from VLABench.utils.register import register
 from VLABench.utils.utils import distance, quaternion_to_euler, matrix_to_quaternion
 from VLABench.tasks.components.entity import Entity
+from VLABench.tasks.components.specific_entities.solute_reaction import (
+    SOLUTE2RGBA, lookup_reaction, alpha_over, mix_rgba, resolve_color_from_solutes
+)
 
 class Condition:
     def __init__(self):
@@ -302,15 +305,36 @@ class PourIntoCondition(Condition):
 
     def _transfer_solution(self, physics):
         """
-        源容器清空 + 目标容器按源当前颜色灌入。
-        任一不是 SolutionMixin 则静默 return。
+        化学反应驱动的溶液转移。
+
+        规则：
+          - 有反应：反应物消耗，产物加入溶质列表，用产物颜色
+          - 无反应：溶质列表合并，颜色走 alpha-over 混合
+          - 任一容器没有 SolutionMixin 能力则静默 return
         """
         target = self.receiver_container
         if not hasattr(target, "fill_solution"):
             return
         source = self.target_entity
-        src_rgba = getattr(source, "_current_solution_rgba", None)
-        target.fill_solution(physics, source_solution_rgba=src_rgba)
+        src_solutes = list(getattr(source, "solutes", []))
+        tgt_solutes = list(getattr(target, "solutes", []))
+
+        # 查反应表
+        new_solutes, product = lookup_reaction(src_solutes, tgt_solutes)
+
+        # 决定渲染颜色
+        if product is not None and product in SOLUTE2RGBA:
+            new_rgba = list(SOLUTE2RGBA[product])
+        elif new_solutes:
+            # 多物质或无产物：resolve_color_from_solutes 负责查表/混合
+            new_rgba = resolve_color_from_solutes(
+                new_solutes,
+                getattr(target, "solution_rgba", None) or getattr(source, "solution_rgba", None)
+            )
+        else:
+            new_rgba = [1.0, 1.0, 1.0, 0.0]
+
+        target.fill_solution(physics, source_solutes=new_solutes, source_solution_rgba=new_rgba)
         if hasattr(source, "clear_solution"):
             source.clear_solution(physics)
 

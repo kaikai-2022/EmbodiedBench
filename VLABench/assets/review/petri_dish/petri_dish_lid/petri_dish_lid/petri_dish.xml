@@ -41,7 +41,7 @@
 </asset>
   <worldbody>
     <body name="petri_dish">
-      <inertial pos="0 0 0.009571" mass="0.02" diaginertia="0.0008 0.0008 0.0005"/>
+      <inertial pos="0.000000 0.000000 0.004339" mass="0.02" diaginertia="0.0008 0.0008 0.0005"/>
       <geom material="petri_dish_material" mesh="petri_dish_lid" class="visual"/>
       <geom mesh="petri_dish_lid_collision_0"  class="collision"/>
       <geom mesh="petri_dish_lid_collision_1"  class="collision"/>
@@ -70,12 +70,12 @@
       <geom mesh="petri_dish_lid_collision_24"  class="collision"/>
       <geom mesh="petri_dish_lid_collision_25"  class="collision"/>
       <geom mesh="petri_dish_lid_collision_26"  class="collision"/>
-      <site class="grasppoint" pos="0.0000 0.0000 0.0115"/>
-      <site class="grasppoint" pos="0.0000 0.0000 0.0153"/>
-      <site class="grasppoint" pos="0.0000 0.0000 0.0182"/>
-          <geom name="solution" type="cylinder" size="2.373116 0.227143" pos="0 0 0.378571" material="CaSO4" class="visual"/>
-      <site name="top_site" pos="0 0 0.757142" size="0.01" rgba="1 0 0 0"/>
-      <site name="bottom_site" pos="0 0 0.000000" size="0.01" rgba="0 1 0 0"/>
+      <site class="grasppoint" pos="0.00000 0.00000 0.00521"/>
+      <site class="grasppoint" pos="0.00000 0.00000 0.00694"/>
+      <site class="grasppoint" pos="0.00000 0.00000 0.00825"/>
+          <geom name="solution" type="cylinder" size="0.03384 0.0030297" pos="0.00000 0.00000 0.003162" material="CaSO4" class="visual"/>
+      <site name="top_site" pos="0.00000 0.00000 0.34325" size="0.01" rgba="1 0 0 0"/>
+      <site name="bottom_site" pos="0.00000 0.00000 0.00000" size="0.01" rgba="0 1 0 0"/>
 </body>
   </worldbody>
   <compiler boundmass="0.015" boundinertia="1e-05" angle="radian"/>
