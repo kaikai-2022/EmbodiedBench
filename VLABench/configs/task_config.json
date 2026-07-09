@@ -4467,5 +4467,186 @@
         }
       ]
     }
+  },
+  "pres_button_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "button",
+          "drying_box"
+        ],
+        "unseen_object": [
+          "button",
+          "drying_box"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "pres_drying_box_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "drying_box"
+        ],
+        "unseen_object": [
+          "drying_box"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "open_dryingbox_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "drying_box"
+        ],
+        "unseen_object": [
+          "drying_box"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "place_beaker_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "small_beaker",
+          "heat_device"
+        ],
+        "unseen_object": [
+          "small_beaker",
+          "heat_device"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "open_drying_box_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "drying_box"
+        ],
+        "unseen_object": [
+          "drying_box"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "pres_heat_device_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "heat_device"
+        ],
+        "unseen_object": [
+          "heat_device"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "place_small_beaker_pres_hot_device_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "small_beaker",
+          "heat_device"
+        ],
+        "unseen_object": [
+          "small_beaker",
+          "heat_device"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
   }
 }

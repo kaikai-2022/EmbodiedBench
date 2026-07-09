@@ -6,6 +6,7 @@ os.environ["MUJOCO_GL"] = "egl"
 import json
 import numpy as np
 import os
+import types
 import open3d as o3d
 import mediapy
 import argparse
@@ -26,7 +27,7 @@ from VLABench.configs import name2config
 def get_args():
     parser = argparse.ArgumentParser(description='Generate trajectory for a task')
     parser.add_argument('--task-name', default="select_poker", type=str, help='task name')
-    parser.add_argument('--record-video', default=True, help='record video')
+    parser.add_argument('--record-video', action='store_true', default=True, help='record video')
     parser.add_argument('--save-dir', default="/media/shiduo/LENOVO_USB_HDD/dataset/VLABench")
     parser.add_argument('--n-sample', default=1, type=int, help='number of samples to generate')
     parser.add_argument('--start-id', default=0, type=int, help='start index for data storage')
@@ -63,6 +64,15 @@ def generate_trajectory(args, index, logger):
 
     # 技能执行模式：避免 step 中 should_terminate_episode 触发 reset 导致重入死循环
     env._skill_execution_mode = True
+
+    # 方案 A Patch：录制期间完全屏蔽终止判定
+    # 让所有 skill 完整跑完，最后再用 conditions.is_met(physics) 决定 task_success
+    # 避免三条件 AND 在 insert_to_entity RRT 中途碰巧成立时截断 trajectory
+    _orig_should_terminate = env.task.should_terminate_episode
+    def _never_terminate(physics):
+        return False
+    env.task.should_terminate_episode = _never_terminate
+    print(f"[DEBUG] 已 patch should_terminate_episode → 录制期强制 False")
 
     # 初始化顺序条件评测（与 test_simulation_only.py 一致）：
     # 1) 重置条件锁 2) 记录初始状态 3) 挂载逐帧回调
@@ -163,47 +173,58 @@ def generate_trajectory(args, index, logger):
     else: # TODO: some special tasks should be handled based on the feedback
         raise NotImplementedError("No expert skill sequence found")
 
-    task_dir = os.path.join(args.save_dir, args.task_name)
+    task_dir = args.save_dir
     print(f"\n[TIMING] 所有技能执行完成, 总观测数={len(observations)}, task_success={task_success}")
     print(f"[TIMING] 技能执行总耗时: {time.time()-t0:.1f}s")
 
-    if args.record_video:
-        print(f"[TIMING] 开始生成视频 ({len(observations)} 帧)...")
-        t1 = time.time()
-        frames = []
-        for o in observations:
-            frames.append(np.vstack([np.hstack(o["rgb"][:2]), np.hstack(o["rgb"][2:4])]))
-        if not os.path.exists(task_dir):
-            os.makedirs(task_dir)
-        video_path = os.path.join(task_dir, f"demo_{index}_success_{task_success}.mp4")
-        mediapy.write_video(video_path, frames, fps=10)
-        print(f"[TIMING] 视频生成完成, 耗时 {time.time()-t1:.1f}s, 路径: {video_path}")
-    if not task_success:
-        logger.warning("Task failed, skip saving data")
-        print(f"[TIMING] generate_trajectory 结束 (失败), 总耗时: {time.time()-t0:.1f}s")
-        env._skill_execution_mode = False
-        env.close()
-        return
-    else:
-        logger.info("Task success, saving data")
-    
-    # timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    data_to_save = process_observations(observations)
-    
-    robot_position = env.robot.robot_config["position"]
-    robot_frame_waypoints = [np.array(waypoint) - np.concatenate([robot_position, np.zeros(5)]) for waypoint in waypoints]
-    data_to_save["trajectory"] = robot_frame_waypoints
-    data_to_save["entities"] = meta_info["entities"]
-    data_to_save["target_entity"] = meta_info["target_entity"]
-    data_to_save["episode_config"] = json.dumps(episode_config)
-    data_to_save["instruction"] =meta_info["instruction"]
-    save_single_data(data_to_save,
-                     save_dir=task_dir,
-                     filename=f"data_{index}.hdf5",
-                     )
-    env._skill_execution_mode = False
-    env.close()
-    
+    try:
+        if args.record_video:
+            print(f"[TIMING] 开始生成视频 ({len(observations)} 帧)...")
+            t1 = time.time()
+            frames = []
+            for o in observations:
+                frames.append(np.vstack([np.hstack(o["rgb"][:2]), np.hstack(o["rgb"][2:4])]))
+            if not os.path.exists(task_dir):
+                os.makedirs(task_dir)
+            video_path = os.path.join(task_dir, f"demo_{index}_success_{task_success}.mp4")
+            mediapy.write_video(video_path, frames, fps=10)
+            print(f"[TIMING] 视频生成完成, 耗时 {time.time()-t1:.1f}s, 路径: {video_path}")
+        if not task_success:
+            logger.warning("Task failed, skip saving data")
+            print(f"[TIMING] generate_trajectory 结束 (失败), 总耗时: {time.time()-t0:.1f}s")
+            return
+        else:
+            logger.info("Task success, saving data")
+
+        # timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        data_to_save = process_observations(observations)
+
+        robot_position = env.robot.robot_config["position"]
+        robot_frame_waypoints = [np.array(waypoint) - np.concatenate([robot_position, np.zeros(5)]) for waypoint in waypoints]
+        data_to_save["trajectory"] = robot_frame_waypoints
+        data_to_save["entities"] = meta_info["entities"]
+        data_to_save["target_entity"] = meta_info["target_entity"]
+        data_to_save["episode_config"] = json.dumps(episode_config)
+        data_to_save["instruction"] =meta_info["instruction"]
+        save_single_data(data_to_save,
+                         save_dir=task_dir,
+                         filename=f"data_{index}.hdf5",
+                         )
+    finally:
+        # 无论任务成功/失败都恢复 patch，避免影响后续 episode
+        try:
+            env.task.should_terminate_episode = _orig_should_terminate
+        except Exception:
+            pass
+        try:
+            env._skill_execution_mode = False
+        except Exception:
+            pass
+        try:
+            env.close()
+        except Exception:
+            pass
+
         
 if __name__ == "__main__":
     args = get_args()

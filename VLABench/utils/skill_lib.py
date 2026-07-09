@@ -690,14 +690,32 @@ class SkillLib:
         """
         target_container = env.task.entities[target_container_name]
         start_pos, start_quat = env.robot.get_end_effector_pos(env.physics), env.robot.get_end_effector_quat(env.physics)
-        
+        observations = [env.get_observation()]
+        waypoints = []
+
+        # Step 1: pick the door handle first (must grasp before pulling open)
+        print(f"[open_door] Step 1: picking door handle on {target_container_name}")
+        pick_obs, pick_wp, _, pick_success = SkillLib.pick(
+            env,
+            target_entity_name=target_container_name,
+            prior_eulers=[[-np.pi/2, -np.pi/2, 0]],  # face forward, horizontal — 适用于旋转后的干燥箱门把手
+            specific_keypoint=0,  # door_handle_grasp is the first (and only) grasp site on the door
+        )
+        observations.extend(pick_obs)
+        waypoints.extend(pick_wp)
+        if not pick_success:
+            print(f"[open_door] pick failed, stage_success=False")
+            return observations, waypoints, False, False
+
         trajectory = target_container.get_open_trajectory(env.physics)
         trajectory_quats = []
         door_joint = target_container.door_joint
         rotation_axis = env.physics.bind(door_joint).xaxis
-        # rotation_anchor = env.physics.bind(door_joint).xanchor
-        observations = [env.get_observation()]
-        waypoints = []
+        print(f"[open_door] start_ee_pos=[{start_pos[0]:.4f},{start_pos[1]:.4f},{start_pos[2]:.4f}]")
+        print(f"[open_door] trajectory[0]=[{trajectory[0][0]:.4f},{trajectory[0][1]:.4f},{trajectory[0][2]:.4f}]")
+        print(f"[open_door] trajectory[-1]=[{trajectory[-1][0]:.4f},{trajectory[-1][1]:.4f},{trajectory[-1][2]:.4f}]")
+        print(f"[open_door] rotation_axis={rotation_axis}")
+        print(f"[open_door] start_quat=[{start_quat[0]:.4f},{start_quat[1]:.4f},{start_quat[2]:.4f},{start_quat[3]:.4f}]")
         stage_success = False
         task_success = False
         for i in range(len(trajectory)):
@@ -706,10 +724,17 @@ class SkillLib:
             trajectory_quats.append(new_quat)
         # init_qpos = np.array(env.robot.get_qpos(env.physics)).reshape(-1)
         interplate_path, interplate_quat = interpolate_path(trajectory, trajectory_quats)
+        print(f"[open_door] interplate_path[0]=[{interplate_path[0][0]:.4f},{interplate_path[0][1]:.4f},{interplate_path[0][2]:.4f}]")
+        print(f"[open_door] interplate_path[-1]=[{interplate_path[-1][0]:.4f},{interplate_path[-1][1]:.4f},{interplate_path[-1][2]:.4f}]")
         new_obs, new_waypoints, _, task_success = SkillLib.step_trajectory(env,
-                                                            interplate_path, 
-                                                            interplate_quat, 
+                                                            interplate_path,
+                                                            interplate_quat,
                                                             np.zeros(2))
+        print(f"[open_door] step_trajectory done, {len(new_waypoints)} waypoints")
+        if new_waypoints:
+            print(f"[open_door] waypoint[0] ee_pos=[{new_waypoints[0][0]:.4f},{new_waypoints[0][1]:.4f},{new_waypoints[0][2]:.4f}]")
+            print(f"[open_door] waypoint[-1] ee_pos=[{new_waypoints[-1][0]:.4f},{new_waypoints[-1][1]:.4f},{new_waypoints[-1][2]:.4f}]")
+        print(f"[open_door] door_qpos after trajectory: {float(env.physics.bind(door_joint).qpos[0]):.4f}")
         observations.extend(new_obs)
         waypoints.extend(new_waypoints)
         qpos = np.array(env.robot.get_qpos(env.physics)).reshape(-1)
@@ -796,9 +821,11 @@ class SkillLib:
     
     @staticmethod
     def press(env, target_pos, target_quat=None, move_vector=[0, 0, 0.1], max_n_substep=100): #TODO move vector to determine the press direction
+        target_pos = SkillLib._resolve_press_target(env, target_pos)
         prepare_pos = target_pos + np.array(move_vector) if move_vector is not None else target_pos
-        observations, waypoints, _, _ = SkillLib.moveto(env, 
-                                                     prepare_pos, 
+        print(f"[press] target_pos={target_pos}, prepare_pos={prepare_pos}, move_vector={move_vector}")
+        observations, waypoints, _, _ = SkillLib.moveto(env,
+                                                     prepare_pos,
                                                      target_quat,
                                                      max_n_substep=max_n_substep)
         # close gripper
@@ -819,6 +846,35 @@ class SkillLib:
         waypoints.extend(new_waypoints)
         assert len(observations) == len(waypoints), f"observations and waypoints should have the same length, {len(observations)} and {len(waypoints)}"
         return observations, waypoints, stage_success, task_success
+
+    @staticmethod
+    def _resolve_press_target(env, target):
+        """
+        Normalize the press target into an array-like position in world space.
+
+        Accepts either:
+        - a coordinate-like object (np.ndarray / list / tuple of 3 numbers)
+        - a string entity name from env.task.entities (preferred)
+
+        Resolution priority when given a string:
+        1. EntityWithButton mixin: target the start_button world-space position.
+        2. Fallback: entity center xpos.
+        """
+        print(f"[_resolve_press_target] input target={target}, type={type(target)}")
+        if isinstance(target, str):
+            entity = env.task.entities[target]
+            print(f"[_resolve_press_target] entity type={type(entity).__name__}, hasattr get_start_button_pos={hasattr(entity, 'get_start_button_pos')}")
+            if hasattr(entity, "get_start_button_pos"):
+                try:
+                    pos = entity.get_start_button_pos(env.physics)
+                    print(f"[_resolve_press_target] get_start_button_pos returned={pos}")
+                    if pos is not None:
+                        return np.array(pos)
+                except Exception as e:
+                    print(f"[_resolve_press_target] get_start_button_pos failed: {e}")
+            print(f"[_resolve_press_target] fallback to get_xpos")
+            return np.array(entity.get_xpos(env.physics))
+        return np.asarray(target, dtype=float)
     
     @staticmethod
     def pull(env, target_pos=None, target_quat=None, gripper_state=None, pull_distance=0.3):
@@ -1863,4 +1919,323 @@ class SkillLib:
             stage_success = (current_slide - initial_slide) > 0.003
             print(f"[unscrew_cap] final slide qpos: {current_slide:.6f}, delta: {current_slide - initial_slide:.6f}, stage_success: {stage_success}")
         return observations, waypoints, stage_success, task_success
+
+    @staticmethod
+    def aspirate(env,
+                 source_container_name,
+                 dwell_steps=20,
+                 descend_below_surface=0.005,
+                 gripper_state=None):
+        """
+        Aspirate (取样) — insert held pipette/dropper tip into source container's liquid,
+        wait for contact + dwell, then store the solution info on the tool entity.
+
+        Success condition: aspirate_site geom contacts source container geoms
+        for dwell_steps consecutive steps (~2s @ 10fps).
+
+        Args:
+            env: LM4manipEnv object
+            source_container_name: name of the source container entity
+            dwell_steps: number of consecutive contact steps required (default 20 ≈ 2s)
+            descend_below_surface: how far below the liquid surface to push the tip (m)
+            gripper_state: gripper state, default uses lock mode or closed
+        Returns:
+            observations: list of observations
+            waypoints: list of waypoints
+            stage_success: bool, whether aspiration succeeded
+            task_success: bool, always False (intermediate step)
+        """
+        import mujoco as mj
+
+        source = env.task.entities[source_container_name]
+        observations = [env.get_observation()]
+        waypoints = []
+        stage_success = False
+        task_success = False
+
+        if gripper_state is None:
+            gripper_state = SkillLib._get_gripper_state(env)
+
+        # ── 1. Resolve liquid surface Z from container top_site / bottom_site ──
+        top_site = source.mjcf_model.find("site", "top_site")
+        bottom_site = source.mjcf_model.find("site", "bottom_site")
+        if top_site is None:
+            print(f"[aspirate] WARNING: {source_container_name} has no top_site, using place_point")
+            place_points = source.get_place_point(env.physics)
+            if place_points:
+                top_z = np.array(place_points[0])[2] if isinstance(place_points, list) else np.array(place_points)[2]
+            else:
+                top_z = np.array(source.get_xpos(env.physics))[2] + 0.05
+        else:
+            top_z = env.physics.bind(top_site).xpos[2]
+
+        if bottom_site is None:
+            bottom_z = top_z - 0.1  # fallback: assume 10cm internal height
+        else:
+            bottom_z = env.physics.bind(bottom_site).xpos[2]
+
+        internal_height = max(top_z - bottom_z, 0.01)
+        liquid_surface_z = top_z - 0.005  # 5mm below the rim, inside liquid
+        aspirate_target_z = liquid_surface_z - descend_below_surface
+        print(f"[aspirate] liquid_surface_z={liquid_surface_z:.4f}, aspirate_target_z={aspirate_target_z:.4f}")
+
+        # ── 2. Get aspirate site from grasped pipette/dropper ──
+        grasped_names, grasped_entities = env.get_grasped_entity()
+        if not grasped_entities:
+            print("[aspirate] no grasped entity, cannot aspirate")
+            return [env.get_observation()], [], False, False
+
+        tool = grasped_entities[0]
+        aspirate_site = tool.get_aspirate_site()
+        if aspirate_site is None:
+            print(f"[aspirate] WARNING: {grasped_names[0]} has no aspirate_site, using EE position")
+            aspirate_pos = np.array(env.robot.get_end_effector_pos(env.physics))
+            aspirate_geom_id = None
+        else:
+            aspirate_geom_id = env.physics.bind(aspirate_site).element_id
+            aspirate_pos = env.physics.bind(aspirate_site).xpos
+
+        # Compute tool Z offset: aspirate site world Z - grasped keypoint world Z
+        grasp_keypoints = tool.get_grasped_keypoints(env.physics)
+        tool_z_offset = 0.0
+        if grasp_keypoints:
+            tool_z_offset = aspirate_pos[2] - grasp_keypoints[0][2]
+
+        # Target XY: center of the source container
+        source_xpos = np.array(source.get_xpos(env.physics))
+        aspirate_xy = source_xpos[:2]
+
+        # ── 3. moveto hover position (vertical-down EE) ──
+        vertical_quat = euler_to_quaternion(-np.pi, 0, 0)
+        hover_z = liquid_surface_z + 0.10 + tool_z_offset  # 10cm above liquid surface
+        hover_pos = np.array([aspirate_xy[0], aspirate_xy[1], hover_z])
+
+        print(f"[aspirate] hovering at {hover_pos}")
+        obs, wp, stage_success_mv, _ = SkillLib.moveto(
+            env, target_pos=hover_pos, target_quat=vertical_quat, gripper_state=gripper_state)
+        observations.extend(obs)
+        waypoints.extend(wp)
+        if not stage_success_mv:
+            return observations, waypoints, False, False
+
+        # ── 4. lift (negative) to descend tip to liquid surface ──
+        descend_lift = aspirate_target_z - hover_pos[2]
+        print(f"[aspirate] descending {descend_lift:.4f}m to target Z={aspirate_target_z:.4f}")
+        obs, wp, _, _ = SkillLib.lift(env, lift_height=descend_lift, gripper_state=gripper_state)
+        observations.extend(obs)
+        waypoints.extend(wp)
+
+        # ── 5. Contact + dwell loop ──
+        raw_m = env.physics.model._model
+        raw_d = env.physics.data._data
+        source_geom_ids = {env.physics.bind(g).element_id for g in source.geoms}
+
+        consecutive_contact = 0
+        for step in range(dwell_steps):
+            timestep = env.step(np.concatenate([np.array(env.robot.get_qpos(env.physics)), gripper_state]))
+            if timestep.last():
+                task_success = True
+                break
+
+            # Check contact between aspirate_site and source container geoms
+            has_contact = False
+            for c in raw_d.contact:
+                if c.dist > 0.005:  # ignore distant contacts
+                    continue
+                if aspirate_geom_id is not None:
+                    if c.geom1 == aspirate_geom_id and c.geom2 in source_geom_ids:
+                        has_contact = True
+                        break
+                    if c.geom2 == aspirate_geom_id and c.geom1 in source_geom_ids:
+                        has_contact = True
+                        break
+                else:
+                    # Fallback: check if any gripper geom contacts source
+                    gripper_geom_ids = {env.physics.bind(g).element_id for g in env.robot.gripper_geoms}
+                    if (c.geom1 in gripper_geom_ids and c.geom2 in source_geom_ids) or \
+                       (c.geom2 in gripper_geom_ids and c.geom1 in source_geom_ids):
+                        has_contact = True
+                        break
+
+            if has_contact:
+                consecutive_contact += 1
+            else:
+                consecutive_contact = 0  # reset on contact loss
+
+            waypoint = np.concatenate([
+                env.robot.get_end_effector_pos(env.physics),
+                quaternion_to_euler(env.robot.get_end_effector_quat(env.physics)),
+                gripper_state
+            ])
+            observations.append(env.get_observation())
+            waypoints.append(waypoint)
+
+            if consecutive_contact >= dwell_steps:
+                stage_success = True
+                print(f"[aspirate] ✓ contact maintained for {consecutive_contact} steps, aspiration success!")
+                break
+
+        if not stage_success:
+            print(f"[aspirate] ✗ contact lost after {consecutive_contact}/{dwell_steps} steps")
+
+        # ── 6. On success: read source solution and store on tool ──
+        if stage_success:
+            # Read solution info from source container
+            if hasattr(source, 'solutes') and source.solutes:
+                solution = source.solutes[0]
+            elif hasattr(source, 'solution') and source.solution:
+                solution = source.solution
+            else:
+                solution = None
+
+            if hasattr(source, 'get_solution_rgba'):
+                solution_rgba = source.get_solution_rgba(env.physics)
+            elif hasattr(source, '_current_solution_rgba') and source._current_solution_rgba:
+                solution_rgba = source._current_solution_rgba
+            else:
+                solution_rgba = None
+
+            tool.store_solution(solution, solution_rgba)
+            print(f"[aspirate] stored solution: {solution}, rgba={solution_rgba}")
+
+        # ── 7. Withdraw ──
+        obs, wp, _, _ = SkillLib.lift(env, lift_height=0.10, gripper_state=gripper_state)
+        observations.extend(obs)
+        waypoints.extend(wp)
+
+        observations.pop(-1)
+        assert len(observations) == len(waypoints), \
+            f"observations and waypoints should have same length: {len(observations)} vs {len(waypoints)}"
+        return observations, waypoints, stage_success, task_success
+
+    @staticmethod
+    def dispense(env,
+                 target_container_name,
+                 contact_steps=5,
+                 gripper_state=None):
+        """
+        Dispense (点样) — move held pipette/dropper over target container and
+        trigger the target to display the solution with correct color.
+
+        The solution info is read from the currently grasped tool entity
+        (set by a prior aspirate call).
+
+        Args:
+            env: LM4manipEnv object
+            target_container_name: name of the target container entity
+            contact_steps: number of steps to dwell near the target before triggering (visual)
+            gripper_state: gripper state, default uses lock mode or closed
+        Returns:
+            observations: list of observations
+            waypoints: list of waypoints
+            stage_success: bool, always True on success
+            task_success: bool, always False (intermediate step)
+        """
+        target = env.task.entities[target_container_name]
+        observations = [env.get_observation()]
+        waypoints = []
+        task_success = False
+
+        if gripper_state is None:
+            gripper_state = SkillLib._get_gripper_state(env)
+
+        # ── 1. Resolve target XY from top_site / place_point ──
+        top_site = target.mjcf_model.find("site", "top_site")
+        if top_site is None:
+            place_points = target.get_place_point(env.physics)
+            if place_points:
+                target_xy = np.array(place_points[0])[:2] if isinstance(place_points, list) else np.array(place_points)[:2]
+            else:
+                target_xy = np.array(target.get_xpos(env.physics))[:2]
+        else:
+            target_xy = env.physics.bind(top_site).xpos[:2]
+
+        if top_site is not None:
+            target_z = env.physics.bind(top_site).xpos[2]
+        else:
+            target_z = np.array(target.get_xpos(env.physics))[2]
+
+        # ── 2. Get tool aspirate site for Z offset ──
+        grasped_names, grasped_entities = env.get_grasped_entity()
+        tool_z_offset = 0.0
+        if grasped_entities:
+            tool = grasped_entities[0]
+            aspirate_pos = tool.get_aspirate_pos(env.physics)
+            grasp_keypoints = tool.get_grasped_keypoints(env.physics)
+            if aspirate_pos is not None and grasp_keypoints:
+                tool_z_offset = aspirate_pos[2] - grasp_keypoints[0][2]
+
+        # ── 3. moveto hover above target (vertical-down EE) ──
+        vertical_quat = euler_to_quaternion(-np.pi, 0, 0)
+        hover_z = target_z + 0.15 + tool_z_offset
+        hover_pos = np.array([target_xy[0], target_xy[1], hover_z])
+
+        print(f"[dispense] hovering at {hover_pos}")
+        obs, wp, stage_success_mv, _ = SkillLib.moveto(
+            env, target_pos=hover_pos, target_quat=vertical_quat, gripper_state=gripper_state)
+        observations.extend(obs)
+        waypoints.extend(wp)
+        if not stage_success_mv:
+            return observations, waypoints, False, False
+
+        # ── 4. lift (negative) to lower tip inside the container rim ──
+        descend_z = target_z + 0.02  # just inside the rim
+        descend_lift = descend_z - hover_pos[2]
+        print(f"[dispense] descending {descend_lift:.4f}m to Z={descend_z:.4f}")
+        obs, wp, _, _ = SkillLib.lift(env, lift_height=descend_lift, gripper_state=gripper_state)
+        observations.extend(obs)
+        waypoints.extend(wp)
+
+        # ── 5. Dwell steps (visual — tip near liquid surface) ──
+        for _ in range(contact_steps):
+            timestep = env.step(np.concatenate([np.array(env.robot.get_qpos(env.physics)), gripper_state]))
+            if timestep.last():
+                task_success = True
+                break
+            waypoint = np.concatenate([
+                env.robot.get_end_effector_pos(env.physics),
+                quaternion_to_euler(env.robot.get_end_effector_quat(env.physics)),
+                gripper_state
+            ])
+            observations.append(env.get_observation())
+            waypoints.append(waypoint)
+
+        # ── 6. Trigger liquid display on target container ──
+        if grasped_entities:
+            tool = grasped_entities[0]
+            solution = getattr(tool, 'solution', None)
+            solution_rgba = getattr(tool, 'solution_rgba', None)
+
+            if solution is not None or solution_rgba is not None:
+                if hasattr(target, 'set_solution_rgba'):
+                    target.set_solution_rgba(env.physics,
+                                            solution_name=solution,
+                                            target_rgba=solution_rgba)
+                    print(f"[dispense] called target.set_solution_rgba: solution={solution}, rgba={solution_rgba}")
+                elif hasattr(target, 'show_fluid'):
+                    target.show_fluid(env.physics)
+                    print(f"[dispense] called target.show_fluid()")
+                elif hasattr(target, 'fill_solution'):
+                    target.fill_solution(env.physics,
+                                         source_solutes=[solution] if solution else None,
+                                         source_solution_rgba=solution_rgba)
+                    print(f"[dispense] called target.fill_solution()")
+                else:
+                    print(f"[dispense] WARNING: target {target_container_name} has no solution display method")
+
+                # Clear tool's stored solution
+                tool.clear_solution()
+                print(f"[dispense] cleared tool solution state")
+            else:
+                print(f"[dispense] WARNING: tool has no stored solution, cannot dispense")
+
+        # ── 7. Withdraw ──
+        obs, wp, _, _ = SkillLib.lift(env, lift_height=0.15, gripper_state=gripper_state)
+        observations.extend(obs)
+        waypoints.extend(wp)
+
+        observations.pop(-1)
+        assert len(observations) == len(waypoints), \
+            f"observations and waypoints should have same length: {len(observations)} vs {len(waypoints)}"
+        return observations, waypoints, True, task_success
 

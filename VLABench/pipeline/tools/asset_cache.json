@@ -318,5 +318,45 @@
     "spec": "NaOH solution",
     "source_type": "local",
     "is_physical": false
+  },
+  "button": {
+    "spec": "button",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "drying_box": {
+    "spec": "drying_box",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "table": {
+    "spec": "chemistry_lab_table",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "red solution": {
+    "spec": "red solution",
+    "source_type": "local",
+    "is_physical": false
+  },
+  "yellow solution": {
+    "spec": "yellow solution",
+    "source_type": "local",
+    "is_physical": false
+  },
+  "blue solution": {
+    "spec": "blue solution",
+    "source_type": "local",
+    "is_physical": false
+  },
+  "dryingbox": {
+    "spec": "drying_box",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "hot_device": {
+    "spec": "heat_device",
+    "source_type": "local",
+    "is_physical": true
   }
 }

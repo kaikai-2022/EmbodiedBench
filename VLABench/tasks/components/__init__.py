@@ -9,3 +9,4 @@ from VLABench.tasks.components.specific_entities.mul_texture_entities import *
 from VLABench.tasks.components.specific_entities.random_geom import *
 from VLABench.tasks.components.specific_entities.ml_liquid_containers import *
 from VLABench.tasks.components.specific_entities.ml_lighters import *
+from VLABench.tasks.components.specific_entities.pipette import *

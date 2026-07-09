@@ -120,13 +120,31 @@ class IsGraspedCondition(Condition):
 @register.add_condition("press_button")
 class ButtonPressedCondition(Condition):
     """
-    Check if the button is pressed
+    Check if the button is pressed.
+
+    Gates on _initial_state_recorded: before record_initial_state() is called
+    (i.e. during env.reset() wait-step loop), is_met() returns False even if
+    the button is already in contact. This prevents false-positive triggering
+    that would cause dm_env.reset() reentry.
     """
     def __init__(self, target_button):
+        super().__init__()
         self.button = target_button
-        
+        self._initial_pressed_state = False
+
+    def record_initial_state(self, physics=None):
+        super().record_initial_state(physics)
+        try:
+            self._initial_pressed_state = self.button.is_pressed()
+        except Exception:
+            self._initial_pressed_state = False
+
     def is_met(self, physics=None):
-        return self.button.is_pressed()
+        if not self._initial_state_recorded:
+            return False
+        if physics is not None:
+            self.button.is_activate(physics)
+        return self.button.is_pressed() and not self._initial_pressed_state
     
 @register.add_condition("on")
 class OnCondition(Condition):
@@ -466,9 +484,16 @@ class JointInRangeCondition(Condition):
     
     def is_met(self, physics=None):
         for entity in self.entities:
-            joints = entity.joints
-            assert len(joints) == 1, "The number of joints should be equal to the target position range"
-            if physics.bind(joints[-1]).qpos < self.target_pos_range[0] or physics.bind(joints[-1]).qpos > self.target_pos_range[1]:
+            # Use door_joint if available (e.g. ContainerWithDoor subclasses like DryingBoxWithButton
+            # have both door_joint and button_joint, so we must not use the generic entity.joints)
+            if hasattr(entity, 'door_joint') and entity.door_joint is not None:
+                joint = entity.door_joint
+            else:
+                joints = entity.joints
+                assert len(joints) == 1, f"The number of joints should be equal to the target position range (entity={entity.name}, joints={len(joints)})"
+                joint = joints[-1]
+            qpos = float(physics.bind(joint).qpos[0])
+            if qpos < float(self.target_pos_range[0]) or qpos > float(self.target_pos_range[1]):
                 return False
         return True
 

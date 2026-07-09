@@ -36,6 +36,7 @@ class PourTubeInsertTubeConfigManager(BenchTaskConfigManager):
             init_container_config["subentities"] = []
         obj_config = dict(
             name="tube_0",
+            solution="CuSO4",
             solution_rgba=[0.0, 0.45, 1.0, 0.4],
             xml_path=name2class_xml["tube"][-1],
             position=pos,

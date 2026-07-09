@@ -77,6 +77,9 @@
       <geom mesh="heat_device_2" material="heat_device_2_mat" class="visual"/>
       <geom mesh="heat_device_3" material="heat_device_3_mat" class="visual"/>
       <geom mesh="heat_device_4" material="heat_device_4_mat" class="visual"/>
+      <!-- Start button collision (covers heat_device_2.obj cylinder) -->
+      <geom type="cylinder" size="0.025 0.025" pos="-0.0912 -0.0563 0.0634"
+            material="heat_device_2_mat" name="start_button" class="collision"/>
       <!-- Collision meshes -->
       <geom mesh="heat_device_collision_0" class="collision"/>
       <geom mesh="heat_device_collision_1" class="collision"/>
@@ -127,7 +130,7 @@
       <site class="grasppoint" pos="0.0000 0.0000 0.0850"/>
       <site class="keypoint" pos="-0.1272 -0.0900 0.0000"/>
       <site class="keypoint" pos="0.1272 0.0900 0.0894"/>
-      <site class="placepoint" pos="0.0500 0.0000 0.0994"/>
+      <site class="placepoint" pos="0.0500 0.0000 0.154"/>
     </body>
   </worldbody>
   <compiler boundmass="0.015" boundinertia="1e-05" angle="radian"/>

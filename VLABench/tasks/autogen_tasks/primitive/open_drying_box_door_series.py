@@ -20,7 +20,7 @@ class OpenDryingBoxDoorConfigManager(BenchTaskConfigManager):
         obj_config = dict(
             name="drying_box_0",
             xml_path=name2class_xml["drying_box"][-1],
-            position=[random.uniform(0.25, 0.35), random.uniform(0.0, 0.15), 0.8],
+            position=[random.uniform(0.15, 0.15), random.uniform(0.4, 0.4), 0.8],
             # 绕Z轴旋转90度，让柜门朝向机械臂
             quat=[0, 0, 0.7071, 0.7071],  # 90度绕Z轴的四元数
         )
