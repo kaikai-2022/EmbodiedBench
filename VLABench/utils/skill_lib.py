@@ -305,7 +305,7 @@ class SkillLib:
         waypoints.extend(new_waypoints)
         # 无论 step_trajectory 返回什么，都要执行 close_gripper 完成抓取
         # grasp
-        new_obs, new_waypoints, _, _ = SkillLib.close_gripper(env)
+        new_obs, new_waypoints, _, _ = SkillLib.close_gripper(env, repeat=20)
         observations.extend(new_obs)
         waypoints.extend(new_waypoints)
 
@@ -695,7 +695,7 @@ class SkillLib:
 
         # Step 1: pick the door handle first (must grasp before pulling open)
         print(f"[open_door] Step 1: picking door handle on {target_container_name}")
-        pick_obs, pick_wp, _, pick_success = SkillLib.pick(
+        pick_obs, pick_wp, pick_success, _ = SkillLib.pick(
             env,
             target_entity_name=target_container_name,
             prior_eulers=[[-np.pi/2, -np.pi/2, 0]],  # face forward, horizontal — 适用于旋转后的干燥箱门把手
@@ -707,6 +707,14 @@ class SkillLib:
             print(f"[open_door] pick failed, stage_success=False")
             return observations, waypoints, False, False
 
+        # ========== Grasp lock 不适用于带门实体的"开"动作 ==========
+        # _sync_grasped_entity_pose 尝试找 entity 的 freejoint 来 lock
+        # 实体只有 hinge+slide joint，sync 静默 return，lock 实际未生效
+        # 所以下一步 step_trajectory 中夹爪会从把手上"打滑"
+        # 修复：关掉 grasp lock，让 open_door 自己用 close_gripper 把手指合紧，物理上推开门
+        if hasattr(env, 'disable_grasp_lock'):
+            env.disable_grasp_lock()
+            print(f"[open_door] disabled grasp lock; pick 阶段未真正抓紧把手，依赖物理碰撞推门")
         trajectory = target_container.get_open_trajectory(env.physics)
         trajectory_quats = []
         door_joint = target_container.door_joint

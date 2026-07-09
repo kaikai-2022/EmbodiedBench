@@ -122,12 +122,14 @@ class EntityWithButton:
         """
         btn = self.start_button
         if btn is None:
+            print("[is_activate] start_button geom is None!")
             return False
         try:
             # Use full path (body_name/geom_name) since MuJoCo compiles with namespace
             body_name = self.mjcf_model.model
             btn_id = physics.model.name2id(f"{body_name}/start_button", "geom")
-        except Exception:
+        except Exception as e:
+            print(f"[is_activate] name2id FAILED: {e}")
             return False
         contacts = physics.data.contact
         contact_geoms = [c.geom1 for c in contacts] + [c.geom2 for c in contacts]
@@ -135,30 +137,54 @@ class EntityWithButton:
 
         prev_pressed = getattr(self, "_is_pressed", False)
         if currently_pressed and not prev_pressed:
+            print(f"[is_activate] STATE CHANGE False->True! btn_id={btn_id}, calling _set_button_color(active=True)")
             self._set_button_color(physics, active=True)
         elif not currently_pressed and prev_pressed:
+            print(f"[is_activate] STATE CHANGE True->False! calling _set_button_color(active=False)")
             self._set_button_color(physics, active=False)
 
         self._is_pressed = currently_pressed
+        if currently_pressed:
+            print(f"[is_activate] PRESSED! (call returned True)")
         return currently_pressed
 
     def _set_button_color(self, physics, active: bool):
         """Rewrite the button material rgba in the live mj_model."""
         mat = self._resolve_button_material()
         if mat is None:
+            print(f"[_set_button_color] FAILED: material not resolved! active={active}")
             return
         try:
             target = BUTTON_COLOR_ACTIVE if active else BUTTON_COLOR_IDLE
             body_name = self.mjcf_model.model
-            # MuJoCo compiles materials with body namespace: "body_name/material_name"
-            # Try full path first, fall back to bare material name (for global materials)
-            try:
-                physics.named.model.mat_rgba[f"{body_name}/{mat.name}"] = target
-            except KeyError:
-                physics.named.model.mat_rgba[mat.name] = target
-        except (KeyError, AttributeError):
-            # Material not bound in mj_model, or environment without named view;
-            # silently skip — press state still updates.
+            print(f"[_set_button_color] mat.name={mat.name}, target={target}")
+
+            # Approach: find the material ID in the raw MjModel by name, then write directly.
+            # dm_control's physics.named.model.mat_rgba and physics.bind(mat).rgba both
+            # write to views that may not propagate to the renderer. Writing directly to
+            # the underlying MjModel.mat_rgba[mat_id] is the most reliable approach.
+            import mujoco
+            raw_m = physics.model._model
+            target_full_name = f"{body_name}/{mat.name}"
+            mat_id = None
+            for i in range(raw_m.nmat):
+                addr = raw_m.name_matadr[i]
+                name_bytes = raw_m.names[addr:].split(b'\x00')[0]
+                name = name_bytes.decode('utf-8', errors='replace')
+                if name == target_full_name or name == mat.name:
+                    mat_id = i
+                    break
+
+            if mat_id is None:
+                print(f"[_set_button_color] FAILED: material '{target_full_name}' not found in raw MjModel")
+                return
+
+            print(f"[_set_button_color] before: mat_id={mat_id}, rgba={raw_m.mat_rgba[mat_id]}")
+            raw_m.mat_rgba[mat_id] = target
+            print(f"[_set_button_color] after:  mat_id={mat_id}, rgba={raw_m.mat_rgba[mat_id]}")
+            print(f"[_set_button_color] SUCCESS via raw MjModel write")
+        except (KeyError, AttributeError) as e:
+            print(f"[_set_button_color] FAILED: {type(e).__name__}: {e}")
             pass
 
     def is_pressed(self):
