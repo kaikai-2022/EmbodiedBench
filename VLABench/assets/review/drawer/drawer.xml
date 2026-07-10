@@ -39,7 +39,7 @@
 			<inertial pos="0 0 0" mass="3" diaginertia="1 1 1" />
 			<joint name="top_drawer" type="slide" pos="0.00000 0.00000 0.00000" axis="1 0 0" limited="true" range="-0.005 0.32" damping="50" />
 			<site rgba="0 0 0 0" type="box" pos="-0.00218 0.05636 -0.00000" quat="0.00000 0.70711 0.70711 0.00000" size="0.02022 0.08279 0.08821" name="top_region" />
-			<site class="grasppoint" pos="0.26000 0.13000 0.00000" group="4" />
+			<site class="grasppoint" pos="0.26000 0.12200 0.00000" group="4" />
 			<geom solimp="0.998 0.998 0.001" solref="0.001 1" density="100" friction="0.95 0.3 0.1" type="mesh" mesh="drawer_high_vis" class="visual" material="base_vis" />		
 			<geom class="collision" pos="0.22961 0.11677 -0.00000" quat="1.00000 0.00000 0.00000 -0.00000" size="0.01375 0.05382 0.25090" rgba="0.8 0.8 0.8 0.3" />
 			<geom class="collision" pos="-0.22347 0.11677 0.00000" quat="1.00000 0.00000 0.00000 0.00000" size="0.01375 0.05294 0.25415" rgba="0.8 0.8 0.8 0.3" />

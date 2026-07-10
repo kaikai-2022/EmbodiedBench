@@ -21,6 +21,7 @@ class OpenDrawerConfigManager(BenchTaskConfigManager):
             position=[0, 0.45, 0.8],
         )
         obj_config["class"] = "ContainerWithDrawer"
+        obj_config["attach_to_arena"] = True
         self.config["task"]["components"].append(obj_config)
 
         self.target_entity = "drawer_0"

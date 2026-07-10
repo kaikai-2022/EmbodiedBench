@@ -3379,33 +3379,6 @@
       ]
     }
   },
-  "place_flask_series": {
-    "task": {
-      "asset": {
-        "seen_object": [
-          "flask",
-          "heat_device"
-        ],
-        "unseen_object": [
-          "flask",
-          "heat_device"
-        ]
-      },
-      "scene": {
-        "name": "laboratory_0"
-      },
-      "components": [
-        {
-          "name": "table",
-          "xml_path": "obj/meshes/table/table.xml",
-          "class": "Table",
-          "randomness": {
-            "texture": false
-          }
-        }
-      ]
-    }
-  },
   "unscrew_bottle_series": {
     "task": {
       "asset": {
@@ -4042,6 +4015,33 @@
       ]
     }
   },
+  "place_flask_on_the_mat_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "flask",
+          "square_mat"
+        ],
+        "unseen_object": [
+          "flask",
+          "square_mat"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
   "pick_mechanical_pipette_lift_mechanical_pipette_series": {
     "task": {
       "asset": {
@@ -4632,6 +4632,56 @@
         "unseen_object": [
           "small_beaker",
           "heat_device"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "pick_tube_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "tube"
+        ],
+        "unseen_object": [
+          "tube"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "pick_cylinder_small_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "cylinder_small"
+        ],
+        "unseen_object": [
+          "cylinder_small"
         ]
       },
       "scene": {

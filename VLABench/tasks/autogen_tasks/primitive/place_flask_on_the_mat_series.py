@@ -8,8 +8,8 @@ from VLABench.tasks.config_manager import BenchTaskConfigManager
 from VLABench.utils.register import register
 from VLABench.configs.constant import name2class_xml
 
-@register.add_config_manager("place_flask")
-class PlaceFlaskConfigManager(BenchTaskConfigManager):
+@register.add_config_manager("place_flask_on_the_mat")
+class PlaceFlaskOnTheMatConfigManager(BenchTaskConfigManager):
     def __init__(self, task_name, num_objects=[1, 1], **kwargs):
         super().__init__(task_name, num_objects, **kwargs)
         self.config["task"]["n_distractor"] = 0
@@ -46,8 +46,8 @@ class PlaceFlaskConfigManager(BenchTaskConfigManager):
         self.config["task"]["conditions"] = conditions_config
 
 
-@register.add_task("place_flask")
-class PlaceFlaskTask(PrimitiveTask):
+@register.add_task("place_flask_on_the_mat")
+class PlaceFlaskOnTheMatTask(PrimitiveTask):
     def __init__(self, task_name, robot, **kwargs):
         super().__init__(task_name, robot=robot, **kwargs)
 

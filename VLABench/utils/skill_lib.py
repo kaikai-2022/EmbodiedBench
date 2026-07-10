@@ -707,14 +707,17 @@ class SkillLib:
             print(f"[open_door] pick failed, stage_success=False")
             return observations, waypoints, False, False
 
-        # ========== Grasp lock 不适用于带门实体的"开"动作 ==========
-        # _sync_grasped_entity_pose 尝试找 entity 的 freejoint 来 lock
-        # 实体只有 hinge+slide joint，sync 静默 return，lock 实际未生效
-        # 所以下一步 step_trajectory 中夹爪会从把手上"打滑"
-        # 修复：关掉 grasp lock，让 open_door 自己用 close_gripper 把手指合紧，物理上推开门
-        if hasattr(env, 'disable_grasp_lock'):
-            env.disable_grasp_lock()
-            print(f"[open_door] disabled grasp lock; pick 阶段未真正抓紧把手，依赖物理碰撞推门")
+        # ========== Grasp lock 启用 hinge 关节同步 ==========
+        # _sync_grasped_entity_pose 已扩展支持带 door_joint 的实体（hinge/slide lock）
+        # 让 door_joint.qpos 跟随手相对 anchor 的方位角，门会随机械臂绕 hinge 轴旋转
+        # 注意：dm_env 默认 _GRASP_LOCK_SYNC_INTERVAL=10，但 n_sub_steps=1，sync 永远不触发
+        # 这里临时改成 1，确保每个 step 都同步
+        old_sync_interval = type(env)._GRASP_LOCK_SYNC_INTERVAL
+        type(env)._GRASP_LOCK_SYNC_INTERVAL = 1
+        print(f"[open_door] hinge lock active: door qpos will follow hand position (sync_interval=1)")
+        # 关键修复：start_quat 必须是 pick 之后的当前夹爪姿态，而不是 open_door 入口时的默认姿态。
+        # 否则 step_trajectory 会让夹爪从"水平抓握"突变回"默认向下"，破坏抓取关系。
+        start_pos, start_quat = env.robot.get_end_effector_pos(env.physics), env.robot.get_end_effector_quat(env.physics)
         trajectory = target_container.get_open_trajectory(env.physics)
         trajectory_quats = []
         door_joint = target_container.door_joint
@@ -743,6 +746,8 @@ class SkillLib:
             print(f"[open_door] waypoint[0] ee_pos=[{new_waypoints[0][0]:.4f},{new_waypoints[0][1]:.4f},{new_waypoints[0][2]:.4f}]")
             print(f"[open_door] waypoint[-1] ee_pos=[{new_waypoints[-1][0]:.4f},{new_waypoints[-1][1]:.4f},{new_waypoints[-1][2]:.4f}]")
         print(f"[open_door] door_qpos after trajectory: {float(env.physics.bind(door_joint).qpos[0]):.4f}")
+        # 恢复 sync_interval
+        type(env)._GRASP_LOCK_SYNC_INTERVAL = old_sync_interval
         observations.extend(new_obs)
         waypoints.extend(new_waypoints)
         qpos = np.array(env.robot.get_qpos(env.physics)).reshape(-1)

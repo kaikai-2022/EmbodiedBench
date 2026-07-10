@@ -58,6 +58,10 @@ def generate_trajectory(args, index, logger):
     env = load_env(args.task_name, robot=args.robot, eval=args.eval_unseen)
     print(f"[TIMING] load_env 完成, 耗时 {time.time()-t1:.1f}s")
 
+    # Enable grasp lock for better object manipulation
+    env.enable_grasp_lock()
+    print(f"[DEBUG] 已启用 grasp_lock 模式")
+
     t1 = time.time()
     env.reset()
     print(f"[TIMING] env.reset() 完成, 耗时 {time.time()-t1:.1f}s")
@@ -173,7 +177,7 @@ def generate_trajectory(args, index, logger):
     else: # TODO: some special tasks should be handled based on the feedback
         raise NotImplementedError("No expert skill sequence found")
 
-    task_dir = args.save_dir
+    task_dir = os.path.join(args.save_dir, args.task_name)
     print(f"\n[TIMING] 所有技能执行完成, 总观测数={len(observations)}, task_success={task_success}")
     print(f"[TIMING] 技能执行总耗时: {time.time()-t0:.1f}s")
 

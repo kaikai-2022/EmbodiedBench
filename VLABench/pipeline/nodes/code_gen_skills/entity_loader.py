@@ -97,16 +97,16 @@ FIXTURE_RANGES = [
 # 用于需要精确定位的物体（如 drying_box 由视觉标定过）
 FIXED_POSITIONS = {
     "DryingBoxWithButton": (0.30, 0.45),
-    "ContainerWithDrawer": (0.30, 0.45)
+    "ContainerWithDrawer": (0.0, 0.4),
 }
 
 # 容器类需要被固定到 arena 才能完成任务的清单
 # （单手机械臂无法在被自由放置的物体上完成拧/插/按等需要底座稳定的操作）
 ATTACH_TO_ARENA_CLASSES = {
     # 暂时禁用 attach_to_arena 以测试 drawer 问题
-    # "ContainerWithCap",
-    # "DryingBoxWithButton",
-    # "ContainerWithDrawer",
+    "ContainerWithCap",
+    "DryingBoxWithButton",
+    "ContainerWithDrawer",
 }
 
 

@@ -109,7 +109,8 @@
         <site class="keypoint" name="door_p2" pos="-0.28820701490376166 -0.3704462501843404 0.626919157520663"/>
         <site class="keypoint" name="door_p3" pos="-0.28820701490376166 0.17519648199678195 0.626919157520663"/>
         <!-- Handle grasppoint -->
-        <site class="grasppoint" name="door_handle_grasp" pos="-0.2576 0.1274 0.3484"/>
+        <site class="grasppoint" name="door_handle_grasp" pos="-0.2626 0.1274 0.3484"/>
+        <!-- <site class="grasppoint" name="door_handle_grasp" pos="-0.2226 0.1274 0.6154"/> -->
       </body>
 
       <!-- Button (sliding joint along X, can be pressed inward) -->
