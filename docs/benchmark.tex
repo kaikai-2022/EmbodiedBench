@@ -1,0 +1,136 @@
+\section{Benchmark}
+\label{sec:benchmark}
+
+\subsection{Benchmark Positioning}
+\label{sec:benchmark-positioning}
+
+Built upon the protocol-to-task compilation framework, SciVLABench provides a pre-generated reference benchmark suite for evaluating embodied scientific agents in simulated laboratory environments. Rather than aiming to exhaustively enumerate all possible laboratory procedures, SciVLABench instantiates the proposed construction pipeline on a curated set of real-world scientific scenarios, producing executable, verifiable, and reusable task templates. The released benchmark therefore serves a dual role: it provides a fixed task suite for reproducible evaluation, while also offering a concrete construction template for future researchers to extend the benchmark with new protocols, assets, and task families.
+
+This positioning reflects the central motivation of SciVLABench: laboratory benchmark construction should be protocol-grounded, executable, verifiable, and extensible. First, each task is grounded in a real laboratory procedure rather than an arbitrary manipulation goal. Second, each benchmark task is represented as an executable simulation specification with concrete laboratory assets, manipulation primitives, state transitions, and success conditions. Third, every generated task is certified through simulation-based verification before being included in the benchmark. Finally, the same construction pipeline can be reused to incorporate new scientific protocols, enabling SciVLABench to grow beyond the pre-generated task suite released in this work.
+
+\subsection{Scenario Collection}
+\label{sec:scenario-collection}
+
+To instantiate the reference benchmark suite, we begin with a curated collection of protocol-grounded seed scenarios. These scenarios are selected from contemporary scientific literature, automated laboratory systems, laboratory safety practices, and robotic manipulation benchmarks. Instead of designing isolated manipulation tasks from scratch, we use real experimental procedures as the starting point of benchmark construction. Each seed scenario is inspected and annotated with its source protocol, procedural description, required laboratory assets, executable action sequence, and associated scientific domain. These annotations provide the initial grounding required by the protocol-to-task compilation pipeline.
+
+Table~\ref{tab:seed-scenarios} summarizes the 21 seed scenarios currently included in SciVLABench. We organize these scenarios according to recurring laboratory operations, such as liquid transfer, physical mixing, thermal control, solid handling, instrument setup, anomaly handling, and chemical analysis. These categories are used to describe benchmark coverage rather than to define an exhaustive taxonomy of scientific intelligence. This design allows the released benchmark to cover representative laboratory procedures while remaining open to future expansion as new scientific protocols and operation types are incorporated.
+
+\begin{table*}[t]
+  \centering
+  \caption{Overview of protocol-grounded seed scenarios in SciVLABench.}
+  \label{tab:seed-scenarios}
+  \small
+  \setlength{\tabcolsep}{5pt}
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabular}{p{3.4cm} c p{5.1cm} p{5.1cm}}
+    \toprule
+    \textbf{Category} & \textbf{\#} & \textbf{Representative Scenarios} & \textbf{Representative Assets} \\
+    \midrule
+    Liquid transfer and separation
+    & 3
+    & Stock-solution pouring; micro-liquid dispensing; dual-beaker rinsing
+    & Cylinders, beakers, pipettes, pipette stands, Petri dishes \\
+
+    Physical mixing and stirring
+    & 3
+    & Glass-rod stirring; magnetic stirring; free-space shaking
+    & Stirring rods, beakers, magnetic stir plates, flasks \\
+
+    Thermodynamic control
+    & 4
+    & Hot-plate drying; heated beaker transfer; water-bath incubation; flame-assisted tube heating
+    & Petri dishes, hot plates, water baths, tubes, Bunsen burners \\
+
+    Solid handling and weighing
+    & 2
+    & Taring and powder dispensing; reagent-bottle opening
+    & Electronic scales, Petri dishes, pill bottles \\
+
+    Instrument assembly and spatial organization
+    & 4
+    & Gravity filtration setup; high-throughput tube placement; cabinet or drying-box opening; light-sensitive reagent storage
+    & Funnels, supports, beakers, tube racks, drying boxes, drawers, reagent bottles \\
+
+    Anomaly recovery and sensing
+    & 2
+    & Chemical spill wiping; fallen-container recovery
+    & Cleaning rags, laboratory tables, flasks \\
+
+    Chemical testing and analysis
+    & 3
+    & Acid--base spotting test; pipette-based micro-sampling; neutralization monitoring
+    & Beakers, tubes, stirring rods, pipettes, pH paper \\
+    \bottomrule
+  \end{tabular}
+\end{table*}
+
+\subsection{Hierarchical Task Organization}
+\label{sec:hierarchical-task-organization}
+
+SciVLABench organizes benchmark tasks hierarchically to bridge the gap between real laboratory protocols and executable simulation tasks. At the top level, seed scenarios provide protocol-grounded experimental contexts extracted from real scientific procedures. Each seed scenario is associated with one or more recurring laboratory operation categories. Within each category, we further identify operation clusters that capture reusable procedural patterns shared across related tasks. These clusters are then instantiated into executable task templates by specifying concrete laboratory assets, ordered manipulation primitives, initial states, intermediate dependencies, and step-level success conditions. Finally, certified task templates can be diversified into benchmark instances through scene randomization while preserving their underlying scientific semantics.
+
+This hierarchical organization is central to the scalability of SciVLABench. A seed scenario does not correspond to a single benchmark task. Instead, it serves as a protocol-grounded source from which multiple reusable operation clusters can be derived. Each cluster captures a distinct executable structure, such as single-step pouring, multi-stage transfer, pipette-based dispensing, magnetic stirring, or multi-container mixing. Task templates are then generated by varying executable procedural factors, including source and target objects, tool choices, operation order, intermediate containers, state dependencies, and physical constraints. As a result, task diversity arises from structured procedural variation rather than superficial changes to natural-language instructions.
+
+\begin{table*}[t]
+  \centering
+  \caption{Examples of operation-cluster expansion in SciVLABench.}
+  \label{tab:cluster-expansion}
+  \small
+  \setlength{\tabcolsep}{5pt}
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabular}{p{2.8cm} c c c p{7.8cm}}
+    \toprule
+    \textbf{Category} & \textbf{\#Seed} & \textbf{\#Clusters} & \textbf{\#Templates} & \textbf{Operation Clusters} \\
+    \midrule
+    Liquid Handling
+    & 3
+    & 6
+    & 76
+    & Single-step pouring; multi-stage transfer; pipette dispensing; assisted transfer; funnel-assisted transfer; reverse transfer \\
+
+    Mixing and Stirring
+    & 3
+    & 5
+    & 41
+    & Glass-rod stirring; magnetic stirring; shaking-based mixing; stirring-transfer mixing; multi-container mixing \\
+    \bottomrule
+  \end{tabular}
+\end{table*}
+
+\subsection{Benchmark Composition}
+\label{sec:benchmark-composition}
+
+The hierarchical construction process produces a pre-generated benchmark suite that can be directly used for evaluation and policy learning. As summarized in Table~\ref{tab:benchmark-statistics}, the current release of SciVLABench contains 21 protocol-grounded seed scenarios, 7 recurring laboratory operation categories, over 1,000 executable task templates, more than 100 specialized laboratory assets, over 30 reusable manipulation primitives, and expert demonstrations for all certified task templates. These components jointly define a reusable benchmark artifact rather than a collection of isolated task descriptions.
+
+Each task template in SciVLABench consists of an instantiated laboratory scene, a structured manipulation program, and step-level success conditions. The laboratory scene specifies the required assets, object poses, physical properties, and spatial configuration. The manipulation program is composed of reusable robotic primitives, enabling the task to be executed in simulation and used to collect expert demonstrations. The success conditions define the expected state after each experimental step, supporting both process-level verification and final task evaluation. In addition to task templates and demonstrations, SciVLABench records execution traces, keyframes, and verification logs to make generated tasks inspectable and reproducible.
+
+\begin{table}[t]
+  \centering
+  \caption{Overall statistics of SciVLABench.}
+  \label{tab:benchmark-statistics}
+  \small
+  \setlength{\tabcolsep}{5pt}
+  \renewcommand{\arraystretch}{1.12}
+  \begin{tabular}{p{3.2cm} c}
+    \toprule
+    \textbf{Component} & \textbf{Scale} \\
+    \midrule
+    Seed scenarios & 21 \\
+    Operation categories & 7 \\
+    Task templates & 1,000+ \\
+    Laboratory assets & 100+ \\
+    Manipulation primitives & 30+ \\
+    Expert demonstrations & 1,000+ \\
+    Scientific disciplines & 5+ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+The released benchmark is therefore usable at multiple levels. At the task level, agents can be evaluated on their ability to complete executable laboratory procedures under simulation-based verification. At the step level, success conditions provide fine-grained diagnostic signals for identifying procedural failures. At the data level, expert demonstrations and execution traces provide training resources for imitation learning, policy learning, and future model development. This design allows SciVLABench to serve both as a standardized evaluation suite and as a reusable data resource for embodied scientific agents.
+
+\subsection{Extension Protocol}
+\label{sec:extension-protocol}
+
+Beyond serving as a fixed evaluation suite, SciVLABench is designed as an extensible construction template for future benchmark development. New laboratory procedures can be incorporated by following the same protocol-to-task compilation workflow used to construct the current release. Specifically, a researcher can introduce a new scientific protocol, ground the required entities to existing or newly retrieved laboratory assets, decompose the procedure into operation clusters and executable task templates, and certify the generated tasks through simulation-based verification. In this way, SciVLABench provides not only a pre-generated benchmark suite, but also a reusable recipe for expanding the benchmark toward new scientific domains, experimental procedures, and robotic interaction patterns.
+
+This extensible design is important because scientific laboratories are inherently open-ended: new protocols, instruments, materials, and safety requirements continuously emerge across disciplines. Rather than claiming to exhaust this space, SciVLABench provides a protocol-grounded starting point together with a validated construction pipeline. The released benchmark can therefore be used directly for reproducible evaluation, while its organization into seed scenarios, operation clusters, task templates, and verified demonstrations offers a concrete reference for future researchers to build larger and more specialized scientific laboratory benchmarks.

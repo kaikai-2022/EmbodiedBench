@@ -52,8 +52,8 @@ def create_lerobot_dataset_from_hdf5(args):
                 "names": ["action"]
             },
         },
-        image_writer_processes=5,
-        image_writer_threads=10
+        image_writer_processes=12,
+        image_writer_threads=4
     )
     
     if args.task_list is None:
@@ -68,6 +68,8 @@ def create_lerobot_dataset_from_hdf5(args):
     for file in h5py_files:
         with h5py.File(file, "r") as f:
             for timestamp in f["data"].keys():
+                # Skip flag
+                skip_episode = False
                 # load episode config
                 episode_config_bytes = np.asarray(f["data"][timestamp]["meta_info"]["episode_config"]).astype('S')
                 episode_config = episode_config_bytes.item().decode('utf-8')
@@ -85,8 +87,15 @@ def create_lerobot_dataset_from_hdf5(args):
                 # transform ee_state to robot frame
                 ee_pos -= robot_frame_pos
                 ee_state = np.concatenate([ee_pos, ee_euler, gripper.reshape(-1, 1)], axis=1)
-                assert images.shape[0] == ee_state.shape[0] == q_state.shape[0] == actions.shape[0]
-                for i in range(images.shape[0]):
+                # Handle shape mismatches: take minimum length (some trajectories have terminal state)
+                min_len = min(images.shape[0], ee_state.shape[0], q_state.shape[0], actions.shape[0])
+                if min_len < images.shape[0]:
+                    print(f"  Truncating {file} from {images.shape[0]} to {min_len} frames")
+                    images = images[:min_len]
+                    ee_state = ee_state[:min_len]
+                    q_state = q_state[:min_len]
+                    actions = actions[:min_len]
+                for i in range(min_len):
                     action = actions[i]
                     # Handle both 7D and 8D action formats
                     # 8D: [pos3, euler3, gripper1, gripper2] (VLABench format)
@@ -108,7 +117,7 @@ def create_lerobot_dataset_from_hdf5(args):
                         }
                     )
                 dataset.save_episode(task=np.array(f["data"][timestamp]["instruction"])[0].decode("utf-8"))
-    dataset.consolidate(run_compute_stats=True)
+    dataset.consolidate(run_compute_stats=False)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Create a LeRobot dataset")
