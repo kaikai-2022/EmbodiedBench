@@ -276,6 +276,11 @@ if __name__ == "__main__":
             if len(h5_files) >= args.max_episode:
                 logger.info(f"Task {args.task_name} has reached the maximum episode number, skip")
                 break
+            # Skip if this index already exists
+            existing_files = [f for f in h5_files if f"data_{i}." in f]
+            if existing_files:
+                logger.info(f"Index {i} already exists, skipping")
+                continue
             generate_trajectory(args, i, logger)
         except Exception as e:
             err = traceback.TracebackException.from_exception(e)

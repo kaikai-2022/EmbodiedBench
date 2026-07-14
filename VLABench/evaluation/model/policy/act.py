@@ -196,8 +196,9 @@ class ACTPolicy(Policy):
         target_euler = raw_action[3:6]
 
         # Gripper conversion: 1D signal -> 2D gripper state
+        # Training data uses [0, 0.04] range (0=closed, 0.04=open)
         gripper_signal = raw_action[6]
-        gripper_state = np.ones(2) * 0.04 if gripper_signal >= 0.5 else np.zeros(2)
+        gripper_state = np.ones(2) * 0.04 if gripper_signal >= 0.02 else np.zeros(2)
 
         self.timestep += 1
 
