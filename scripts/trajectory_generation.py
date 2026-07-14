@@ -232,6 +232,42 @@ def generate_trajectory(args, index, logger):
         
 if __name__ == "__main__":
     args = get_args()
+
+    # 动态注册 _series 后缀任务：触发 ConfigManager/Task 的 @register 装饰器
+    # 与 test_simulation_only.py 的处理逻辑一致：
+    # autogen_tasks 默认 __init__ 不会递归加载 primitive/ 子目录下的 series 文件，
+    # 因此需要在脚本入口显式 importlib 把对应文件加载进来，再注入 name2config。
+    if args.task_name.endswith("_series"):
+        import importlib.util as _ilu
+        _vlabench_root = os.environ.get("VLABENCH_ROOT") or os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), "VLABench"
+        )
+        _series_path = os.path.join(
+            _vlabench_root, "tasks", "autogen_tasks", "primitive", f"{args.task_name}.py"
+        )
+        if not os.path.exists(_series_path):
+            _series_path = os.path.join(
+                _vlabench_root, "tasks", "autogen_tasks", f"{args.task_name}.py"
+            )
+        if os.path.exists(_series_path):
+            _spec = _ilu.spec_from_file_location(args.task_name, _series_path)
+            _mod = _ilu.module_from_spec(_spec)
+            _spec.loader.exec_module(_mod)
+            _base_name = args.task_name[: -len("_series")]
+            from VLABench.configs import name2config as _n2c
+            from VLABench.utils.register import register as _register
+            import VLABench.envs as _envs_mod
+            _n2c[args.task_name] = [_base_name]
+            _envs_mod.name2config[args.task_name] = [_base_name]
+            # series 名也指向同一个 Task 类，让 load_env(series_name) 可解析
+            if _base_name in _register._tasks and args.task_name not in _register._tasks:
+                _register._tasks[args.task_name] = _register._tasks[_base_name]
+            if _base_name in _register._config_managers and args.task_name not in _register._config_managers:
+                _register._config_managers[args.task_name] = _register._config_managers[_base_name]
+            print(f"✓ 动态注册 series: {args.task_name} -> {_base_name}")
+        else:
+            print(f"[WARN] 找不到 series 文件: {args.task_name}")
+
     logger = get_logger()
     for i in tqdm(range(args.n_sample)):
         i += args.start_id

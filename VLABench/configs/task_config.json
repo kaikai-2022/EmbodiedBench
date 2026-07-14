@@ -4698,5 +4698,167 @@
         }
       ]
     }
+  },
+  "wait_beaker_place_beaker_pres_heat_device_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "small_beaker",
+          "heat_device"
+        ],
+        "unseen_object": [
+          "small_beaker",
+          "heat_device"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "add_object_place_beaker_pres_heat_device_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "small_beaker",
+          "heat_device"
+        ],
+        "unseen_object": [
+          "small_beaker",
+          "heat_device"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "wait_for_object_place_beaker_pres_heat_device_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "small_beaker",
+          "heat_device"
+        ],
+        "unseen_object": [
+          "small_beaker",
+          "heat_device"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "place_beaker_place_beaker_pres_heat_device_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "small_beaker",
+          "heat_device"
+        ],
+        "unseen_object": [
+          "small_beaker",
+          "heat_device"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "place_beaker_pres_heat_device_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "small_beaker",
+          "heat_device"
+        ],
+        "unseen_object": [
+          "small_beaker",
+          "heat_device"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
+  },
+  "pick_cylinder_mid_pour_object_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "cylinder_mid",
+          "large_beaker"
+        ],
+        "unseen_object": [
+          "cylinder_mid",
+          "large_beaker"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
   }
 }

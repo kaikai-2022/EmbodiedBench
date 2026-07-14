@@ -1,6 +1,3 @@
-import sys
-sys.path.insert(0, "/ssd/mkqin/workspace/lerobot")
-
 from lerobot.common.datasets.lerobot_dataset import LeRobotDataset
 import h5py
 import json
@@ -36,6 +33,11 @@ def create_lerobot_dataset_from_hdf5(args):
                 "shape": (480, 480, 3),
                 "names": ["height", "width", "channels"]
             },
+            "observation.second_image":{
+                "dtype": "image",
+                "shape": (480, 480, 3),
+                "names": ["height", "width", "channels"]
+            },
             "observation.wrist_image":{
                 "dtype": "image",
                 "shape": (480, 480, 3),
@@ -46,10 +48,10 @@ def create_lerobot_dataset_from_hdf5(args):
                 "shape": (7,),
                 "names": ["state"]
             },
-            "action":{
+            "actions":{
                 "dtype": "float",
                 "shape": (7,),
-                "names": ["action"]
+                "names": ["actions"]
             },
         },
         image_writer_processes=5,
@@ -86,6 +88,7 @@ def create_lerobot_dataset_from_hdf5(args):
                 ee_pos -= robot_frame_pos
                 ee_state = np.concatenate([ee_pos, ee_euler, gripper.reshape(-1, 1)], axis=1)
                 assert images.shape[0] == ee_state.shape[0] == q_state.shape[0] == actions.shape[0]
+                task_str = np.array(f["data"][timestamp]["instruction"])[0].decode("utf-8")
                 for i in range(images.shape[0]):
                     action = actions[i]
                     # Handle both 7D and 8D action formats
@@ -101,14 +104,23 @@ def create_lerobot_dataset_from_hdf5(args):
                         action = np.concatenate([action[:6], np.array([0])])
                     dataset.add_frame(
                         {
-                            "observation.image": images[i][2], # front camera
-                            "observation.wrist_image": images[i][3], # wrist camera
+                            "observation.image": images[i][2], # front camera (base_0_rgb)
+                            # NOTE: VLABench eval has 3 cameras (base + left_wrist + right_wrist),
+                            # but HDF5 trajectories only record 4 cameras (rgb[0..3]). We use the
+                            # 4th as wrist, and mirror it to second_image so pi0.5 sees 3 views.
+                            "observation.second_image": images[i][3], # left_wrist_0_rgb (same as wrist here)
+                            "observation.wrist_image": images[i][3], # right_wrist_0_rgb
                             "observation.state": ee_state[i],
-                            "action": action
+                            "actions": action,
+                            "task": task_str,
                         }
                     )
-                dataset.save_episode(task=np.array(f["data"][timestamp]["instruction"])[0].decode("utf-8"))
-    dataset.consolidate(run_compute_stats=True)
+                dataset.save_episode()
+    # LeRobot 0.1.0 不提供 consolidate()：norm_stats.json 由 openpi 的
+    # scripts/compute_norm_stats.py 单独生成，输出到
+    # $assets_base_dir/$config_name/$repo_id/norm_stats.json。
+    # 这里只 stop image writer，保证所有 mp4 flush 到磁盘。
+    dataset.stop_image_writer()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Create a LeRobot dataset")

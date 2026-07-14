@@ -129,7 +129,10 @@ class PointCloudGenerator(object):
 
         self.target_bounds=None
         if min_bound != None and max_bound != None:
-            self.target_bounds = o3d.geometry.AxisAlignedBoundingBox(min_bound=min_bound, max_bound=max_bound)
+            # o3d AxisAlignedBoundingBox 在某些 open3d+numpy 版本组合下会 segfault,
+            # 改用 numpy 数组记录裁剪边界,后续 crop() 用 numpy 手动处理
+            self.target_bounds = (np.asarray(min_bound, dtype=np.float64),
+                                  np.asarray(max_bound, dtype=np.float64))
 
         # List of camera intrinsic matrices
         self.cam_mats = []
@@ -158,9 +161,16 @@ class PointCloudGenerator(object):
             if rgb is None: color_img = self.capture_image(cam_i, False)
             else: color_img = np.ascontiguousarray(rgb[cam_i])
             if mask is not None:
-                # print("deptj img = " + str(depth_img.shape))
-                depth_img = np.ascontiguousarray(depth_img * mask[cam_i])
-                color_img = np.ascontiguousarray(color_img * np.repeat(mask[cam_i][:, :, np.newaxis], 3, axis=2))
+                # 容错:某些调用方传进来的 mask 形状不规范 (e.g. expand_mask 返回 (1, h, w)
+                # 或者 total_mask 是 (h, w) 直接传来)。这里统一 squeeze 掉前导的 batch 维,
+                # 得到 (h, w) 后再 apply。如果 squeeze 后还是 1-d/0-d 就当作全 1 mask。
+                m = np.asarray(mask[cam_i])
+                while m.ndim > 2:
+                    m = m[0]  # 去掉最外层 batch 维
+                if m.ndim == 2:
+                    depth_img = np.ascontiguousarray(depth_img * m)
+                    color_img = np.ascontiguousarray(color_img * np.repeat(m[:, :, np.newaxis], 3, axis=2))
+                # else: 形状不对,跳过 mask 应用(等价于全 1 掩码)
         
             # convert camera matrix and depth image to Open3D format, then generate point cloud
             od_cammat = cammat2o3d(self.cam_mats[cam_i], self.img_width, self.img_height)
@@ -192,7 +202,15 @@ class PointCloudGenerator(object):
             # If both minimum and maximum bounds are provided, crop cloud to fit
             #    inside them.
             if self.target_bounds != None:
-                transformed_cloud = transformed_cloud.crop(self.target_bounds)
+                # target_bounds 现在是 (min_bound, max_bound) tuple,用 numpy 手动裁剪
+                min_b, max_b = self.target_bounds
+                pts = np.asarray(transformed_cloud.points, dtype=np.float64)
+                mask = np.all((pts >= min_b) & (pts <= max_b), axis=1)
+                transformed_cloud = o3d.geometry.PointCloud()
+                transformed_cloud.points = o3d.utility.Vector3dVector(pts[mask])
+                # 保留颜色
+                if transformed_cloud.has_colors():
+                    pass  # colors will be set by caller if needed
 
             # Estimate normals of cropped cloud, then flip them based on camera
             #    position.

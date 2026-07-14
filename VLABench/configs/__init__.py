@@ -33,6 +33,7 @@ name2config = {
     "lift_beaker_series":["lift_beaker"],
     "lift_flask_series":["lift_flask"],
     "lift_beaker_series":["lift_beaker"],
+    "place_beaker_pres_heat_device_series":["place_beaker_pres_heat_device"],
     "pick_stir_series":["pick_stir"],
     "wait_for_object_lift_beaker_series":["wait_for_object_lift_beaker"],
     "pick_up_small_beaker_series":["pick_up_small_beaker"],

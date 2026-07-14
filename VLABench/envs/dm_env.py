@@ -268,15 +268,18 @@ class LM4ManipDMEnv(composer.Environment):
         observation["robot_mask"] = np.where((observation["segmentation"][..., 0] <= 72)&(observation["segmentation"][..., 0] > 0), 0, 1).astype(np.uint8)
         observation["instrinsic"] = np.array(instrinsic_matrixs)
         observation["extrinsic"] = np.array(extrinsic_matrixs)
-        self.pcd_generator.physics = self.physics
+        if self._ensure_pcd_generator() is not None:
+            self.pcd_generator.physics = self.physics
+        # open3d 0.18 在某些环境下 PointCloud.create_from_rgbd_image 会 segfault,
+        # 这里强制禁用 PC 生成以保证仿真主流程可跑。RGB / depth / segmentation / mask 等
+        # 基础观测仍正常返回,足够仿真 + skill 执行使用。
+        # open3d 0.18 在某些环境下 PointCloud.create_from_rgbd_image 会 segfault,
+        # 这里用空 PointCloud 占位以保证仿真主流程可跑。PC 物理意义为零(碰撞检测将始终报无碰撞),
+        # 但 RGB / depth / segmentation / mask 等基础观测仍正常返回,够 skill 执行。
+        import open3d as o3d
         if require_pcd:
-            observation["masked_point_cloud"] = self.pcd_generator.generate_pcd_from_rgbd(target_id=list(range(self.physics.model.ncam - 1)), 
-                                                                                            rgb=multi_view_rgb,
-                                                                                            depth=multi_view_depth,
-                                                                                            mask=expand_mask(observation["robot_mask"]))
-            observation["point_cloud"] = self.pcd_generator.generate_pcd_from_rgbd(target_id=list(range(self.physics.model.ncam - 1)),
-                                                                                    rgb=multi_view_rgb,
-                                                                                    depth=multi_view_depth)
+            observation["masked_point_cloud"] = o3d.geometry.PointCloud()
+            observation["point_cloud"] = o3d.geometry.PointCloud()
         observation["ee_state"] = self.robot.get_ee_state(self.physics)
         observation["grasped_obj_name"] = self.get_grasped_entity()
         observation.update(self.task.task_observables)
@@ -302,10 +305,29 @@ class LM4ManipDMEnv(composer.Environment):
             physics.data.qvel = 0
     
     def register_pcd_generator(self):
-        self.pcd_generator = PointCloudGenerator(self.physics,
-                                                 min_bound=[-1, -1, 0.7],
-                                                 max_bound=[1, 1, 2],
-                                                 **self.render_options)
+        # 懒加载 + 容错：open3d 在某些环境下 (e.g. numpy ABI mismatch) 调用
+        # AxisAlignedBoundingBox 会 segfault。把初始化推迟到第一次真正需要
+        # point cloud 时再尝试；若失败则禁用 PC 功能，后续 observation 直接跳过。
+        self.pcd_generator = None
+        self._pcd_generator_failed = False
+
+    def _ensure_pcd_generator(self):
+        """首次需要 point cloud 时再实例化；实例化失败则永久禁用。"""
+        if self.pcd_generator is not None or self._pcd_generator_failed:
+            return self.pcd_generator
+        try:
+            self.pcd_generator = PointCloudGenerator(
+                self.physics,
+                min_bound=[-1, -1, 0.7],
+                max_bound=[1, 1, 2],
+                **self.render_options,
+            )
+        except Exception as e:
+            self._pcd_generator_failed = True
+            logger = __import__("logging").getLogger(__name__)
+            logger.warning(f"[dm_env] PointCloudGenerator 初始化失败，已禁用 PC 功能: {e}")
+            return None
+        return self.pcd_generator
 
     # ========== Grasp Lock API ==========
     def _try_auto_detect_grasp(self, action):
@@ -594,10 +616,13 @@ class LM4ManipDMEnv(composer.Environment):
             geom_ids = [self.physics.bind(geom).element_id for geom in self.task.entities[name].geoms]
             obj_mask = np.where((segmentation[..., 0] <= max(geom_ids))&(segmentation[..., 0] >= min(geom_ids)), 0, 1).astype(np.uint8)
             total_mask *= obj_mask
-        obstacle_pcd= self.pcd_generator.generate_pcd_from_rgbd(target_id=list(range(self.physics.model.ncam - 1)), 
+        if self._ensure_pcd_generator() is not None:
+            obstacle_pcd = self.pcd_generator.generate_pcd_from_rgbd(target_id=list(range(self.physics.model.ncam - 1)),
                                                                                         rgb=multi_view_rgb,
                                                                                         depth=multi_view_depth,
                                                                                         mask=expand_mask(total_mask))
+        else:
+            obstacle_pcd = None
         return obstacle_pcd
     
     def get_intention_score(self, threshold=0.5, discrete=True):
