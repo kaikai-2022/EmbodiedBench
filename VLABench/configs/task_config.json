@@ -4860,5 +4860,30 @@
         }
       ]
     }
+  },
+  "shake_cylinder_small_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "cylinder_small"
+        ],
+        "unseen_object": [
+          "cylinder_small"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
   }
 }
