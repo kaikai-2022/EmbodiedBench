@@ -358,5 +358,10 @@
     "spec": "heat_device",
     "source_type": "local",
     "is_physical": true
+  },
+  "stirring_rod": {
+    "spec": "stirring_rod",
+    "source_type": "objaverse",
+    "is_physical": true
   }
 }

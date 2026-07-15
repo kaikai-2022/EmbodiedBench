@@ -35,7 +35,7 @@
       <geom mesh="cylinder_mid_collision_6"  class="collision"/>
       <geom mesh="cylinder_mid_collision_7"  class="collision"/>
       <geom mesh="cylinder_mid_collision_8"  class="collision"/>
-      <site class="grasppoint" pos="0.0000 0.0000 0.171"/>
+      <site class="grasppoint" pos="0.0000 0.0000 0.165"/>
           <geom name="solution" type="cylinder" size="0.0113 0.050012" pos="0 0 0.053524" material="CaSO4" class="visual"/>
       <site name="top_site" pos="0 0 0.180000" size="0.01" rgba="1 0 0 0"/>
       <site name="bottom_site" pos="0 0 0.000000" size="0.01" rgba="0 1 0 0"/>
@@ -47,7 +47,7 @@
       <geom group="2" type="mesh" contype="0" conaffinity="0" density="50"/>
     </default>
     <default class="collision">
-      <geom group="3" type="mesh" density="50" friction="1 1 0.001" solimp="0.998 0.998 0.001" solref="0.001 2"/>
+      <geom group="3" type="mesh" density="50" friction="1 1 0.001" solimp="0.999 0.999 0.001" solref="0.001 2"/>
     </default>
     <default class="grasppoint">
       <site type="sphere" size="0.005" group="4" rgba="0 0 1 1"/>

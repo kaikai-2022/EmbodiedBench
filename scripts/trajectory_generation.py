@@ -58,9 +58,9 @@ def generate_trajectory(args, index, logger):
     env = load_env(args.task_name, robot=args.robot, eval=args.eval_unseen)
     print(f"[TIMING] load_env 完成, 耗时 {time.time()-t1:.1f}s")
 
-    # Enable grasp lock for better object manipulation
-    env.enable_grasp_lock()
-    print(f"[DEBUG] 已启用 grasp_lock 模式")
+    # Disable grasp lock for normal physics simulation
+    env.disable_grasp_lock()
+    print(f"[DEBUG] 已禁用 grasp_lock 模式")
 
     t1 = time.time()
     env.reset()

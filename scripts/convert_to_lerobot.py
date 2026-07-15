@@ -103,19 +103,7 @@ def create_lerobot_dataset_from_hdf5(args):
                 task_str = np.array(f["data"][timestamp]["instruction"])[0].decode("utf-8")
                 for i in range(images.shape[0]):
                     action = actions[i]
-                    # Handle both 7D and 8D action formats
-                    # 8D: [pos3, euler3, gripper1, gripper2] (VLABench format)
-                    # 7D: [pos3, euler3, gripper1] (LeRobot format)
-                    if len(action) == 8:
-                        # Average both gripper values for robust representation
-                        # This ensures consistent behavior even if gripper1 and gripper2 differ slightly
-                        avg_gripper = (action[6] + action[7]) / 2
-                        action = np.concatenate([action[:6], np.array([avg_gripper])])
-                    # Convert gripper to binary (open/close)
-                    # NOTE: With grasp_lock enabled, _lock_gripper_state is set to actual
-                    # finger qpos (e.g., 0.03 for beaker radius) instead of 0.0.
-                    # Use threshold >= 0.039 to correctly distinguish open (0.04) from closed/locked (< 0.039).
-                    if action[-1] >= 0.039:
+                    if actions[i][-1] > 0.03:
                         action = np.concatenate([action[:6], np.array([1])])
                     else:
                         action = np.concatenate([action[:6], np.array([0])])
