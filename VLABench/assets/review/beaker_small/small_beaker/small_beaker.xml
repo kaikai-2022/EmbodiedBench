@@ -77,6 +77,24 @@
       <geom mesh="small_beaker_collision_21" class="collision"/>
       <geom mesh="small_beaker_collision_22" class="collision"/>
       <site class="grasppoint" pos="0.0000 0.0000 0.0650"/>
+      <!-- Anti-slip grip walls: 4 thin flat boxes forming a square cross-section matching beaker diameter.
+           Square inscribed in beaker's octagonal cross-section (circumscribed diameter = 0.061m).
+           Each wall: width=circumscribed_diameter, thickness=0.001m, height=beaker_height.
+           collision box: contype=3 conaffinity=3 (bit0=visual+bit1=collision_isolation). -->
+      <!-- Four walls form a square enclosure (inner span = beaker diameter 0.061m).
+           size is half-extent: wall half-thickness=0.0305 (extends ±0.0305 from center).
+           X-walls: vertical plates in YZ plane, size=(0.0305, 0.001, 0.0446), pos=±0.0305 along X.
+           Y-walls: vertical plates in XZ plane, size=(0.001, 0.0305, 0.0446), pos=±0.0305 along Y. -->
+      <!-- Visual boxes (contype=0 conaffinity=0 → rgba renders fully). -->
+      <geom name="grip_wall_xp_v" type="box" size="0.0305 0.001 0.0446" pos="0 0.0305 0.0446" contype="0" conaffinity="0" group="2" rgba="1 0 0 0.8"/>
+      <geom name="grip_wall_xn_v" type="box" size="0.0305 0.001 0.0446" pos="0 -0.0305 0.0446" contype="0" conaffinity="0" group="2" rgba="1 0 0 0.8"/>
+      <geom name="grip_wall_yp_v" type="box" size="0.001 0.0305 0.0446" pos="0.0305 0 0.0446" contype="0" conaffinity="0" group="2" rgba="1 0 0 0.8"/>
+      <geom name="grip_wall_yn_v" type="box" size="0.001 0.0305 0.0446" pos="-0.0305 0 0.0446" contype="0" conaffinity="0" group="2" rgba="1 0 0 0.8"/>
+      <!-- Collision boxes: only collide with gripper pads (contype=3 conaffinity=3). -->
+      <geom name="grip_wall_xp" type="box" size="0.0305 0.001 0.0446" pos="0.0305 0 0.0446" contype="3" conaffinity="2" group="3" friction="4 4 0.1" density="50" solref="0.001 1"/>
+      <geom name="grip_wall_xn" type="box" size="0.0305 0.001 0.0446" pos="-0.0305 0 0.0446" contype="3" conaffinity="2" group="3" friction="4 4 0.1" density="50" solref="0.001 1"/>
+      <geom name="grip_wall_yp" type="box" size="0.001 0.0305 0.0446" pos="0 0.0305 0.0446" contype="3" conaffinity="2" group="3" friction="4 4 0.1" density="50" solref="0.001 1"/>
+      <geom name="grip_wall_yn" type="box" size="0.001 0.0305 0.0446" pos="0 -0.0305 0.0446" contype="3" conaffinity="2" group="3" friction="4 4 0.1" density="50" solref="0.001 1"/>
       <geom name="solution" type="cylinder" size="0.0305 0.0225" pos="-0.001494 -0.000163 0.0225" material="CaSO4" class="visual"/>
       <site name="top_site" pos="0 0 0.0892" size="0.01" rgba="1 0 0 0"/>
       <site name="bottom_site" pos="0 0 0.000000" size="0.01" rgba="0 1 0 0"/>

@@ -99,9 +99,15 @@ def create_lerobot_dataset_from_hdf5(args):
                 # transform ee_state to robot frame
                 ee_pos -= robot_frame_pos
                 ee_state = np.concatenate([ee_pos, ee_euler, gripper.reshape(-1, 1)], axis=1)
-                assert images.shape[0] == ee_state.shape[0] == q_state.shape[0] == actions.shape[0]
+                # Handle shape mismatch: images may have 1 more frame than actions
+                # Use the minimum length to align all arrays
+                min_len = min(images.shape[0], ee_state.shape[0], q_state.shape[0], actions.shape[0])
+                images = images[:min_len]
+                ee_state = ee_state[:min_len]
+                q_state = q_state[:min_len]
+                actions = actions[:min_len]
                 task_str = np.array(f["data"][timestamp]["instruction"])[0].decode("utf-8")
-                for i in range(images.shape[0]):
+                for i in range(min_len):
                     action = actions[i]
                     if actions[i][-1] > 0.03:
                         action = np.concatenate([action[:6], np.array([1])])
