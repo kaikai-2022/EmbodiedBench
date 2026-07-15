@@ -98,7 +98,7 @@
       <site class="grasppoint" pos="0.0000 0.0000 0.0900"/>
       <site class="grasppoint" pos="0.0000 0.0000 0.1200"/>
       <site class="grasppoint" pos="0.0000 0.0000 0.1425"/>
-      <geom name="solution" type="cylinder" size="0.055 0.0375" pos="-0.002484 0 0.0405" material="CaSO4" class="visual"/>
+      <geom name="solution" type="cylinder" size="0.055 0.0275" pos="-0.002484 0 0.0405" material="CaSO4" class="visual"/>
       <site name="top_site" pos="0 0 0.1260" size="0.01" rgba="1 0 0 0"/>
       <site name="bottom_site" pos="0 0 0.000000" size="0.01" rgba="0 1 0 0"/>
     </body>

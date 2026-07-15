@@ -30,7 +30,7 @@ class PlaceSmallBeakerPresHotDeviceConfigManager(BenchTaskConfigManager):
             position=[random.uniform(-0.0, 0.0), random.uniform(0.15, 0.2), 0.8],
         )
         obj_config["class"] = "HeatDevice"
-        obj_config["randomness"] = dict(pos=[0.02, 0.02, 0], quat=[0, 0, 0.05])
+        obj_config["randomness"] = dict(pos=[0.02, 0.02, 0], quat=[0, 0, 0.15])
         self.config["task"]["components"].append(obj_config)
 
         self.target_entity = "small_beaker_0"
