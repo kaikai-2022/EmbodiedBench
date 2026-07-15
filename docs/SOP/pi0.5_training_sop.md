@@ -120,7 +120,8 @@ f["data/<timestamp>"]/{
 **关键 schema 约束**：
 - `actions` 列名是**复数**（lerobot 0.1.0 openpi 默认 `action_sequence_keys=("actions",)`）
 - 所有 feature key 用 **`.` 分隔**（lerobot 0.1.0 禁用 `/`）
-- `action` 第 7 维 = `>0.03` → `1` (open)，否则 `0` (close)
+- `action` 第 7 维 = `>=0.039` → `1` (open)，否则 `0` (close/grasped)
+  - **注意**：使用 `>= 0.039` 而不是 `> 0.03`，因为 grasp_lock 机制会将抓取时的 gripper 锁定在物体宽度（如 beaker ≈ 0.0356），而不是 0.0
 
 ### 3.3 pi0.5 内部 schema（transforms 之后）
 

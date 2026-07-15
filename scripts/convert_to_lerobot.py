@@ -65,10 +65,20 @@ def create_lerobot_dataset_from_hdf5(args):
     print("Task to process:", tasks)
     h5py_files = list()
     for task in tasks:
-        h5py_files.extend(get_all_hdf5_files(os.path.join(args.dataset_path, task))[:args.max_files])
-    print("File numbers:", len(h5py_files))
+        all_files = get_all_hdf5_files(os.path.join(args.dataset_path, task))
+        # Skip first skip_files, then take max_files
+        files_to_use = all_files[args.skip_files:args.skip_files + args.max_files]
+        h5py_files.extend(files_to_use)
+    print(f"Using files {args.skip_files} to {args.skip_files + len(h5py_files)-1} (total: {len(h5py_files)})")
+    skipped = 0
     for file in h5py_files:
-        with h5py.File(file, "r") as f:
+        try:
+            f = h5py.File(file, "r")
+        except (OSError, Exception) as e:
+            print(f"  WARNING: Skipping corrupted file: {file} ({e})")
+            skipped += 1
+            continue
+        with f:
             for timestamp in f["data"].keys():
                 # Skip flag
                 skip_episode = False
@@ -128,12 +138,15 @@ def create_lerobot_dataset_from_hdf5(args):
     # $assets_base_dir/$config_name/$repo_id/norm_stats.json。
     # 这里只 stop image writer，保证所有 mp4 flush 到磁盘。
     dataset.stop_image_writer()
+    if skipped > 0:
+        print(f"Conversion complete. Skipped {skipped} corrupted files.")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Create a LeRobot dataset")
     parser.add_argument("--dataset-name", type=str, default="test", help="Name of the dataset")
     parser.add_argument("--dataset-path", type=str, default="/media/shiduo/LENOVO_USB_HDD/dataset/VLABench/select_billiards", help="Path to the dataset")
     parser.add_argument("--max-files", type=int, default=500, help="Maximum number of files to process")
+    parser.add_argument("--skip-files", type=int, default=0, help="Number of files to skip from the beginning")
     parser.add_argument("--task-list", type=str, nargs="+", default=None, help="List of tasks to process")
     args = parser.parse_args()
 
