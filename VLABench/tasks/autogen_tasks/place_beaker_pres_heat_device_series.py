@@ -23,7 +23,7 @@ class PlaceBeakerPresHeatDeviceConfigManager(BenchTaskConfigManager):
             solution_rgba=[0, 0.45, 1, 0.4],
         )
         obj_config["class"] = "ChemistryBeaker"
-        obj_config["randomness"] = dict(pos=[0.02, 0.02, 0], quat=[0, 0, 3.14])
+        obj_config["randomness"] = dict(pos=[0.02, 0.02, 0], quat=[0, 0, 0])
         self.config["task"]["components"].append(obj_config)
 
         obj_config = dict(

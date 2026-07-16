@@ -90,6 +90,33 @@ def replay_trajectory(hdf5_path, save_video=False, save_dir=None):
         task_name = os.path.basename(os.path.dirname(hdf5_path))
     print(f"  - Task name: {task_name}")
 
+    # 动态导入 series 任务（与 trajectory_generation.py 一致）
+    if task_name.endswith("_series"):
+        import importlib.util as _ilu
+        _vlabench_root = os.environ.get("VLABENCH_ROOT") or os.path.join(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "VLABench"
+        )
+        _series_path = os.path.join(
+            _vlabench_root, "tasks", "autogen_tasks", "primitive", f"{task_name}.py"
+        )
+        if not os.path.exists(_series_path):
+            _series_path = os.path.join(
+                _vlabench_root, "tasks", "autogen_tasks", f"{task_name}.py"
+            )
+        if os.path.exists(_series_path):
+            print(f"  - Importing series task from: {_series_path}")
+            _spec = _ilu.spec_from_file_location(task_name, _series_path)
+            _mod = _ilu.module_from_spec(_spec)
+            _spec.loader.exec_module(_mod)
+            # 去掉 _series 后缀
+            base_name = task_name[:-len("_series")]
+            task_name = base_name
+            print(f"  - Using base task name: {task_name}")
+        else:
+            print(f"  - WARNING: Series file not found, trying: {task_name}")
+    else:
+        print(f"  - Task name: {task_name}")
+
     # 创建环境（使用相同的 episode config）
     print(f"\n[2/4] Creating environment...")
 

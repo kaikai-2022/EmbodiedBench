@@ -50,6 +50,7 @@ name2config = {
     "place_beaker_on_the_mat_series":["place_beaker_on_the_mat"],
     "place_flask_on_the_mat_series":["place_flask_on_the_mat"],
     "pour_beaker_series":["pour_beaker"],
+    "pick_cylinder_mid_pour_object_series":["pick_cylinder_mid_pour_object"],
     "pick_funnel":["pick_funnel"],
     "two_tube_pour_stir_series":["two_tube_pour_stir"],
 }

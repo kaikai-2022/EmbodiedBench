@@ -4937,5 +4937,32 @@
         }
       ]
     }
+  },
+  "pick_flask_pour_object_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "flask",
+          "large_beaker"
+        ],
+        "unseen_object": [
+          "flask",
+          "large_beaker"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
   }
 }

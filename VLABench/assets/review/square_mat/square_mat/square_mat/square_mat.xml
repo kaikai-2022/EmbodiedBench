@@ -17,7 +17,7 @@
       <site class="keypoint" pos="0.0750 0.0750 0.0000"/>
       <site class="keypoint" pos="-0.0750 0.0750 0.0000"/>
       <site class="keypoint" pos="0.0750 -0.0750 0.0000"/>
-      <site class="placepoint" pos="0.0000 0.0000 0.0300"/>
+      <site class="placepoint" pos="0.0000 0.0000 0.04500"/>
 </body>
   </worldbody>
   <compiler boundmass="0.015" boundinertia="1e-05" angle="radian"/>
