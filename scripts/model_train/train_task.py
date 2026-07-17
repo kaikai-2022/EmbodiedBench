@@ -81,8 +81,10 @@ class TrajectoryGenMonitor(ProgressMonitor):
         task_dir = f"{PROJECT_ROOT}/dataset/training_data/{self.series_name}"
         if not os.path.exists(task_dir):
             return
-        files = [f for f in os.listdir(task_dir) if f.endswith(".hdf5")]
-        count = len(files)
+        # 递归查找所有 .hdf5 文件（支持嵌套目录结构）
+        count = 0
+        for root, dirs, files in os.walk(task_dir):
+            count += sum(1 for f in files if f.endswith(".hdf5"))
         elapsed = time.time() - self.start_time if self.start_time else 0
         rate = count / elapsed if elapsed > 0 else 0
         remaining = self.num_target - count
