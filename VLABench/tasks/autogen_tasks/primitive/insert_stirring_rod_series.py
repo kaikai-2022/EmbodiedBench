@@ -53,7 +53,7 @@ class InsertStirringRodTask(PrimitiveTask):
     def get_expert_skill_sequence(self, physics):
         skill_sequence = [
             partial(SkillLib.pick, target_entity_name="glass_stirring_rod_0", prior_eulers=[[-3.141592653589793, 0, 0]]),
-            partial(SkillLib.lift, lift_height=0.35),
+            partial(SkillLib.lift, lift_height=0.2),
             partial(SkillLib.place, target_container_name="large_beaker_0"),
         ]
         return skill_sequence

@@ -22,9 +22,9 @@
       <!-- Anti-slip box: width=0.013m, height=0.04m, top at flask mouth (z=0.2).
            contype=2 conaffinity=2: ONLY collide with finger pads (pad contype=2, conaffinity=3). -->
       <!-- <geom name="grip_assist_visual" type="box" rgba="1 0 0 0.4" size="0.026 0.026 0.03" pos="0 0 0.17" class="visual"/> -->
-      <geom name="grip_assist" type="box" size="0.026 0.026 0.03" pos="0 0 0.17"
+      <!-- <geom name="grip_assist" type="box" size="0.026 0.026 0.03" pos="0 0 0.17"
             contype="2" conaffinity="2" group="3" friction="4 4 0.1"
-            density="50" solref="0.001 2"/>
+            density="50" solref="0.001 2"/> -->
           <geom name="solution" type="cylinder" size="0.0569 0.0130" pos="0 0 0.0180" material="CaSO4" class="visual"/>
       <site name="top_site" pos="0 0 0.2000" size="0.01" rgba="1 0 0 0"/>
       <site name="bottom_site" pos="0 0 0.000000" size="0.01" rgba="0 1 0 0"/>

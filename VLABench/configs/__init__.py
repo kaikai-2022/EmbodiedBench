@@ -47,6 +47,7 @@ name2config = {
     "unscrew_asprin_pill_bottle_series":["unscrew_asprin_pill_bottle"],
     "pour_tube_insert_tube_series":["pour_tube_insert_tube"],
     "stir_beaker_series":["stir_beaker"],
+    "unscrew_bottle_series":["unscrew_bottle"],
     "place_beaker_on_the_mat_series":["place_beaker_on_the_mat"],
     "place_flask_on_the_mat_series":["place_flask_on_the_mat"],
     "pour_beaker_series":["pour_beaker"],
