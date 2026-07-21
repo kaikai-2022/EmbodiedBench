@@ -18,7 +18,7 @@ class OpenDrawerConfigManager(BenchTaskConfigManager):
         obj_config = dict(
             name="drawer_0",
             xml_path=name2class_xml["drawer"][-1],
-            position=[0, 0.45, 0.8],
+            position=[random.uniform(-0.05, 0.05), random.uniform(0.48, 0.52), 0.8],
         )
         obj_config["class"] = "ContainerWithDrawer"
         obj_config["attach_to_arena"] = True

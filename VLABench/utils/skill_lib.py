@@ -1547,15 +1547,20 @@ class SkillLib:
         return observations, waypoints, True, False  # Don't return task_success, let loop continue
 
     @staticmethod
-    def shake(env, n_shakes=3, shake_angle=0.5, steps_per_swing=5, gripper_state=None):
+    def shake(env, n_shakes=3, shake_angle=0.5, steps_per_swing=5,
+              gripper_state=None, max_n_substep=10, pos_tolerance=0.005):
         """
         摇晃操作：在当前位置保持不动，通过快速交替偏转末端姿态实现摇摆。
+
+        优化版本：每步用当前真实位置重新解算IK，严格控制位置偏差。
 
         参数：
             n_shakes: 摇摆次数（一次 = 正→负 完整往返）
             shake_angle: 摇摆幅度（弧度），默认0.5（约30度）
             steps_per_swing: 每段摇摆的插值步数，默认5
             gripper_state: 夹爪状态，默认保持当前状态
+            max_n_substep: 每个姿态点的最大执行步数，默认10
+            pos_tolerance: 位置容差（米），默认5mm
         """
         start_pos = np.array(env.robot.get_end_effector_pos(env.physics))
         start_quat = np.array(env.robot.get_end_effector_quat(env.physics))
@@ -1585,24 +1590,52 @@ class SkillLib:
 
         current_quat = start_quat
         for target_quat in shake_targets:
-            # 手动生成插值点（interpolate_path 对 distance=0 只返回1个点）
-            interp_positions = []
-            interp_quats = []
             for t in np.linspace(0, 1, steps_per_swing, endpoint=True):
-                interp_positions.append(start_pos.copy())
-                interp_quats.append(qauternion_slerp(current_quat, target_quat, t))
+                interp_quat = qauternion_slerp(current_quat, target_quat, t)
 
-            obs, new_waypoints, stage_success, ts = SkillLib.step_trajectory(
-                env, interp_positions, interp_quats, gripper_state
-            )
-            observations.extend(obs)
-            waypoints.extend(new_waypoints)
+                # 用当前真实位置（而不是预设的start_pos）解算IK
+                current_actual_pos = np.array(env.robot.get_end_effector_pos(env.physics))
 
-            if ts:
-                task_success = True
-                break
+                success, target_qpos = env.robot.get_qpos_from_ee_pos(
+                    env.physics, current_actual_pos, interp_quat
+                )
+
+                if not success:
+                    continue
+
+                action = np.concatenate([target_qpos, gripper_state])
+
+                # 多次substep执行，直到位置+qpos都收敛
+                for substep in range(max_n_substep):
+                    timestep = env.step(action)
+                    if timestep.last():
+                        task_success = True
+                        break
+
+                    actual_pos = np.array(env.robot.get_end_effector_pos(env.physics))
+                    pos_err = np.linalg.norm(actual_pos - current_actual_pos)
+
+                    current_qpos = np.array(env.robot.get_qpos(env.physics)).reshape(-1)
+                    qpos_err = np.max(np.abs(current_qpos - target_qpos))
+
+                    if pos_err < pos_tolerance and qpos_err < 0.02:
+                        break
+
+                obs = env.get_observation()
+                waypoint = np.concatenate([
+                    env.robot.get_end_effector_pos(env.physics),
+                    quaternion_to_euler(env.robot.get_end_effector_quat(env.physics)),
+                    gripper_state
+                ])
+                observations.append(obs)
+                waypoints.append(waypoint)
+
+                if task_success:
+                    break
 
             current_quat = target_quat
+            if task_success:
+                break
 
         observations.pop(-1)
         assert len(observations) == len(waypoints), \
@@ -1730,7 +1763,7 @@ class SkillLib:
         return observations, waypoints, True, task_success
 
     @staticmethod
-    def stir_entity_with_tool(env, target_container_name, stir_radius=0.01, stir_duration=5, insert_ratio=2/3):
+    def stir_entity_with_tool(env, target_container_name, stir_radius=0.01, stir_duration=2, insert_ratio=2/3):
         """
         使用搅拌工具搅动容器内的液体。
 

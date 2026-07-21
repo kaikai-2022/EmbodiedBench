@@ -953,26 +953,27 @@ class ShakeCondition(Condition):
 @register.add_condition("stir")
 class StirCondition(Condition):
     """
-    搅拌成功判定：搅拌工具插入容器后，累积 XY 方向运动距离达标且未与容器壁发生硬碰撞。
+    搅拌成功判定：搅拌工具插入容器后，累积 XY 方向运动距离达标且插入深度满足要求。
 
     判定流程（每个 simulation step 调用一次 is_met）：
     1. 检查工具是否被握住，未被握住则直接失败
     2. 获取工具 tip 位置（优先 bottom_site，退化为 geom 均值或 worldbody xpos）
     3. 插入验证：tip 必须在容器 AABB 内（通过 container.contain()），否则失败
-    4. 累积 XY 方向路径长度（只统计 X、Y 平面位移，忽略 Z 轴垂直下降/上升）
-    5. 扫描 contacts，工具与容器壁接触时记录软警告（_collision_warnings[name] = True）
+    4. 深度验证：工具最低点必须低于容器上1/3位点的高度值
+    5. 累积 XY 方向路径长度（只统计 X、Y 平面位移，忽略 Z 轴垂直下降/上升）
+    6. 扫描 contacts，工具与容器壁接触时记录软警告（_collision_warnings[name] = True）
        但不阻止成功判定，最终评分时可查阅
-    6. 累积距离 >= min_distance 时锁存成功
+    7. 累积距离 >= min_distance 时锁存成功
 
     params:
         entities: 要检查的搅拌工具实体列表（通常为玻璃棒）
         container: 目标容器（如烧杯），用于插入验证和碰撞检测
         robot: 机器人对象（用于检查抓取状态）
-        min_distance: 累积 XY 运动距离阈值（m），默认 0.15
+        min_distance: 累积 XY 运动距离阈值（m），默认 0.05
         tool_tip_site: 工具上用于读取位置的 site 名称，默认 "bottom_site"
     """
     def __init__(self, entities, container, robot,
-                 min_distance=0.15, tool_tip_site="bottom_site"):
+                 min_distance=0.05, tool_tip_site="bottom_site"):
         super().__init__()
         self.entities = entities
         self.container = container
@@ -1048,17 +1049,51 @@ class StirCondition(Condition):
                     name = entity.name if hasattr(entity, 'name') else str(id(entity))
                     self._collision_warnings[name] = True
 
-        # 3. 逐个工具更新距离并判断
+        # 3. 获取容器上1/3位点的高度值（从顶部往下量1/3）
+        top_site = self.container.mjcf_model.find("site", "top_site")
+        bottom_site = self.container.mjcf_model.find("site", "bottom_site")
+        if top_site is not None and bottom_site is not None:
+            top_z = physics.bind(top_site).xpos[2]
+            bottom_z = physics.bind(bottom_site).xpos[2]
+            one_third_z = top_z - (top_z - bottom_z) / 3.0  # 上1/3位点的高度
+        else:
+            # Fallback: 使用 worldbody xpos 或 place_point 估算
+            container_xpos = physics.bind(self.container.mjcf_model.worldbody).xpos
+            place_points = self.container.get_place_point(physics)
+            if place_points:
+                place_point = np.array(place_points[0]) if isinstance(place_points, list) else np.array(place_points)
+                one_third_z = container_xpos[2] + 0.04  # 简单估算
+            else:
+                one_third_z = container_xpos[2] + 0.04
+
+        # 4. 逐个工具更新距离并判断
         all_passed = True
+        fail_reason = None
         for entity in self.entities:
             name = entity.name if hasattr(entity, 'name') else str(id(entity))
-            if not entity.is_grasped(physics, self.robot):
+
+            # 检查抓取状态
+            is_grasped = entity.is_grasped(physics, self.robot)
+            if not is_grasped:
+                print(f"[DEBUG StirCondition] ✗ {name} 未被握住")
+                fail_reason = "未握住工具"
                 return False
 
             tip = self._get_tool_tip_pos(entity, physics)
 
             # 插入验证：tip 必须在容器 AABB 内
-            if not self.container.contain(tip, physics):
+            contain_result = self.container.contain(tip, physics)
+            if not contain_result:
+                print(f"[DEBUG StirCondition] ✗ {name} tip 位置 {tip} 不在容器内")
+                fail_reason = "工具未插入容器"
+                return False
+
+            # 深度验证：工具最低点必须低于容器上1/3位点的高度
+            depth_ok = tip[2] < one_third_z
+            print(f"[DEBUG StirCondition] {name}: tip_z={tip[2]:.4f}, one_third_z={one_third_z:.4f}, depth_ok={depth_ok}")
+            if not depth_ok:
+                print(f"[DEBUG StirCondition] ✗ {name} 插入深度不足，tip_z={tip[2]:.4f} >= one_third_z={one_third_z:.4f}")
+                fail_reason = "插入深度不足"
                 return False
 
             # 累积 XY 方向路径长度（忽略 Z 轴垂直位移）
@@ -1068,11 +1103,15 @@ class StirCondition(Condition):
                                               + float(xy_distance)
             self._last_tip_pos[name] = tip
 
-            if self._cumulative_distance[name] < self.min_distance:
+            dist_ok = self._cumulative_distance[name] >= self.min_distance
+            print(f"[DEBUG StirCondition] {name}: 累计距离={self._cumulative_distance[name]:.4f}, 阈值={self.min_distance:.4f}, dist_ok={dist_ok}")
+
+            if not dist_ok:
                 all_passed = False
 
         if all_passed:
             self._met = True
+            print(f"[DEBUG StirCondition] ✓ 所有条件满足，搅拌成功!")
         return self._met
 
     def met_progress(self, physics):
