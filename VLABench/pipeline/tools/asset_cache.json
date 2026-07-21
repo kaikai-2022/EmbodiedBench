@@ -363,5 +363,10 @@
     "spec": "stirring_rod",
     "source_type": "objaverse",
     "is_physical": true
+  },
+  "cylinder": {
+    "spec": "cylinder_mid",
+    "source_type": "local",
+    "is_physical": true
   }
 }

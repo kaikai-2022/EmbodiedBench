@@ -23,7 +23,7 @@ set -e
 
 # 默认值
 GPU_LIST="0,1,2,3,4,5,6,7"
-SAMPLES_PER_GPU=10
+SAMPLES_PER_GPU=40
 MAX_EPISODE=1000
 
 # 解析参数
@@ -60,10 +60,12 @@ fi
 
 SERIES_NAME="${TASK_NAME}_series"
 PROJECT_ROOT="/ssd/qinmaokai/workspace/SciVLABench"
+# SAVE_DIR 只到 series 这一层：trajectory_generation.py 内部会拼上 task_name
+# (=SERIES_NAME)，最终落到 ${SERIES_NAME}/。convert_to_lerobot.py 也是按
+# series_name 作为 task-list 直接 os.walk 这一层，与下面 TASK_DIR 对齐。
 SAVE_DIR="$PROJECT_ROOT/dataset/training_data/${SERIES_NAME}"
 LOG_DIR="$PROJECT_ROOT/logs/traj_gen/${SERIES_NAME}"
-# 关键修复: trajectory_generation.py 的 task_dir = save_dir/task_name (多一层)
-TASK_DIR="$SAVE_DIR/${TASK_NAME}/${TASK_NAME}"
+TASK_DIR="$SAVE_DIR"
 
 # 解析 GPU 列表为数组
 IFS=',' read -ra GPUS <<< "$GPU_LIST"

@@ -9,6 +9,7 @@ from VLABench.tasks.autogen_tasks.primitive.lift_flask_series import *
 from VLABench.tasks.autogen_tasks.primitive.lift_tube_series import *
 from VLABench.tasks.autogen_tasks.primitive.place_beaker_on_the_mat_series import *
 from VLABench.tasks.autogen_tasks.primitive.place_flask_on_the_mat_series import *
+from VLABench.tasks.autogen_tasks.pour_object_stir_large_beaker_series import *
 from VLABench.tasks.autogen_tasks.primitive.pour_beaker_series import *
 from VLABench.tasks.autogen_tasks.primitive.pour_cylinder_series import *
 from VLABench.tasks.autogen_tasks.primitive.pour_tube_insert_tube_series import *

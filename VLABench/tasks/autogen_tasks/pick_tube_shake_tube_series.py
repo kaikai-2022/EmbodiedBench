@@ -22,7 +22,7 @@ class PickTubeShakeTubeConfigManager(BenchTaskConfigManager):
             container_config = dict(
                 name="chemistry_tube_stand",
                 xml_path=name2class_xml["chemistry_tube_stand"][-1],
-                position=[random.uniform(-0.25, -0.15), random.uniform(-0.15, 0.15), 0.8],
+                position=[random.uniform(-0.1, 0.01), random.uniform(0.05, 0.15), 0.8],
             )
             container_config["class"] = "TubeStand"
             self.config["task"]["components"].append(container_config)
@@ -36,7 +36,7 @@ class PickTubeShakeTubeConfigManager(BenchTaskConfigManager):
             init_container_config["subentities"] = []
         obj_config = dict(
             name="tube_0",
-            solution_rgba=[0.65, 0.57, 0.02, 0.4],
+            solution="tube_0",
             xml_path=name2class_xml["tube"][-1],
             position=pos,
         )
@@ -46,12 +46,18 @@ class PickTubeShakeTubeConfigManager(BenchTaskConfigManager):
         self.target_entity = "tube_0"
 
     def get_instruction(self, target_entity, init_container, **kwargs):
-        self.config["task"]["instructions"] = ["Pick the <tube_0> which contains <FeCl3_0>."]
+        self.config["task"]["instructions"] = ["Pick the <tube_0>."]
 
     def get_condition_config(self, target_entity, init_container, **kwargs):
         conditions_config = [
             dict(is_grasped=dict(entities=['tube_0'], robot='robot')),
-            dict(shake=dict(entities=['tube_0'], robot='robot')),
+            dict(shake=dict(
+            entities=['tube_0'],
+            robot='robot',
+            min_direction_changes=3,
+            min_angle_threshold=0.1,
+            check_axis=1,
+        )),
         ]
         self.config["task"]["conditions"] = conditions_config
 
@@ -63,9 +69,9 @@ class PickTubeShakeTubeTask(PrimitiveTask):
 
     def get_expert_skill_sequence(self, physics):
         skill_sequence = [
-            partial(SkillLib.pick, target_entity_name="tube_0"),
-            partial(SkillLib.lift, lift_height=0.15),
+            partial(SkillLib.pick, target_entity_name="tube_0", prior_eulers=[[-3.14159, 0, 0]]),
+            partial(SkillLib.lift, lift_height=0.15, gripper_state=[0, 0]),
             partial(SkillLib.shake, n_shakes=3, shake_angle=0.7, steps_per_swing=5),
-            partial(SkillLib.insert_to_entity, target_entity_name="chemistry_tube_stand"),
+            partial(SkillLib.insert_to_entity, target_entity_name="chemistry_tube_stand", insert_depth=0.05),
         ]
         return skill_sequence

@@ -416,29 +416,38 @@ def print_conv_progress(log_file, target_num=200):
             content = f.read()
         lines = content.split("\n")
 
-        # 统计进度
-        processed = processed_files = skipped = 0
+        # 统计进度——以"完成的 episode 数"为单位
+        # 一个 episode 完成的标志：依次出现
+        #   Map: ... 100%|...| N/N     (转换该 episode 的帧)
+        #   Creating parquet ... 100%  (保存该 episode 的 parquet)
+        # 这里统计 Map: 100% 的次数（=== 完整行，非 tqdm 进度刷新），
+        # 即每个 episode 一次。
+        processed = skipped = 0
+        import re
+        map_full_pattern = re.compile(r"Map:.*100[%|].*\|\s*\d+/\d+\s*\[\d+:<\d+:")
         for line in lines:
-            if "Creating parquet" in line and "100%" in line:
-                processed += 1
-            if "Skipping" in line or "skipping" in line or "Empty" in line:
-                skipped += 1
-            if "Map:" in line and "%" in line:
-                # 从 Map 行提取进度
-                import re
+            # 用更稳健的“整行出现 100% 的 Map 行”统计
+            # 注意 tqdm 刷新时也会短暂出现 100%，但分母会变；我们只数分母最大的那个
+            if "Map:" in line and "100%" in line:
                 m = re.search(r"(\d+)/(\d+)", line)
                 if m:
-                    processed_files = int(m.group(1))
+                    num, den = int(m.group(1)), int(m.group(2))
+                    if num == den:  # 只在分母等于总帧数时才计一次
+                        processed += 1
+            if "Skipping" in line or "skipping" in line or "Empty" in line or "skipping corrupted" in line:
+                skipped += 1
 
-        # 检查是否完成
-        if "100%" in content and ("Done" in content or "Writing" in content):
+        # 检查是否完成（数据集级 100% 也算）
+        if "100%" in content and ("Done" in content or "Writing" in content or "Consolidate" in content):
             log(f"  [转换] ✅ 完成! 处理了 {processed} 个文件")
             return
 
-        # 显示进度摘要
+        # 显示进度摘要（已处理/成功/跳过/剩余）
+        # 成功 = 已处理 − 跳过
+        # 剩余 = target - 已处理，但钳制到不出现负值（当处理数已经超过 target 时显示 0）
         remaining = max(0, target_num - processed)
-        if processed > 0:
-            log(f"  [转换] 已处理: {processed} | 成功: {processed - skipped} | 跳过: {skipped} | 剩余: {remaining}")
+        success = max(0, processed - skipped)
+        log(f"  [转换] 已处理: {processed} | 成功: {success} | 跳过: {skipped} | 剩余: {remaining}")
 
         # 打印关键行
         for line in reversed(lines[-20:]):

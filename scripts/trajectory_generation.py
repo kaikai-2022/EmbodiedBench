@@ -177,7 +177,11 @@ def generate_trajectory(args, index, logger):
     else: # TODO: some special tasks should be handled based on the feedback
         raise NotImplementedError("No expert skill sequence found")
 
-    task_dir = os.path.join(args.save_dir, args.task_name)
+    # task_dir 直接使用 args.save_dir：调用方（generate_trajectories.sh）已经
+    # 把路径规划到 ${series_name}/ 这一层，避免在这里再拼 task_name 造成
+    # series/series/ 的双层嵌套。保持 task_dir = save_dir 是与外部监控脚本
+    # 唯一的约定。
+    task_dir = args.save_dir
     print(f"\n[TIMING] 所有技能执行完成, 总观测数={len(observations)}, task_success={task_success}")
     print(f"[TIMING] 技能执行总耗时: {time.time()-t0:.1f}s")
 
@@ -272,7 +276,7 @@ if __name__ == "__main__":
     for i in tqdm(range(args.n_sample)):
         i += args.start_id
         try:
-            h5_files = get_all_hdf5_files(os.path.join(args.save_dir, args.task_name))
+            h5_files = get_all_hdf5_files(args.save_dir)
             if len(h5_files) >= args.max_episode:
                 logger.info(f"Task {args.task_name} has reached the maximum episode number, skip")
                 break
