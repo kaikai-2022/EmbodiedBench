@@ -368,5 +368,10 @@
     "spec": "cylinder_mid",
     "source_type": "local",
     "is_physical": true
+  },
+  "FeCl3 solution": {
+    "spec": "FeCl3 solution",
+    "source_type": "local",
+    "is_physical": false
   }
 }
