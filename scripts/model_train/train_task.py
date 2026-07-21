@@ -78,13 +78,12 @@ class TrajectoryGenMonitor(ProgressMonitor):
         super().__init__("轨迹生成", self._check)
 
     def _check(self):
-        task_dir = f"{PROJECT_ROOT}/dataset/training_data/{self.series_name}"
+        # 实际保存路径是 series_name/task_name/（与 generate_trajectories.sh 一致）
+        task_dir = f"{PROJECT_ROOT}/dataset/training_data/{self.series_name}/{self.task_name}"
         if not os.path.exists(task_dir):
             return
-        # 递归查找所有 .hdf5 文件（支持嵌套目录结构）
-        count = 0
-        for root, dirs, files in os.walk(task_dir):
-            count += sum(1 for f in files if f.endswith(".hdf5"))
+        files = [f for f in os.listdir(task_dir) if f.endswith(".hdf5")]
+        count = len(files)
         elapsed = time.time() - self.start_time if self.start_time else 0
         rate = count / elapsed if elapsed > 0 else 0
         remaining = self.num_target - count
@@ -178,6 +177,7 @@ def main():
     parser.add_argument("--gpus", default="0,1,2,3,4,5,6", help="GPU 列表")
     parser.add_argument("--train-steps", type=int, default=100000, help="训练步数")
     parser.add_argument("--batch-size", type=int, default=7, help="batch size")
+    parser.add_argument("--samples-per-gpu", type=int, default=40, help="每张 GPU 每轮最大尝试次数")
     parser.add_argument("--skip-gen", action="store_true")
     parser.add_argument("--skip-conv", action="store_true")
     parser.add_argument("--skip-config", action="store_true")
@@ -201,7 +201,7 @@ def main():
     if not args.skip_gen:
         log("[1/5] 启动轨迹生成...")
         gen_script = f"{PROJECT_ROOT}/scripts/model_train/generate_trajectories.sh"
-        cmd = conda_run("vlabench_2", f"bash {gen_script} --task {args.task} --num {args.num} --gpus {args.gpus}")
+        cmd = conda_run("vlabench_2", f"bash {gen_script} --task {args.task} --num {args.num} --gpus {args.gpus} --samples {args.samples_per_gpu}")
 
         # 后台运行生成
         proc = subprocess.Popen(cmd, shell=True, executable="/bin/bash", stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=1)

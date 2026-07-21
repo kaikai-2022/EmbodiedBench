@@ -62,7 +62,8 @@ SERIES_NAME="${TASK_NAME}_series"
 PROJECT_ROOT="/ssd/qinmaokai/workspace/SciVLABench"
 SAVE_DIR="$PROJECT_ROOT/dataset/training_data/${SERIES_NAME}"
 LOG_DIR="$PROJECT_ROOT/logs/traj_gen/${SERIES_NAME}"
-TASK_DIR="$SAVE_DIR/${TASK_NAME}"
+# 关键修复: trajectory_generation.py 的 task_dir = save_dir/task_name (多一层)
+TASK_DIR="$SAVE_DIR/${TASK_NAME}/${TASK_NAME}"
 
 # 解析 GPU 列表为数组
 IFS=',' read -ra GPUS <<< "$GPU_LIST"

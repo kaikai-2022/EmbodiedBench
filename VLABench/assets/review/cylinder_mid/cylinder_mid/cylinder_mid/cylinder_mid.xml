@@ -38,7 +38,7 @@
       <!-- Anti-slip box: collision + visual overlay. Both boxes share identical size/pos. -->
       <!-- <geom name="grip_assist_visual" type="box" rgba="0 0 1 0.4" size="0.0165 0.0165 0.09" pos="0 0 0.09" class="visual"/> -->
       <geom name="grip_assist" type="box" size="0.0165 0.0165 0.09" pos="0 0 0.09"
-            contype="2" conaffinity="2" group="3" friction="4 4 0.1"
+            contype="2" conaffinity="2" group="3" friction="1 1 0.1"
             density="50" solref="0.001 1"/>
       <site class="grasppoint" pos="0.0000 0.0000 0.158"/>
           <geom name="solution" type="cylinder" size="0.0113 0.050012" pos="0 0 0.059524" material="CaSO4" class="visual"/>
