@@ -588,6 +588,7 @@ def _code_subentity(plan: EntityLoadPlan, flags: Dict) -> List[str]:
             '            init_container_config["subentities"] = []',
             f'        obj_config = dict(',
             f'            name="{plan.uid}",',
+            f'            solution="{solution}",',
             f'            solution_rgba={solution_rgba},',
             f'            xml_path=name2class_xml["{plan.spec}"][-1],',
             f'            position=pos,',
