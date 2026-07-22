@@ -2,7 +2,7 @@ import numpy as np
 import torch
 from collections import deque
 import sys
-sys.path.insert(0, "/ssd/mkqin/workspace/lerobot")
+sys.path.insert(0, "/ssd/liuzirui/lerobot")
 
 from VLABench.evaluation.model.policy.base import Policy
 from VLABench.utils.utils import quaternion_to_euler

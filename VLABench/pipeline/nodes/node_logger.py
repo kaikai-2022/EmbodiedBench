@@ -58,7 +58,7 @@ def init_run_log(instruction: str) -> str:
     Returns:
         日志文件路径字符串
     """
-    log_root = Path(os.environ.get("VLABENCH_LOG_ROOT", "/ssd/mkqin/workspace/VLABench/logs"))
+    log_root = Path(os.environ.get("VLABENCH_LOG_ROOT", "/ssd/liuzirui/VLAbench_LZR/logs"))
     log_root.mkdir(parents=True, exist_ok=True)
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")

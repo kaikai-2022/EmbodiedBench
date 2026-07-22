@@ -601,6 +601,37 @@ class SkillLib:
         if env.task.entities[target_entity_name].is_grasped(env.physics, env.robot):
             stage_success = True
             print(f"DEBUG [gently_pick]: ✓ 轻抓成功! stage_success=True")
+
+            # ========== 启用 grasp lock substep 同步 ==========
+            # 与 pick() 函数相同的 lock 机制：在 substep 层面同步物体到夹爪
+            if hasattr(env, "_grasp_lock_mode") and env._grasp_lock_mode > 0:
+                raw_m = env.physics.model._model
+                raw_d = env.physics.data._data
+                hand_id = mujoco.mj_name2id(raw_m, mujoco.mjtObj.mjOBJ_BODY, "franka/hand")
+                if hand_id >= 0:
+                    hand_pos = raw_d.xpos[hand_id].copy()
+                    hand_quat = raw_d.xquat[hand_id].copy()
+                    obj_pos = np.array(env.task.entities[target_entity_name].get_xpos(env.physics))
+                    obj_quat = np.array(env.task.entities[target_entity_name].get_xqaut(env.physics))
+                    rel_pos = obj_pos - hand_pos
+                    rel_quat = _quat_mul(_quat_conjugate(hand_quat), obj_quat)
+                    env._grasped_entity_info = {
+                        "name": target_entity_name,
+                        "rel_pos_local": _quat_rotate(_quat_conjugate(hand_quat), rel_pos),
+                        "rel_quat_local": rel_quat,
+                    }
+                    # lock 模式下，手指宽度已在上面设为 final_hold_width（由 _lock_gripper_state 保存）
+                    # Mode 2: 创建 weld 约束
+                    if env._grasp_lock_mode == 2 and hasattr(env, "_setup_weld_constraint"):
+                        env._setup_weld_constraint()
+
+                    # 等几帧让 lock 同步稳定
+                    for wait_frame in range(5):
+                        arm_qpos = np.array(env.robot.get_qpos(env.physics))
+                        action = np.concatenate([arm_qpos, env._lock_gripper_state])
+                        env.step(action)
+                        mujoco.mj_forward(raw_m, raw_d)
+                    print(f"DEBUG [gently_pick]: ✓ grasp lock 模式 {env._grasp_lock_mode} 已启用")
         else:
             print(f"DEBUG [gently_pick]: ✗ 轻抓未通过 is_grasped 判定")
         return observations, waypoints, stage_success, False
@@ -1079,7 +1110,7 @@ class SkillLib:
 
         # 获取容器位置
         container_pos = np.array(env.task.entities[target_container_name].get_xpos(env.physics))
-        pour_target_pos = container_pos + np.array([0, 0, 0.3])
+        pour_target_pos = container_pos + np.array([0, 0, 0.4])
 
         # 1. 抬高到倾倒高度
         start_pos = np.array(env.robot.get_end_effector_pos(env.physics))

@@ -1,5 +1,5 @@
 import sys
-sys.path.insert(0, "/ssd/mkqin/workspace/lerobot")
+sys.path.insert(0, "/ssd/liuzirui/lerobot")
 
 from lerobot.common.datasets.lerobot_dataset import LeRobotDataset
 import h5py

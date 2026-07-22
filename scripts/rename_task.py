@@ -20,7 +20,7 @@ import shutil
 import argparse
 from pathlib import Path
 
-VLABENCH_ROOT = Path("/ssd/mkqin/workspace/VLABench/VLABench")
+VLABENCH_ROOT = Path("/ssd/liuzirui/VLAbench_LZR/VLABench")
 
 
 def parse_args():

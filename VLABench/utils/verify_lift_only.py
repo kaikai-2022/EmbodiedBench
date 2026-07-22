@@ -3,8 +3,8 @@
 模拟 unscrew_cap 流程但 rotation_angle=0（不旋转），只走 lift。
 """
 import sys, os
-sys.path.insert(0, "/ssd/mkqin/workspace/VLABench")
-os.environ.setdefault("VLABENCH_ROOT", "/ssd/mkqin/workspace/VLABench/VLABench")
+sys.path.insert(0, "/ssd/liuzirui/VLAbench_LZR")
+os.environ.setdefault("VLABENCH_ROOT", "/ssd/liuzirui/VLAbench_LZR/VLABench")
 os.environ.setdefault("MUJOCO_GL", "egl")
 os.environ.setdefault("DM_ENV_GRASP_LOCK", "0")
 
@@ -15,7 +15,7 @@ importlib.import_module("VLABench.tasks.hierarchical_tasks.composite")
 import VLABench.tasks.components
 
 import glob
-series_path = sorted(glob.glob("/ssd/mkqin/workspace/VLABench/VLABench/tasks/autogen_tasks/unscrew_*_series.py"))[-1]
+series_path = sorted(glob.glob("/ssd/liuzirui/VLAbench_LZR/VLABench/tasks/autogen_tasks/unscrew_*_series.py"))[-1]
 mod_name = os.path.basename(series_path).replace(".py", "")
 spec = importlib.util.spec_from_file_location(mod_name, series_path)
 mod = importlib.util.module_from_spec(spec)

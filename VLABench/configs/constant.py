@@ -14,6 +14,8 @@ def get_object_list(xml_dir, all=True, seen=True):
         a list of split paths of xml files
     """
     xml_paths = []
+    if not os.path.isdir(xml_dir):
+        return []  # 资产目录缺失时容错，避免整个 import 崩；补齐资产后自动生效
     subdirs = os.listdir(xml_dir)
     for subdir in subdirs:
         if subdir.endswith(".xml"):

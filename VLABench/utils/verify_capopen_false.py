@@ -8,8 +8,8 @@
 用法: python VLABench/utils/verify_capopen_false.py
 """
 import sys, os
-sys.path.insert(0, "/ssd/mkqin/workspace/VLABench")
-os.environ.setdefault("VLABENCH_ROOT", "/ssd/mkqin/workspace/VLABench/VLABench")
+sys.path.insert(0, "/ssd/liuzirui/VLAbench_LZR")
+os.environ.setdefault("VLABENCH_ROOT", "/ssd/liuzirui/VLAbench_LZR/VLABench")
 os.environ.setdefault("MUJOCO_GL", "egl")
 os.environ.setdefault("DM_ENV_GRASP_LOCK", "0")
 
@@ -20,7 +20,7 @@ importlib.import_module("VLABench.tasks.hierarchical_tasks.composite")
 import VLABench.tasks.components
 
 # 加载流水线生成的 unscrew_bottle_series
-series_path = "/ssd/mkqin/workspace/VLABench/VLABench/tasks/autogen_tasks/unscrew_bottle_series.py"
+series_path = "/ssd/liuzirui/VLAbench_LZR/VLABench/tasks/autogen_tasks/unscrew_bottle_series.py"
 spec = importlib.util.spec_from_file_location("unscrew_bottle_series", series_path)
 mod = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(mod)

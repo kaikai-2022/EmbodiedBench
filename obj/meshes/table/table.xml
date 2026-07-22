@@ -1,0 +1,30 @@
+<mujoco>
+    <default>
+        <default class="viz_Table" >
+            <geom  contype="0" conaffinity="0" type="mesh"/>
+        </default>
+        <default class="body_Table" >
+            <geom contype="1" conaffinity="1" group="3" solref="0.001 1"/>
+        </default>
+    </default>
+    <asset>
+        <texture name="wood" type="cube" height="1" width="1" file="../../assets/textures/wood0.png" />
+        <material name="wood" texture="wood"/>
+    </asset>
+   <worldbody>
+        <body name="table_vis" pos="0 0 0" childclass="viz_Table">
+            <geom type="box" material="wood" size=".6 .6 .025" pos="0 0 0.735" mass="40"/>
+            <geom type="box" material="wood" size="0.025 0.025 0.355" pos="-0.55 0.55 0.355"/>
+            <geom type="box" material="wood" size="0.025 0.025 0.355" pos="-0.55 -0.55 0.355"/>
+            <geom type="box" material="wood" size="0.025 0.025 0.355" pos="0.55 0.55 0.355"/>
+            <geom type="box" material="wood" size="0.025 0.025 0.355" pos="0.55 -0.55 0.355"/>
+        </body>
+        <body name="table_body" pos="0 0 0"  childclass="body_Table" >
+            <geom type="box" size=".6 .6 .025" pos="0 0 0.735" mass="40" />
+            <geom type="box" size="0.025 0.025 0.355" pos="-0.55 0.55 0.355"/>
+            <geom type="box" size="0.025 0.025 0.355" pos="-0.55 -0.55 0.355"/>
+            <geom type="box" size="0.025 0.025 0.355" pos="0.55 0.55 0.355"/>
+            <geom type="box" size="0.025 0.025 0.355" pos="0.55 -0.55 0.355"/>
+        </body>
+    </worldbody>
+</mujoco>

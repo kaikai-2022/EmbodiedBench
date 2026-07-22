@@ -77,7 +77,7 @@ def vlm_data_node(state: Dict) -> Dict:
         if render_script.exists():
             logger.info("[VLM Data] 调用渲染脚本...")
 
-            conda_activate = "source /ssd/mkqin/miniconda3/etc/profile.d/conda.sh && conda activate vlabench_2"
+            conda_activate = "source /ssd/liuzirui/miniconda/etc/profile.d/conda.sh && conda activate vlabench_openvla"
             render_cmd = (
                 f"python {render_script} --task {task_name} "
                 f"--dimension '{dimension}' --num-examples 1"

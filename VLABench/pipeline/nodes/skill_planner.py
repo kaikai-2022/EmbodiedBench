@@ -33,12 +33,7 @@ logger = logging.getLogger(__name__)
 SKILL_LIB_DOC = """
 ## 可用原子技能 (Atomic Skills)
 
-- pick(target_uid, prior_eulers=[[-pi, 0, 0]]): 从上方抓取物体。prior_eulers 决定抓取朝向。**抓取时会完全闭合夹爪到 0，可能压坏易碎物体。如需轻柔抓取，请使用 gently_pick**。
-- gently_pick(target_uid, prior_eulers=[[-pi, 0, 0]], extra_close_ratio=0.2, n_close_steps=20, contact_dist_threshold=0.005, hold_steps=5): **柔性抓取技能**。逐步闭合夹爪并检测双侧接触，当左右手指均触碰到物体后仅再额外合上 extra_close_ratio 比例（默认 0.2 = 8mm）的宽度，避免压坏物体。适用场景：抓取易碎品（烧杯、试管）、轻小物体、需要保持物体形状的任务。参数说明：
-  - extra_close_ratio: 接触后额外闭合比例（相对 0.04 满开度），默认 0.2（8mm）。设为 0 表示接触后立即停止，设为 1.0 表示完全闭合（退化到 pick 行为）。
-  - n_close_steps: 闭合阶段总步数，默认 20。增加此值可减慢闭合速度，提高接触检测精度。
-  - contact_dist_threshold: 判定接触的距离阈值（m），默认 0.005（5mm）。物体越小可能需要调大此值。
-  - hold_steps: 接触后稳定步数，默认 5。用此期间的实际手指 qpos 作为最终保持目标。
+- pick(target_uid, prior_eulers=[[-pi, 0, 0]]): 从上方抓取物体。prior_eulers 决定抓取朝向。**抓取时会完全闭合夹爪到 0
 - place(target_container_uid): **将当前抓取的物体精确放置到目标容器/表面上**。target_container_uid 必须是场景中具体的实体（如 hot_plate_0, beaker_0, shelf_0）。place 会使用目标实体的 place_point 作为放置位置。**当任务要求将物体放到某个特定目标上时，必须使用 place，不要用 drop**。
 - drop(): **将抓取的物体放到桌面上**。仅用于"使用完物品后腾出抓夹"的场景，即物体不需要放到任何特定位置，只需放到桌面即可。**drop 不接受 target 参数**。如果任务要求将物体放到某个特定实体上（如加热板、架子），必须使用 place(target_container_uid)，不要用 drop。
 - pour(): 倾倒动作（假设手里已抓着容器）。仅旋转腕部关节，末端位置会偏移。
@@ -66,20 +61,15 @@ SKILL_LIB_DOC = """
 
 ## Skill Usage Guidelines
 
-- **pick vs gently_pick**:
-  - pick: 完全闭合夹爪到 0，适用于抓取坚固物体（金属块、工具、不易变形的容器）。
-  - gently_pick: 柔性抓取，检测双侧接触后仅轻压 20%（可调）（仅适用于pipette的抓取！！！）。
 - **place**: 将物体放置到指定的目标实体上（加热板、容器、架子等）。必须传 target_container_uid 参数。适用场景："put A on B", "place A onto B", "put A in B"。
 - **drop**: 仅用于将物体放到桌面上（无特定目标位置）。适用场景：使用完物品后腾出抓夹，需要抓取下一个物品时。**如果任务指定了放置目标，必须用 place，不能用 drop**。
 - **open_gripper**: 在当前位置直接松开夹爪，物体会掉落。仅用于不需要精确放置的场景。
 - **shake 任务的正确序列**:
-  - 试管类物体 (ChemistryTube): gently_pick -> lift -> shake(n_shakes=3) -> insert_to_entity(target_uid=chemistry_tube_stand)。insert_to_entity 已包含松开夹爪，不需要额外 open_gripper。
-  - 其他物体 (烧杯等): gently_pick -> lift -> shake(n_shakes=3) -> drop。用 drop 把物体放到桌面。
 """
 
 # ========== 原子技能白名单 ==========
 VALID_SKILLS = {
-    "pick", "gently_pick", "place", "drop", "lift", "moveto", "moveto_entity", "pour", "pour_to_entity", "push", "press",
+    "pick", "place", "drop", "lift", "moveto", "moveto_entity", "pour", "pour_to_entity", "push", "press",
     "flip", "wait", "rotate", "open_gripper", "close_gripper",
     "open_door", "close_door", "open_drawer", "open_laptop",
     "move_offset", "reset", "insert_to_entity", "shake", "stir_entity_with_tool",

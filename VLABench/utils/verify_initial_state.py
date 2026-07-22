@@ -3,8 +3,8 @@
 期望是 False（瓶盖初始应该是关闭的）。
 """
 import sys, os
-sys.path.insert(0, "/ssd/mkqin/workspace/VLABench")
-os.environ.setdefault("VLABENCH_ROOT", "/ssd/mkqin/workspace/VLABench/VLABench")
+sys.path.insert(0, "/ssd/liuzirui/VLAbench_LZR")
+os.environ.setdefault("VLABENCH_ROOT", "/ssd/liuzirui/VLAbench_LZR/VLABench")
 os.environ.setdefault("MUJOCO_GL", "egl")
 os.environ.setdefault("DM_ENV_GRASP_LOCK", "0")
 
@@ -16,7 +16,7 @@ import VLABench.tasks.components
 
 # 加载最新生成的 series（动态发现）
 import glob
-series_files = sorted(glob.glob("/ssd/mkqin/workspace/VLABench/VLABench/tasks/autogen_tasks/unscrew_*_series.py"))
+series_files = sorted(glob.glob("/ssd/liuzirui/VLAbench_LZR/VLABench/tasks/autogen_tasks/unscrew_*_series.py"))
 print(f"Found series files: {series_files}")
 series_path = series_files[-1] if series_files else None
 if not series_path:

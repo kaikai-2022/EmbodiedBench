@@ -212,7 +212,7 @@ def simulation_node(state: Dict) -> Dict:
 
     # 确保 VLABENCH_ROOT 环境变量已设置（assets 在 VLABench 子目录下）
     if not os.environ.get("VLABENCH_ROOT"):
-        os.environ["VLABENCH_ROOT"] = "/ssd/mkqin/workspace/VLABench/VLABench"
+        os.environ["VLABENCH_ROOT"] = "/ssd/liuzirui/VLAbench_LZR/VLABench"
 
     task_analysis = state.get("task_analysis", {})
     task_name = task_analysis.get("task_name", "custom_task").replace(" ", "_")
@@ -227,7 +227,7 @@ def simulation_node(state: Dict) -> Dict:
         from VLABench.envs import load_env
 
         # 动态加载 series 文件（由 code_generator 生成，注册 task_name task）
-        vlabench_root = os.environ.get("VLABENCH_ROOT", "/ssd/mkqin/workspace/VLABench/VLABench")
+        vlabench_root = os.environ.get("VLABENCH_ROOT", "/ssd/liuzirui/VLAbench_LZR/VLABench")
         series_path = os.path.join(
             os.path.dirname(vlabench_root),
             "VLABench", "tasks", "autogen_tasks",

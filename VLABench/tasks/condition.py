@@ -254,10 +254,12 @@ class PourCondition(Condition):
     def is_met(self, physics):
         if self._met:
             return True
-        top_site = self.target_entity.mjcf_model.worldbody.find("site", "top_site")
-        bottom_site = self.target_entity.mjcf_model.worldbody.find("site", "bottom_site")
-        top_site_xpos, bottom_site_xpos = physics.bind(top_site).xpos, physics.bind(bottom_site).xpos
-        if (bottom_site_xpos[-1] - top_site_xpos[-1]) > self.threshold:
+        def _site_world(entity, name, physics):
+            site = entity.mjcf_model.worldbody.find("site", name)
+            return physics.data.site_xpos[physics.bind(site).element_id]
+        top_xpos = _site_world(self.target_entity, "top_site", physics)
+        bottom_xpos = _site_world(self.target_entity, "bottom_site", physics)
+        if (bottom_xpos[-1] - top_xpos[-1]) > self.threshold:
             self._met = True
             return True
         return False
@@ -324,15 +326,28 @@ class PourIntoCondition(Condition):
             return True
 
         # Gate 1: object must be grasped by the robot
-        if not self.target_entity.is_grasped(physics, self.robot):
+        is_grasped = self.target_entity.is_grasped(physics, self.robot)
+        if not is_grasped:
+            print(f"[PourInto DEBUG] Gate1 FAIL: not grasped | target={getattr(self.target_entity, 'name', '?')}")
             return False
 
         # Gate 2: object must be tilted (bottom higher than top)
-        top_site = self.target_entity.mjcf_model.worldbody.find("site", "top_site")
-        bottom_site = self.target_entity.mjcf_model.worldbody.find("site", "bottom_site")
-        top_xpos = physics.bind(top_site).xpos
-        bottom_xpos = physics.bind(bottom_site).xpos
-        if (bottom_xpos[-1] - top_xpos[-1]) <= self.tilt_threshold:
+        # 注意: physics.bind(site).xpos 依赖 body 名字与 entity 名字匹配，
+        # 当 entity 名字带后缀(如 cylinder_small_0)但 body 名字不带后缀时(如 cylinder_small)，
+        # bind() 找不到正确 body，只能用 worldbody 做 parent，返回错误的局部坐标。
+        # 正确做法: 用 raw_data.site_xpos[element_id] 获取 site 在 world frame 的实际位置。
+        def _get_site_world_pos(entity, site_name, physics):
+            site = entity.mjcf_model.worldbody.find("site", site_name)
+            if site is None:
+                raise ValueError(f"Site '{site_name}' not found in entity '{entity.name}'")
+            sid = physics.bind(site).element_id
+            return physics.data.site_xpos[sid]
+
+        top_xpos = _get_site_world_pos(self.target_entity, "top_site", physics)
+        bottom_xpos = _get_site_world_pos(self.target_entity, "bottom_site", physics)
+        tilt_diff = bottom_xpos[-1] - top_xpos[-1]
+        if tilt_diff <= self.tilt_threshold:
+            print(f"[PourInto DEBUG] Gate2 FAIL: tilt_diff={tilt_diff:.4f} <= {self.tilt_threshold} | top_z={top_xpos[-1]:.4f} bottom_z={bottom_xpos[-1]:.4f}")
             return False
 
         # Gate 3: mouth must be within receiver container's XY AABB and above it
@@ -360,12 +375,17 @@ class PourIntoCondition(Condition):
                 # Step 3a: XY must be inside AABB (temporarily set Z to max_z)
                 point_to_check = top_xpos.copy()
                 point_to_check[2] = max_z
-                if not self.receiver_container.contain(point_to_check, physics):
+                is_inside = self.receiver_container.contain(point_to_check, physics)
+                if not is_inside:
+                    print(f"[PourInto DEBUG] Gate3a FAIL: top_xy=({top_xpos[0]:.4f},{top_xpos[1]:.4f}) not inside receiver AABB | max_z={max_z:.4f} receiver_keysites={[(kp.name or '?', kp) for kp in keysites]}")
                     return False
 
                 # Step 3b: Z must be high enough above the receiver top
                 if top_xpos[2] < max_z + self.z_clearance:
+                    print(f"[PourInto DEBUG] Gate3b FAIL: top_z={top_xpos[2]:.4f} < max_z({max_z:.4f}) + clearance({self.z_clearance}) = {max_z + self.z_clearance:.4f}")
                     return False
+
+                print(f"[PourInto DEBUG] ALL GATES PASS: top_xy=({top_xpos[0]:.4f},{top_xpos[1]:.4f}) top_z={top_xpos[2]:.4f} max_z={max_z:.4f} tilt={tilt_diff:.4f}")
 
         # All gates passed — trigger solution transfer, then latch
         if not self._transfer_applied:
