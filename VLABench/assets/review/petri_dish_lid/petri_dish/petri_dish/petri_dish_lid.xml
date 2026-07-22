@@ -1,0 +1,82 @@
+<?xml version="1.0" ?>
+<mujoco model="petri_dish_lid">
+  <asset>
+    <material name="petri_dish_material" specular="0.9" shininess="0.9" rgba="0.95 0.95 0.95 0.55"/>
+    <mesh file="petri_dish/petri_dish.obj" scale="0.0127 0.0127 0.0127"/>
+    <mesh file="petri_dish/petri_dish_collision_0.obj" scale="0.0127 0.0127 0.0127"/>
+    <mesh file="petri_dish/petri_dish_collision_1.obj" scale="0.0127 0.0127 0.0127"/>
+    <mesh file="petri_dish/petri_dish_collision_2.obj" scale="0.0127 0.0127 0.0127"/>
+    <mesh file="petri_dish/petri_dish_collision_3.obj" scale="0.0127 0.0127 0.0127"/>
+    <mesh file="petri_dish/petri_dish_collision_4.obj" scale="0.0127 0.0127 0.0127"/>
+    <mesh file="petri_dish/petri_dish_collision_5.obj" scale="0.0127 0.0127 0.0127"/>
+    <mesh file="petri_dish/petri_dish_collision_6.obj" scale="0.0127 0.0127 0.0127"/>
+    <mesh file="petri_dish/petri_dish_collision_7.obj" scale="0.0127 0.0127 0.0127"/>
+    <mesh file="petri_dish/petri_dish_collision_8.obj" scale="0.0127 0.0127 0.0127"/>
+    <mesh file="petri_dish/petri_dish_collision_9.obj" scale="0.0127 0.0127 0.0127"/>
+    <mesh file="petri_dish/petri_dish_collision_10.obj" scale="0.0127 0.0127 0.0127"/>
+    <mesh file="petri_dish/petri_dish_collision_11.obj" scale="0.0127 0.0127 0.0127"/>
+    <mesh file="petri_dish/petri_dish_collision_12.obj" scale="0.0127 0.0127 0.0127"/>
+    <mesh file="petri_dish/petri_dish_collision_13.obj" scale="0.0127 0.0127 0.0127"/>
+    <mesh file="petri_dish/petri_dish_collision_14.obj" scale="0.0127 0.0127 0.0127"/>
+    <mesh file="petri_dish/petri_dish_collision_15.obj" scale="0.0127 0.0127 0.0127"/>
+    <mesh file="petri_dish/petri_dish_collision_16.obj" scale="0.0127 0.0127 0.0127"/>
+    <mesh file="petri_dish/petri_dish_collision_17.obj" scale="0.0127 0.0127 0.0127"/>
+    <mesh file="petri_dish/petri_dish_collision_18.obj" scale="0.0127 0.0127 0.0127"/>
+    <mesh file="petri_dish/petri_dish_collision_19.obj" scale="0.0127 0.0127 0.0127"/>
+    <mesh file="petri_dish/petri_dish_collision_20.obj" scale="0.0127 0.0127 0.0127"/>
+    <mesh file="petri_dish/petri_dish_collision_21.obj" scale="0.0127 0.0127 0.0127"/>
+    <mesh file="petri_dish/petri_dish_collision_22.obj" scale="0.0127 0.0127 0.0127"/>
+    <mesh file="petri_dish/petri_dish_collision_23.obj" scale="0.0127 0.0127 0.0127"/>
+    <mesh file="petri_dish/petri_dish_collision_24.obj" scale="0.0127 0.0127 0.0127"/>
+    <mesh file="petri_dish/petri_dish_collision_25.obj" scale="0.0127 0.0127 0.0127"/>
+    <mesh file="petri_dish/petri_dish_collision_26.obj" scale="0.0127 0.0127 0.0127"/>
+  </asset>
+  <worldbody>
+    <body name="petri_dish_lid">
+      <inertial pos="0.000000 0.000000 0.007427" mass="0.02" diaginertia="0.0008 0.0008 0.0005"/>
+      <geom material="petri_dish_material" mesh="petri_dish" class="visual"/>
+      <geom mesh="petri_dish_collision_0"  class="collision"/>
+      <geom mesh="petri_dish_collision_1"  class="collision"/>
+      <geom mesh="petri_dish_collision_2"  class="collision"/>
+      <geom mesh="petri_dish_collision_3"  class="collision"/>
+      <geom mesh="petri_dish_collision_4"  class="collision"/>
+      <geom mesh="petri_dish_collision_5"  class="collision"/>
+      <geom mesh="petri_dish_collision_6"  class="collision"/>
+      <geom mesh="petri_dish_collision_7"  class="collision"/>
+      <geom mesh="petri_dish_collision_8"  class="collision"/>
+      <geom mesh="petri_dish_collision_9"  class="collision"/>
+      <geom mesh="petri_dish_collision_10"  class="collision"/>
+      <geom mesh="petri_dish_collision_11"  class="collision"/>
+      <geom mesh="petri_dish_collision_12"  class="collision"/>
+      <geom mesh="petri_dish_collision_13"  class="collision"/>
+      <geom mesh="petri_dish_collision_14"  class="collision"/>
+      <geom mesh="petri_dish_collision_15"  class="collision"/>
+      <geom mesh="petri_dish_collision_16"  class="collision"/>
+      <geom mesh="petri_dish_collision_17"  class="collision"/>
+      <geom mesh="petri_dish_collision_18"  class="collision"/>
+      <geom mesh="petri_dish_collision_19"  class="collision"/>
+      <geom mesh="petri_dish_collision_20"  class="collision"/>
+      <geom mesh="petri_dish_collision_21"  class="collision"/>
+      <geom mesh="petri_dish_collision_22"  class="collision"/>
+      <geom mesh="petri_dish_collision_23"  class="collision"/>
+      <geom mesh="petri_dish_collision_24"  class="collision"/>
+      <geom mesh="petri_dish_collision_25"  class="collision"/>
+      <geom mesh="petri_dish_collision_26"  class="collision"/>
+      <site class="grasppoint" pos="0.00000 0.00000 0.00891"/>
+      <site class="grasppoint" pos="0.00000 0.00000 0.01190"/>
+      <site class="grasppoint" pos="0.00000 0.00000 0.01409"/>
+    </body>
+  </worldbody>
+  <compiler boundmass="0.015" boundinertia="1e-05" angle="radian"/>
+  <default>
+    <default class="visual">
+      <geom group="2" type="mesh" contype="0" conaffinity="0" density="50"/>
+    </default>
+    <default class="collision">
+      <geom group="3" type="mesh" density="50" friction="1.5 0.1 0.1" solimp="0.9 0.95 0.001" solref="0.02 1"/>
+    </default>
+    <default class="grasppoint">
+      <site type="sphere" size="0.005" group="4" rgba="0 0 1 1"/>
+    </default>
+  </default>
+</mujoco>

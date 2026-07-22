@@ -7,47 +7,39 @@ import numpy as np
 from VLABench.tasks.components.entity import CommonGraspedEntity
 from VLABench.tasks.components.container import ContainerMiXin
 from VLABench.utils.register import register
+from VLABench.tasks.components.specific_entities.solute_reaction import SOLUTE2RGBA, resolve_color_from_solutes, resolve_substance_name
 
 
 class SolutionMixin:
     """
     Solution rendering Mixin — shared capability for all containers that hold liquid.
-    All subclasses share a global solvent color mapping table (solution2rgba).
+    All subclasses share a global solute color mapping table (solute2rgba).
     """
 
-    solution2rgba = {
-        "CuCl2": [0.141, 1.0, 0.174, 0.4],
-        "CuSO4": [0, 0.45, 1, 0.4],
-        "FeCl3": [0.6475, 0.5686, 0.023, 0.4],
-        "KMnO4": [0.5, 0, 0.5, 0.4],
-        "I2": [0.3, 0.13, 0.0, 0.4],
-        "K2CrO4": [0.57, 0.12, 0.013, 0.4],
-        "NaCl": [1, 1, 1, 0.3],
-        "AgNO3": [1, 1, 1, 0.3],
-        "BaCl2": [1, 1, 1, 0.3],
-        "H2SO4": [1, 1, 1, 0.3],
-        "NaOH": [1, 1, 1, 0.3],
-        "Ba(NO3)2": [1, 1, 1, 0.3],
-        "Pb(NO3)2": [1, 1, 1, 0.3],
-        "Na2CO3": [1, 1, 1, 0.3],
-        "CaCl2": [1, 1, 1, 0.3],
-        "HCl": [1, 1, 1, 0.3],
-        "CaSO4": [1, 1, 1, 0.7],
-    }
+    # 类属性别名，保持向后兼容（旧的 solution2rgba 引用继续有效）
+    solute2rgba = SOLUTE2RGBA
+    solution2rgba = SOLUTE2RGBA  # deprecated alias
 
     _solution_geom_name = "solution"
 
-    def __init__(self, solution=None, solution_rgba=None, **kwargs):
-        self.solution = solution
-        self.solution_rgba = solution_rgba
-        self._current_solution_rgba = None  # 最近生效的 rgba；None=空
+    def __init__(self, solution=None, solution_rgba=None, solutes=None, **kwargs):
+        self.solution = solution          # 初始物质名（向后兼容，不随倾倒更新）
+        self.solution_rgba = solution_rgba  # LLM 给的 fallback RGBA
+        self._current_solution_rgba = None  # 最近生效的 rgba
+        # 当前瓶内所有溶质（含反应产物）；向后兼容：从 solution 推断单元素列表
+        if solutes is not None:
+            self.solutes = [resolve_substance_name(s) for s in solutes]
+        elif solution is not None:
+            self.solutes = [resolve_substance_name(solution)]
+        else:
+            self.solutes = []
         super().__init__(**kwargs)
 
     def set_solution_rgba(self, physics, solution_name=None, target_rgba=None):
         """
         Set the rgba color of the solution geom.
 
-        Priority: target_rgba > solution_name > self.solution_rgba > self.solution
+        Priority: target_rgba > solution_name > solutes 查表 > self.solution_rgba (LLM fallback)
         """
         geom = self.mjcf_model.worldbody.find("geom", self._solution_geom_name)
         if geom is None:
@@ -55,20 +47,20 @@ class SolutionMixin:
         if target_rgba is not None:
             physics.bind(geom).rgba = target_rgba
         elif solution_name is not None:
-            rgba = self.solution2rgba.get(solution_name, [1, 1, 1, 0.3])
-            physics.bind(geom).rgba = rgba
-        elif self.solution_rgba is not None:
-            physics.bind(geom).rgba = self.solution_rgba
-        elif self.solution is not None:
-            rgba = self.solution2rgba.get(self.solution, [1, 1, 1, 0.3])
+            # solution_name 传入时：追加到 solutes（人工"添加溶液"语义）
+            if solution_name not in self.solutes:
+                self.solutes.append(solution_name)
+            rgba = self.solute2rgba.get(solution_name, [1, 1, 1, 0.3])
             physics.bind(geom).rgba = rgba
         else:
-            physics.bind(geom).rgba = [1, 1, 1, 0]
-        self._current_solution_rgba = physics.bind(geom).rgba
+            # 无显式参数：按 solutes 列表求颜色，fallback 到 LLM 给的 solution_rgba
+            rgba = resolve_color_from_solutes(self.solutes, self.solution_rgba)
+            physics.bind(geom).rgba = rgba
+        self._current_solution_rgba = list(physics.bind(geom).rgba)
 
     def get_solution(self):
-        """Return the current solvent name."""
-        return self.solution
+        """Return the current solute list."""
+        return self.solutes
 
     def clear_solution(self, physics):
         """
@@ -79,25 +71,34 @@ class SolutionMixin:
             return
         physics.bind(geom).rgba = [1, 1, 1, 0]
         self._current_solution_rgba = [1, 1, 1, 0]
+        self.solutes = []
         self.solution = None
         self.solution_rgba = None
 
-    def fill_solution(self, physics, source_solution_rgba=None):
+    def fill_solution(self, physics, source_solutes=None, source_solution_rgba=None):
         """
-        向容器中灌入溶液（按指定颜色显示）。
-        source_solution_rgba: 要灌入的 RGBA 颜色，如 [0, 0.45, 1, 0.4]。
-                              缺省时 fallback 到 [1, 1, 1, 0.3]（默认无色溶液）。
+        向容器中灌入溶液（含溶质列表和颜色）。
+
+        接受两种调用方式（向后兼容）：
+          - 新路径（推荐）：fill_solution(physics, source_solutes=[...], source_solution_rgba=[...])
+          - 旧路径：fill_solution(physics, source_solution_rgba=[...])  — 仅 rgba，不带物质列表
         """
         geom = self.mjcf_model.worldbody.find("geom", self._solution_geom_name)
-        print(f"[DEBUG fill_solution] entity={getattr(self, 'name', '?')}, geom found={geom}")
         if geom is None:
-            print("[DEBUG fill_solution] geom is None, returning")
             return
-        rgba = source_solution_rgba if source_solution_rgba is not None else [1, 1, 1, 0.3]
+
+        # 优先使用物质列表
+        if source_solutes is not None:
+            self.solutes = list(source_solutes)
+            rgba = resolve_color_from_solutes(self.solutes, source_solution_rgba)
+        elif source_solution_rgba is not None:
+            rgba = list(source_solution_rgba)
+        else:
+            rgba = [1, 1, 1, 0.3]
+
         physics.bind(geom).rgba = rgba
-        print(f"[DEBUG fill_solution] set rgba={rgba}, physics.bind result={physics.bind(geom).rgba}")
-        self._current_solution_rgba = rgba
-        self.solution_rgba = rgba  # 保证重放时 set_solution_rgba 走 self.solution_rgba 分支
+        self._current_solution_rgba = list(rgba)
+        self.solution_rgba = list(rgba)
 
     def initialize_episode(self, physics, random_state):
         self.set_solution_rgba(physics)
@@ -105,7 +106,9 @@ class SolutionMixin:
 
     def save(self, physics):
         data = super().save(physics)
-        data["solution"] = self.solution
+        data["solution"] = self.solution       # 初始物质名（向后兼容）
+        data["solutes"] = list(self.solutes)   # 当前溶质列表（含反应产物）
+        data["solution_rgba"] = list(self.solution_rgba) if self.solution_rgba is not None else None
         return data
 
 

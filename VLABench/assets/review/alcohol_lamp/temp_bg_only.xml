@@ -1,0 +1,7 @@
+<mujoco model="test">
+  <worldbody>
+    <body name="bg_body" pos="0 -0.5 0">
+      <geom name="bg_plane" type="box" size="100 0.001 100" rgba="1 1 1 1" group="1"/>
+    </body>
+  </worldbody>
+</mujoco>

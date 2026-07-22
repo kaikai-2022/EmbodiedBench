@@ -21,7 +21,7 @@ class UnscrewBottleConfigManager(BenchTaskConfigManager):
             position=[random.uniform(0.05, 0.15), random.uniform(-0.15, -0.05), 0.8],
         )
         obj_config["class"] = "ContainerWithCap"
-        obj_config["randomness"] = dict(pos=[0.02, 0.02, 0], quat=[0, 0, 0.05])
+        # obj_config["randomness"] = dict(pos=[0.02, 0.02, 0], quat=[0, 0, 0.05])
         obj_config["attach_to_arena"] = True
         self.config["task"]["components"].append(obj_config)
 

@@ -18,16 +18,16 @@ class PlaceBeakerOnTheMatConfigManager(BenchTaskConfigManager):
         obj_config = dict(
             name="small_beaker_0",
             xml_path=name2class_xml["small_beaker"][-1],
-            position=[random.uniform(0.05, 0.15), random.uniform(-0.15, -0.05), 0.8],
+            position=[random.uniform(0.05, 0.25), random.uniform(-0.15, 0.3), 0.8],
         )
         obj_config["class"] = "ChemistryBeaker"
-        obj_config["randomness"] = dict(pos=[0.02, 0.02, 0], quat=[0, 0, 0.05])
+        obj_config["randomness"] = dict(pos=[0.02, 0.02, 0], quat=[0, 0, 3.14])
         self.config["task"]["components"].append(obj_config)
 
         obj_config = dict(
             name="square_mat_0",
             xml_path=name2class_xml["square_mat"][-1],
-            position=[random.uniform(0.35, 0.45), random.uniform(-0.05, 0.05), 0.8],
+            position=[random.uniform(-0.25, -0.05), random.uniform(-0.15, 0.3), 0.8],
         )
         obj_config["class"] = "FlatContainer"
         obj_config["randomness"] = dict(pos=[0.02, 0.02, 0], quat=[0, 0, 0.05])

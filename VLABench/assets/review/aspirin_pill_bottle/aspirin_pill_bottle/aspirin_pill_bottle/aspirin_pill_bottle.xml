@@ -26,6 +26,15 @@
         <joint name="cap_slide" type="slide" pos="0 0 0" axis="0 0 1" range="0 0" damping="100000"/>
         <geom material="Diffuse" mesh="aspirin_pill_bottle_cap" class="visual"/>
         <geom type="cylinder" size="0.0311 0.0103" pos="0 0 0.0103" class="collision" contype="2" conaffinity="1"/>
+        <!-- Anti-slip cross plates on cap: 2 crossing vertical plates through center.
+             Width=diameter+2cm=0.0822m, height=full cap height, rotated 45° around Z.
+             contype=2 conaffinity=2: ONLY collide with finger pads (pad contype=2, conaffinity=2). -->
+        <!-- Visual plates (contype=0 conaffinity=0 → rgba renders fully). Rotated 45°. -->
+        <!-- <geom name="grip_plate_x_v" type="box" size="0.0411 0.003 0.0103" pos="0 0 0.0103" quat="0.9238795 0 0 0.3826834" contype="0" conaffinity="0" group="2" rgba="1 0 0 0.8"/>
+        <geom name="grip_plate_y_v" type="box" size="0.003 0.0411 0.0103" pos="0 0 0.0103" quat="0.9238795 0 0 0.3826834" contype="0" conaffinity="0" group="2" rgba="1 0 0 0.8"/> -->
+        <!-- Collision plates (contype=2 conaffinity=2). Rotated 45°. -->
+        <geom name="grip_plate_x" type="box" size="0.0411 0.003 0.0103" pos="0 0 0.0103" quat="0.9238795 0 0 0.3826834" contype="2" conaffinity="2" group="3" friction="1 1 0.1" density="50" solref="0.001 1"/>
+        <geom name="grip_plate_y" type="box" size="0.003 0.0411 0.0103" pos="0 0 0.0103" quat="0.9238795 0 0 0.3826834" contype="2" conaffinity="2" group="3" friction="1 1 0.1" density="50" solref="0.001 1"/>
         <!-- <site class="grasppoint" pos="0.0000 0.0000 0.0103"/> -->
         <site class="grasppoint" pos="0.0000 0.0000 0.0150"/>
       </body>

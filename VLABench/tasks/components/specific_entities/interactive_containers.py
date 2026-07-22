@@ -7,6 +7,16 @@ from VLABench.utils.utils import rotate_point_around_axis
 from VLABench.tasks.components.container import CommonContainer, ContainerWithDoor
 from VLABench.tasks.components.specific_entities.entity_with_button import EntityWithButton
 
+
+def _quaternion_to_rotation_matrix(q):
+    """Convert a quaternion [w, x, y, z] to a 3x3 rotation matrix."""
+    w, x, y, z = q[0], q[1], q[2], q[3]
+    return np.array([
+        [1 - 2*(y*y + z*z),     2*(x*y - z*w),     2*(x*z + y*w)],
+        [    2*(x*y + z*w), 1 - 2*(x*x + z*z),     2*(y*z - x*w)],
+        [    2*(x*z - y*w),     2*(y*z + x*w), 1 - 2*(x*x + y*y)],
+    ])
+
 @register.add_entity("CoffeeMachine")
 class CoffeeMachine(CommonContainer):
     """
@@ -316,20 +326,34 @@ class HeatDevice(CommonContainer, EntityWithButton):
 
     def is_activate(self, physics):
         """
-        Check if button is pressed and toggle heating state.
+        Check whether the button is pressed and toggle heating state.
 
-        This extends the base mixin is_activate to add heating state logic.
+        Delegates contact detection + color feedback to EntityWithButton.
         """
-        # Call mixin's is_activate logic
-        contacts = physics.data.contact
-        contact_geoms = [c.geom1 for c in contacts] + [c.geom2 for c in contacts]
-        base_result = physics.bind(self.start_button).element_id in contact_geoms
+        pressed = super().is_activate(physics)
 
-        if base_result and not self._heating_active:
+        if pressed and not self._heating_active:
             self._heating_active = True
-            self._is_pressed = True
-        elif not base_result and self._heating_active:
+        elif not pressed and self._heating_active:
             self._heating_active = False
-            self._is_pressed = False
 
-        return base_result
+        return pressed
+
+
+@register.add_entity("DryingBoxWithButton")
+class DryingBoxWithButton(ContainerWithDoor, EntityWithButton):
+    """
+    Drying box with an interactive power/start button.
+
+    - Inherits door open/close logic from ContainerWithDoor.
+    - Inherits button contact detection + red<->green color feedback
+      from EntityWithButton (no manual is_activate override needed).
+    """
+    _button_material_name = "button_vcol_mat"
+
+    # Note: The get_start_button_pos method from EntityWithButton is now used
+    # which correctly calculates the button surface position using physics.bind
+    # and adding the half-height offset in the geom's local +Z direction.
+
+    pass
+

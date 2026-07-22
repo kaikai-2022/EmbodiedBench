@@ -13,6 +13,7 @@ Entity Loader - 结构化实体加载代码生成
 """
 
 import logging
+import numpy as np
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
@@ -51,10 +52,61 @@ ENTITY_POSITION_RANGES = [
     ([0.35, 0.45], [-0.15, -0.05]),   # 备用位置4
 ]
 
+# ── 大件/小件分类与朝向控制 ───────────────────────────────────────────────
+
+# 大件白名单：远离机械臂 + 需要门/把手朝向机械臂
+FIXTURE_WITH_HANDLE_CLASSES = {
+    "DryingBoxWithButton",
+    "ContainerWithDrawer",   # 覆盖 cabinet 和 drawer
+}
+
+# 大件朝向：绕 z 轴旋转，使门/把手朝向机械臂（world -y 方向）
+# DryingBoxWithButton:  yaw=π/2（90°），让按钮/门把手正对机器人
+# ContainerWithDrawer:  原始方向已对，无需旋转
+FIXTURE_HANDLE_YAW = {
+    "DryingBoxWithButton": np.pi / 2,
+    "ContainerWithDrawer": 0.0,
+}
+
+# 小件位置区间：靠近机械臂
+# x: 全宽 [-0.30, +0.30] 随机（左右分布）
+# y: [-0.05, 0.25]，偏近端（robot base 在 y=-0.4）
+# 与大件之间留 0.15m 缓冲带（[0.25, 0.40]），防止物理碰撞
+SMALL_LABWARE_RANGES = [
+    ([-0.30, -0.15], [-0.05, 0.10]),   # 左侧偏前
+    ([-0.15,  0.00], [-0.05, 0.10]),   # 中左偏前
+    ([ 0.00,  0.15], [-0.05, 0.10]),   # 中右偏前
+    ([ 0.15,  0.30], [-0.05, 0.10]),   # 右侧偏前
+    ([-0.30, -0.15], [0.10, 0.25]),    # 左侧偏后
+    ([-0.15,  0.00], [0.10, 0.25]),    # 中左偏后
+    ([ 0.00,  0.15], [0.10, 0.25]),    # 中右偏后
+    ([ 0.15,  0.30], [0.10, 0.25]),    # 右侧偏后
+]
+
+# 大件位置区间：远离机械臂
+# x: 全宽 [-0.30, +0.30] 随机（左右分布）
+# y: [0.40, 0.45]，远端（与缓冲带 [0.25, 0.40] 隔开）
+FIXTURE_RANGES = [
+    ([-0.30, -0.15], [0.40, 0.45]),   # 左侧远端
+    ([-0.15,  0.00], [0.40, 0.45]),   # 中左远端
+    ([ 0.00,  0.15], [0.40, 0.45]),   # 中右远端
+    ([ 0.15,  0.30], [0.40, 0.45]),   # 右侧远端
+]
+
+# 固定位置表：key 为 class_name，value 为 (x, y)，z 始终为 0.8
+# 用于需要精确定位的物体（如 drying_box 由视觉标定过）
+FIXED_POSITIONS = {
+    "DryingBoxWithButton": (0.30, 0.45),
+    "ContainerWithDrawer": (0.0, 0.4),
+}
+
 # 容器类需要被固定到 arena 才能完成任务的清单
 # （单手机械臂无法在被自由放置的物体上完成拧/插/按等需要底座稳定的操作）
 ATTACH_TO_ARENA_CLASSES = {
-    "ContainerWithCap",  # 拧开瓶盖需要瓶身固定
+    # 暂时禁用 attach_to_arena 以测试 drawer 问题
+    "ContainerWithCap",
+    "DryingBoxWithButton",
+    "ContainerWithDrawer",
 }
 
 
@@ -69,8 +121,45 @@ class EntityLoadPlan:
     properties: Dict = field(default_factory=dict)
     parent_spec: Optional[str] = None
     position_index: int = 0  # 用于位置分散
+    orientation_yaw: float = 0.0  # 仅大件使用，绕 z 轴 rad；小件默认为 0
     attach_to_arena: bool = False  # 加载后是否焊死到 arena
     subentity_position: list = field(default_factory=list)  # 子实体相对位置
+
+
+def _append_plain_like_plan(
+    plans: List[EntityLoadPlan],
+    uid: str,
+    spec: str,
+    class_name: str,
+    properties: Dict,
+    small_counter: int,
+    fixture_counter: int,
+    attach_to_arena: bool = False,
+) -> None:
+    """
+    为 plain/liquid 实体构建 EntityLoadPlan，并根据 class_name 选取对应的位置表和朝向。
+
+    大件走 FIXTURE_RANGES（远离机械臂）并设置 orientation_yaw；
+    小件走 SMALL_LABWARE_RANGES（靠近机械臂），无朝向。
+    """
+    if class_name in FIXTURE_WITH_HANDLE_CLASSES:
+        pos_index = fixture_counter
+        yaw = FIXTURE_HANDLE_YAW[class_name]
+    else:
+        pos_index = small_counter
+        yaw = 0.0
+
+    plans.append(EntityLoadPlan(
+        uid=uid,
+        spec=spec,
+        class_name=class_name,
+        load_mode="liquid" if "solution" in properties else "plain",
+        method_name="load_objects",
+        properties=properties,
+        position_index=pos_index,
+        orientation_yaw=yaw,
+        attach_to_arena=attach_to_arena,
+    ))
 
 
 def plan_entity_loading(
@@ -89,7 +178,8 @@ def plan_entity_loading(
     """
     plans: List[EntityLoadPlan] = []
     has_init_container = False
-    plain_entity_counter = 0  # 用于位置分散
+    small_counter = 0    # 小件位置序号（靠近机械臂）
+    fixture_counter = 0  # 大件位置序号（远离机械臂）
 
     # 第一遍扫描：找出已有的 tube_stand / funnel_support uid
     existing_tube_stand_uid = None
@@ -219,25 +309,25 @@ def plan_entity_loading(
 
         # Liquid: 带 solution
         elif "solution" in properties:
-            plans.append(EntityLoadPlan(
-                uid=uid, spec=spec, class_name=class_name,
-                load_mode="liquid", method_name="load_objects",
-                properties=properties,
-                position_index=plain_entity_counter,
-                attach_to_arena=(class_name in ATTACH_TO_ARENA_CLASSES),
-            ))
-            plain_entity_counter += 1
+            _append_plain_like_plan(
+                plans, uid, spec, class_name, properties,
+                small_counter, fixture_counter, attach_to_arena=(class_name in ATTACH_TO_ARENA_CLASSES),
+            )
+            if class_name in FIXTURE_WITH_HANDLE_CLASSES:
+                fixture_counter += 1
+            else:
+                small_counter += 1
 
         # Plain: 所有其他实体（统一走 load_objects）
         else:
-            plans.append(EntityLoadPlan(
-                uid=uid, spec=spec, class_name=class_name,
-                load_mode="plain", method_name="load_objects",
-                properties=properties,
-                position_index=plain_entity_counter,
-                attach_to_arena=(class_name in ATTACH_TO_ARENA_CLASSES),
-            ))
-            plain_entity_counter += 1
+            _append_plain_like_plan(
+                plans, uid, spec, class_name, properties,
+                small_counter, fixture_counter, attach_to_arena=(class_name in ATTACH_TO_ARENA_CLASSES),
+            )
+            if class_name in FIXTURE_WITH_HANDLE_CLASSES:
+                fixture_counter += 1
+            else:
+                small_counter += 1
 
     return plans
 
@@ -396,16 +486,33 @@ def _gen_objects(plans: List[EntityLoadPlan], flags: Dict) -> str:
 
 
 def _code_plain(plan: EntityLoadPlan, flags: Dict) -> List[str]:
-    pos_range = ENTITY_POSITION_RANGES[plan.position_index % len(ENTITY_POSITION_RANGES)]
+    # 固定位置优先（由视觉标定过的物体）
+    if plan.class_name in FIXED_POSITIONS:
+        fx, fy = FIXED_POSITIONS[plan.class_name]
+        position_line = f'            position=[{fx}, {fy}, 0.8],'
+    else:
+        if plan.class_name in FIXTURE_WITH_HANDLE_CLASSES:
+            pos_table = FIXTURE_RANGES
+        else:
+            pos_table = SMALL_LABWARE_RANGES
+        pos_range = pos_table[plan.position_index % len(pos_table)]
+        position_line = (
+            f'            position=[random.uniform({pos_range[0][0]}, {pos_range[0][1]}), '
+            f'random.uniform({pos_range[1][0]}, {pos_range[1][1]}), 0.8],'
+        )
+
     lines = [
         f'        obj_config = dict(',
         f'            name="{plan.uid}",',
         f'            xml_path=name2class_xml["{plan.spec}"][-1],',
-        f'            position=[random.uniform({pos_range[0][0]}, {pos_range[0][1]}), random.uniform({pos_range[1][0]}, {pos_range[1][1]}), 0.8],',
+        position_line,
         f'        )',
         f'        obj_config["class"] = "{plan.class_name}"',
-        f'        obj_config["randomness"] = dict(pos=[0.02, 0.02, 0], quat=[0, 0, 0.05])',
     ]
+    # 大件：门/把手朝向机械臂（绕 z 轴旋转，dict 构造完之后追加）
+    if plan.orientation_yaw != 0.0:
+        lines.append(f'        obj_config["orientation"] = [0, 0, {plan.orientation_yaw:.4f}]')
+    lines.append(f'        obj_config["randomness"] = dict(pos=[0.02, 0.02, 0], quat=[0, 0, 0.05])')
     if plan.attach_to_arena:
         lines.append(f'        obj_config["attach_to_arena"] = True')
     lines += [
@@ -418,29 +525,26 @@ def _code_plain(plan: EntityLoadPlan, flags: Dict) -> List[str]:
 def _code_liquid(plan: EntityLoadPlan, flags: Dict) -> List[str]:
     solution_rgba = plan.properties.get("solution_rgba")
     solution = plan.properties.get("solution", plan.uid)
-    pos_range = ENTITY_POSITION_RANGES[plan.position_index % len(ENTITY_POSITION_RANGES)]
-    if solution_rgba:
-        lines = [
-            f'        obj_config = dict(',
-            f'            name="{plan.uid}",',
-            f'            xml_path=name2class_xml["{plan.spec}"][-1],',
-            f'            position=[random.uniform({pos_range[0][0]}, {pos_range[0][1]}), random.uniform({pos_range[1][0]}, {pos_range[1][1]}), 0.8],',
-            f'            solution_rgba={solution_rgba},',
-            f'        )',
-            f'        obj_config["class"] = "{plan.class_name}"',
-            f'        obj_config["randomness"] = dict(pos=[0.02, 0.02, 0], quat=[0, 0, 0.05])',
-        ]
+    if plan.class_name in FIXTURE_WITH_HANDLE_CLASSES:
+        pos_table = FIXTURE_RANGES
     else:
-        lines = [
-            f'        obj_config = dict(',
-            f'            name="{plan.uid}",',
-            f'            xml_path=name2class_xml["{plan.spec}"][-1],',
-            f'            position=[random.uniform({pos_range[0][0]}, {pos_range[0][1]}), random.uniform({pos_range[1][0]}, {pos_range[1][1]}), 0.8],',
-            f'            solution="{solution}",',
-            f'        )',
-            f'        obj_config["class"] = "{plan.class_name}"',
-            f'        obj_config["randomness"] = dict(pos=[0.02, 0.02, 0], quat=[0, 0, 0.05])',
-        ]
+        pos_table = SMALL_LABWARE_RANGES
+    pos_range = pos_table[plan.position_index % len(pos_table)]
+    lines = [
+        f'        obj_config = dict(',
+        f'            name="{plan.uid}",',
+        f'            xml_path=name2class_xml["{plan.spec}"][-1],',
+        f'            position=[random.uniform({pos_range[0][0]}, {pos_range[0][1]}), random.uniform({pos_range[1][0]}, {pos_range[1][1]}), 0.8],',
+        f'            solution="{solution}",',
+    ]
+    if solution_rgba:
+        lines.append(f'            solution_rgba={solution_rgba},')
+    lines.append(f'        )')
+    lines.append(f'        obj_config["class"] = "{plan.class_name}"')
+    # 大件：门/把手朝向机械臂（绕 z 轴旋转，单独写赋值语句避免破坏 dict literal）
+    if plan.orientation_yaw != 0.0:
+        lines.append(f'        obj_config["orientation"] = [0, 0, {plan.orientation_yaw:.4f}]')
+    lines.append(f'        obj_config["randomness"] = dict(pos=[0.02, 0.02, 0], quat=[0, 0, 0.05])')
     if plan.attach_to_arena:
         lines.append(f'        obj_config["attach_to_arena"] = True')
     lines += [
@@ -484,6 +588,7 @@ def _code_subentity(plan: EntityLoadPlan, flags: Dict) -> List[str]:
             '            init_container_config["subentities"] = []',
             f'        obj_config = dict(',
             f'            name="{plan.uid}",',
+            f'            solution="{solution}",',
             f'            solution_rgba={solution_rgba},',
             f'            xml_path=name2class_xml["{plan.spec}"][-1],',
             f'            position=pos,',

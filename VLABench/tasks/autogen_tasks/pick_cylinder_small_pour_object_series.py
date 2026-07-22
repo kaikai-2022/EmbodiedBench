@@ -37,7 +37,7 @@ class PickCylinderSmallPourObjectConfigManager(BenchTaskConfigManager):
         self.target_entity = "cylinder_small_0"
 
     def get_instruction(self, target_entity, **kwargs):
-        self.config["task"]["instructions"] = ["Pick the cylinder_small_0 which contains CuSO4 solution."]
+        self.config["task"]["instructions"] = ["Pick the <cylinder_small_0> which contains <CuSO4 solution_0>."]
 
     def get_condition_config(self, target_entity, **kwargs):
         conditions_config = [
@@ -60,7 +60,7 @@ class PickCylinderSmallPourObjectTask(PrimitiveTask):
         skill_sequence = [
             partial(SkillLib.pick, target_entity_name="cylinder_small_0"),
             partial(SkillLib.lift, lift_height=0.15),
-            partial(SkillLib.pour_to_entity, target_container_name="flask_0", tilt_angle=2, wait_time=10),
+            partial(SkillLib.pour_to_entity, target_container_name="flask_0", tilt_angle=1.8, wait_time=10),
             partial(SkillLib.open_gripper),
         ]
         return skill_sequence

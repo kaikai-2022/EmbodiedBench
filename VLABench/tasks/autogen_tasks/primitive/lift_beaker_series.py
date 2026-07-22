@@ -18,10 +18,10 @@ class LiftBeakerConfigManager(BenchTaskConfigManager):
         obj_config = dict(
             name="small_beaker_0",
             xml_path=name2class_xml["small_beaker"][-1],
-            position=[random.uniform(0.05, 0.15), random.uniform(-0.15, -0.05), 0.8],
+            position=[0.25, 0.15, 0.8],
         )
         obj_config["class"] = "ChemistryBeaker"
-        obj_config["randomness"] = dict(pos=[0.02, 0.02, 0], quat=[0, 0, 0.05])
+        # obj_config["randomness"] = dict(pos=[0.02, 0.02, 0], quat=[0, 0, 0.05])
         self.config["task"]["components"].append(obj_config)
 
         self.target_entity = "small_beaker_0"

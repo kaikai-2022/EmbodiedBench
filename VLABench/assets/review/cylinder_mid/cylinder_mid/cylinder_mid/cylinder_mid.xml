@@ -35,8 +35,13 @@
       <geom mesh="cylinder_mid_collision_6"  class="collision"/>
       <geom mesh="cylinder_mid_collision_7"  class="collision"/>
       <geom mesh="cylinder_mid_collision_8"  class="collision"/>
-      <site class="grasppoint" pos="0.0000 0.0000 0.171"/>
-          <geom name="solution" type="cylinder" size="0.0113 0.050012" pos="0 0 0.053524" material="CaSO4" class="visual"/>
+      <!-- Anti-slip box: collision + visual overlay. Both boxes share identical size/pos. -->
+      <!-- <geom name="grip_assist_visual" type="box" rgba="0 0 1 0.4" size="0.0165 0.0165 0.09" pos="0 0 0.09" class="visual"/> -->
+      <geom name="grip_assist" type="box" size="0.0165 0.0165 0.09" pos="0 0 0.09"
+            contype="2" conaffinity="2" group="3" friction="1 1 0.1"
+            density="50" solref="0.001 1"/>
+      <site class="grasppoint" pos="0.0000 0.0000 0.158"/>
+          <geom name="solution" type="cylinder" size="0.0113 0.050012" pos="0 0 0.059524" material="CaSO4" class="visual"/>
       <site name="top_site" pos="0 0 0.180000" size="0.01" rgba="1 0 0 0"/>
       <site name="bottom_site" pos="0 0 0.000000" size="0.01" rgba="0 1 0 0"/>
 </body>
@@ -47,7 +52,7 @@
       <geom group="2" type="mesh" contype="0" conaffinity="0" density="50"/>
     </default>
     <default class="collision">
-      <geom group="3" type="mesh" density="50" friction="1 1 0.001" solimp="0.998 0.998 0.001" solref="0.001 2"/>
+      <geom group="3" type="mesh" density="50" friction="1 1 0.001" solimp="0.999 0.999 0.001" solref="0.01 1"/>
     </default>
     <default class="grasppoint">
       <site type="sphere" size="0.005" group="4" rgba="0 0 1 1"/>

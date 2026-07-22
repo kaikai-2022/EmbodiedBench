@@ -1,0 +1,28 @@
+{
+  "uid": "petri_dish_lid",
+  "centered": true,
+  "scaled": true,
+  "scale_factor": 0.027318416877926965,
+  "orientation_warning": "模型最长轴为 X (5.491m)，Z轴为 1.165m，可能需要旋转",
+  "original_dims": {
+    "center": [
+      0.0,
+      0.0,
+      0.5732378499999999
+    ],
+    "ranges": [
+      5.49080134,
+      5.49080134,
+      1.16511188
+    ],
+    "max_dim": 5.49080134
+  },
+  "final_dims": {
+    "ranges": [
+      0.15,
+      0.15,
+      0.031829012047265216
+    ],
+    "max_dim": 0.15
+  }
+}

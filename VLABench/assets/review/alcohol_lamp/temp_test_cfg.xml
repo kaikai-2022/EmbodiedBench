@@ -1,0 +1,8 @@
+<mujoco model="test">
+  <worldbody>
+    <light directional="true" pos="0 0 3" dir="0 0 -1"/>
+    <body name="bg" pos="0 0 0">
+      <geom type="box" size="50 0.001 50" rgba="1 1 1 1" group="0"/>
+    </body>
+  </worldbody>
+</mujoco>

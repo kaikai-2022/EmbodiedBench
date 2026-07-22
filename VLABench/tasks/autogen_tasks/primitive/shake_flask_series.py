@@ -18,7 +18,7 @@ class ShakeFlaskConfigManager(BenchTaskConfigManager):
         obj_config = dict(
             name="flask_0",
             xml_path=name2class_xml["flask"][-1],
-            position=[random.uniform(0.05, 0.15), random.uniform(-0.15, -0.05), 0.8],
+            position=[random.uniform(-0.25, 0.25), random.uniform(-0.15, 0.25), 0.8],
             solution_rgba=[0, 0.45, 1, 0.4],
         )
         obj_config["class"] = "ChemistryBeaker"
@@ -44,7 +44,7 @@ class ShakeFlaskTask(PrimitiveTask):
 
     def get_expert_skill_sequence(self, physics):
         skill_sequence = [
-            partial(SkillLib.gently_pick, target_entity_name="flask_0", prior_eulers=[[-3.141592653589793, 0, 0]], extra_close_ratio=0.2, n_close_steps=20, contact_dist_threshold=0.005, hold_steps=5),
+            partial(SkillLib.pick, target_entity_name="flask_0"),
             partial(SkillLib.lift, lift_height=0.15, gripper_state=[0, 0]),
             partial(SkillLib.shake, n_shakes=3, shake_angle=0.7, steps_per_swing=5),
             partial(SkillLib.drop),

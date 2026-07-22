@@ -39,13 +39,16 @@
 			<inertial pos="0 0 0" mass="3" diaginertia="1 1 1" />
 			<joint name="top_drawer" type="slide" pos="0.00000 0.00000 0.00000" axis="1 0 0" limited="true" range="-0.005 0.32" damping="50" />
 			<site rgba="0 0 0 0" type="box" pos="-0.00218 0.05636 -0.00000" quat="0.00000 0.70711 0.70711 0.00000" size="0.02022 0.08279 0.08821" name="top_region" />
-			<site class="grasppoint" pos="0.26000 0.13000 0.00000" group="4" />
+			<site class="grasppoint" pos="0.26000 0.12200 0.00000" group="4" />
 			<geom solimp="0.998 0.998 0.001" solref="0.001 1" density="100" friction="0.95 0.3 0.1" type="mesh" mesh="drawer_high_vis" class="visual" material="base_vis" />		
 			<geom class="collision" pos="0.22961 0.11677 -0.00000" quat="1.00000 0.00000 0.00000 -0.00000" size="0.01375 0.05382 0.25090" rgba="0.8 0.8 0.8 0.3" />
 			<geom class="collision" pos="-0.22347 0.11677 0.00000" quat="1.00000 0.00000 0.00000 0.00000" size="0.01375 0.05294 0.25415" rgba="0.8 0.8 0.8 0.3" />
 			<geom class="collision" pos="-0.00000 0.07712 0.00000" quat="0.00000 -0.70711 -0.70711 -0.00000" size="0.00580 0.23863 0.25420" rgba="0.8 0.8 0.8 0.3" />
 			<geom class="collision" pos="0.00335 0.11536 -0.24058" quat="0.70711 0.00000 0.70711 0.00000" size="0.00944 0.05140 0.21406" rgba="0.8 0.8 0.8 0.3" />
-			<geom class="collision" pos="0.26497 0.12483 0.00000" quat="0.00000 0.00000 1.00000 0.00000" size="0.00265 0.00593 0.02681" rgba="0.8 0.8 0.8 0.3" />
+			<geom class="collision" pos="0.26497 0.12483 0.00000" quat="0.00000 0.00000 1.00000 0.00000" size="0.02681 0.015 0.0055" rgba="0.8 0.8 0.8 0.3" />
+			<!-- Anti-slip handle box: same size/pos as handle, ONLY collides with finger pads (contype=2 conaffinity=2). -->
+			<!-- <geom name="grip_handle_top_v" type="box" size="0.025 0.005 0.0555" pos="0.26497 0.12483 0.00000" quat="0.00000 0.00000 1.00000 0.00000" contype="0" conaffinity="0" group="2" rgba="1 0 0 0.8"/> -->
+			<geom name="grip_handle_top" type="box" size="0.025 0.005 0.0555" pos="0.26497 0.12483 0.00000" quat="0.00000 0.00000 1.00000 0.00000" contype="2" conaffinity="2" group="3" friction="4 4 0.1" density="50" solref="0.001 1"/>
 			<geom class="collision" pos="0.25688 0.12483 -0.03487" quat="0.00000 -0.97198 0.00000 0.23506" size="0.00270 0.00593 0.02096" rgba="0.8 0.8 0.8 0.3" />
 			<geom class="collision" pos="0.25566 0.12483 0.03526" quat="0.32083 -0.00000 0.94714 -0.00000" size="0.00270 0.00593 0.02096" rgba="0.8 0.8 0.8 0.3" />
 			<geom class="collision" pos="0.24796 0.12483 0.05470" quat="0.14192 -0.14192 0.69272 0.69272" size="0.00335 0.00528 0.00593" rgba="0.8 0.8 0.8 0.3" />
@@ -66,7 +69,10 @@
 			<geom class="collision" pos="-0.22347 -0.00281 -0.00000" quat="0.00000 0.00000 1.00000 0.00000" size="0.01375 0.05294 0.25415" rgba="0.8 0.8 0.8 0.3" />
 			<geom class="collision" pos="-0.00000 -0.04243 -0.00000" quat="0.00000 0.70711 0.70711 0.00000" size="0.00580 0.23863 0.25420" rgba="0.8 0.8 0.8 0.3" />
 			<geom class="collision" pos="0.00335 -0.00421 -0.24058" quat="0.70711 0.00000 0.70711 0.00000" size="0.00944 0.05140 0.21406" rgba="0.8 0.8 0.8 0.3" />
-			<geom class="collision" pos="0.26497 0.00525 0.00000" quat="0.00000 0.00000 1.00000 0.00000" size="0.00265 0.00593 0.02681" rgba="0.8 0.8 0.8 0.3" />
+			<geom class="collision" pos="0.26497 0.00525 0.00000" quat="0.00000 0.00000 1.00000 0.00000" size="0.02681 0.015 0.0055" rgba="0.8 0.8 0.8 0.3" />
+			<!-- Anti-slip handle box: same size/pos as handle, ONLY collides with finger pads (contype=2 conaffinity=2). -->
+			<!-- <geom name="grip_handle_mid_v" type="box" size="0.025 0.005 0.0555" pos="0.26497 0.00525 0.00000" quat="0.00000 0.00000 1.00000 0.00000" contype="0" conaffinity="0" group="2" rgba="1 0 0 0.8"/> -->
+			<geom name="grip_handle_mid" type="box" size="0.025 0.005 0.0555" pos="0.26497 0.00525 0.00000" quat="0.00000 0.00000 1.00000 0.00000" contype="2" conaffinity="2" group="3" friction="4 4 0.1" density="50" solref="0.001 1"/>
 			<geom class="collision" pos="0.25688 0.00525 -0.03487" quat="0.23506 0.00000 -0.97198 -0.00000" size="0.00270 0.00593 0.02096" rgba="0.8 0.8 0.8 0.3" />
 			<geom class="collision" pos="0.25566 0.00525 0.03526" quat="0.32083 -0.00000 0.94714 -0.00000" size="0.00270 0.00593 0.02096" rgba="0.8 0.8 0.8 0.3" />
 			<geom class="collision" pos="0.24796 0.00525 0.05470" quat="0.14192 -0.14192 0.69272 0.69272" size="0.00335 0.00528 0.00593" rgba="0.8 0.8 0.8 0.3" />
@@ -86,7 +92,10 @@
 			<geom class="collision" pos="-0.22347 -0.12584 -0.00000" quat="0.00000 0.00000 1.00000 0.00000" size="0.01375 0.05294 0.25415" rgba="0.8 0.8 0.8 0.3" />
 			<geom class="collision" pos="-0.00000 -0.16546 -0.00000" quat="0.00000 -0.70711 0.70711 0.00000" size="0.00580 0.23863 0.25420" rgba="0.8 0.8 0.8 0.3" />
 			<geom class="collision" pos="0.00335 -0.12724 -0.24058" quat="0.70711 0.00000 0.70711 0.00000" size="0.00944 0.05140 0.21406" rgba="0.8 0.8 0.8 0.3" />
-			<geom class="collision" pos="0.26497 -0.11778 0.00000" quat="0.00000 0.00000 1.00000 0.00000" size="0.00265 0.00593 0.02681" rgba="0.8 0.8 0.8 0.3" />
+			<geom class="collision" pos="0.26497 -0.11778 0.00000" quat="0.00000 0.00000 1.00000 0.00000" size="0.02681 0.015 0.0055" rgba="0.8 0.8 0.8 0.3" />
+			<!-- Anti-slip handle box: same size/pos as handle, ONLY collides with finger pads (contype=2 conaffinity=2). -->
+			<!-- <geom name="grip_handle_bottom_v" type="box" size="0.025 0.005 0.0555" pos="0.26497 -0.11778 0.00000" quat="0.00000 0.00000 1.00000 0.00000" contype="0" conaffinity="0" group="2" rgba="1 0 0 0.8"/> -->
+			<geom name="grip_handle_bottom" type="box" size="0.025 0.005 0.0555" pos="0.26497 -0.11778 0.00000" quat="0.00000 0.00000 1.00000 0.00000" contype="2" conaffinity="2" group="3" friction="4 4 0.1" density="50" solref="0.001 1"/>
 			<geom class="collision" pos="0.25688 -0.11778 -0.03487" quat="0.97198 -0.00000 0.23506 -0.00000" size="0.00270 0.00593 0.02096" rgba="0.8 0.8 0.8 0.3" />
 			<geom class="collision" pos="0.25566 -0.11778 0.03526" quat="0.32083 -0.00000 0.94714 -0.00000" size="0.00270 0.00593 0.02096" rgba="0.8 0.8 0.8 0.3" />
 			<geom class="collision" pos="0.24796 -0.11778 0.05470" quat="0.14192 -0.14192 0.69272 0.69272" size="0.00335 0.00528 0.00593" rgba="0.8 0.8 0.8 0.3" />

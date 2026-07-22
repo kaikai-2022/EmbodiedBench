@@ -1,0 +1,14 @@
+Model UID: petri_dish_lid
+Model Name: petri_dish_lid
+
+Source Information:
+============================================================
+Source: Local File
+Original Path: /tmp/petri_dish_lid_input/petri_dish_lid.glb
+File Name: petri_dish_lid.glb
+Keyword/Category: petri_dish_lid
+Rotation: 90.0° around X axis
+
+Processing:
+Pipeline: process_local_glb.py
+Steps: GLB->OBJ (trimesh) -> [rotate] -> MJCF (obj2mjcf) -> postprocess -> bottom-align -> validate -> size_fix

@@ -177,7 +177,11 @@ class Evaluator:
             if success:
                 break
             i += 1
-        intention_score =  env.get_intention_score(threshold=self.intention_score_threshold)
+        try:
+            intention_score = env.get_intention_score(threshold=self.intention_score_threshold)
+        except (KeyError, TypeError):
+            # 有些任务的 target_entity 可能是 subentity，不在 intention_distance 中，跳过
+            intention_score = None
         progress_score = env.get_task_progress()
 
         # 记录各条件的最终检查结果

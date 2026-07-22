@@ -1,0 +1,14 @@
+{
+  "uid": "petri_dish_lid",
+  "name": "petri_dish_lid",
+  "source": "local",
+  "original_path": "/tmp/petri_dish_lid_input/petri_dish_lid.glb",
+  "keyword": "petri_dish_lid",
+  "tags": [],
+  "categories": [],
+  "description": "Local GLB model: petri_dish_lid.glb",
+  "rotation": {
+    "axis": "x",
+    "degrees": 90.0
+  }
+}

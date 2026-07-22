@@ -305,7 +305,7 @@ class SkillLib:
         waypoints.extend(new_waypoints)
         # 无论 step_trajectory 返回什么，都要执行 close_gripper 完成抓取
         # grasp
-        new_obs, new_waypoints, _, _ = SkillLib.close_gripper(env)
+        new_obs, new_waypoints, _, _ = SkillLib.close_gripper(env, repeat=20)
         observations.extend(new_obs)
         waypoints.extend(new_waypoints)
 
@@ -356,284 +356,6 @@ class SkillLib:
             print(f"  目标抓取点位置: {key_pos}")
             print(f"  位置误差: {np.linalg.norm(env.robot.get_end_effector_pos(env.physics) - key_pos)}")
         # pick 只是中间步骤，不是任务完成，所以 task_success 始终为 False
-        return observations, waypoints, stage_success, False
-
-    @staticmethod
-    def gently_pick(env,
-                    target_entity_name,
-                    target_pos=None,
-                    target_quat=None,
-                    prepare_distance=-0.1,
-                    prepare_quat=None,
-                    prior_eulers=PRIOR_EULERS,
-                    specific_keypoint=None,
-                    target_velocity=0.05,
-                    extra_close_ratio=0.2,
-                    n_close_steps=20,
-                    contact_dist_threshold=0.005,
-                    hold_steps=5,
-                    motion_planning_kwargs=dict(),
-                    **kwargs):
-        """
-        柔性抓取：移动到抓取点后，逐步闭合夹爪；当左右两侧手指均与目标物体
-        产生接触时，仅再额外合上 extra_close_ratio 比例的开度（即 0.04 的
-        extra_close_ratio），然后**主动发控制信号让夹爪保持在该宽度**，
-        不会再继续合紧。无需开启 grasp lock。
-
-        与 pick() 的关键区别：
-        - pick() 直接调用 close_gripper 合到 0，可能压坏物体；
-        - gently_pick() 在两侧触碰物体时停止主动合拢，仅做轻压。
-
-        保持宽度的实现：franka 夹爪是 position-controlled actuator，
-        持续给 `gripper_state = [w, w]` 就会把手指位置伺服到 w 并停在那里。
-        物理接触会让手指停在物体表面而不是继续往下合——但为了避免伺服
-        持续施力压坏物体，我们用 hold_steps 步后的**实际手指 qpos**作为
-        目标宽度，这样 servo 的目标就是"当前在哪停在哪"。
-
-        param:
-            env: LM4manipEnv object
-            target_entity_name: str, target entity name
-            target_pos / target_quat: 可选的手动抓取点；为 None 时由 keypoint 算法生成
-            prepare_distance: 准备点距抓取点的距离（沿 move_vector 方向）
-            prepare_quat: 准备姿态
-            prior_eulers: 候选欧拉角
-            specific_keypoint: 指定 keypoint id
-            target_velocity: 路径插值速度
-            extra_close_ratio: 两侧接触后再额外合上的开度比例（相对 0.04），默认 0.2
-            n_close_steps: 闭合阶段最多步数
-            contact_dist_threshold: 判定手指-物体接触的距离阈值（m）
-            hold_steps: 轻压后稳定步数；用这段时间内的实际 qpos 作为最终保持目标
-            motion_planning_kwargs: 传给 RRT 的额外参数
-        return:
-            observations, waypoints, stage_success, False
-        """
-        target_entity = env.task.entities[target_entity_name]
-
-        if target_pos is None or target_quat is None:
-            key_pos, prepare_key_pos, key_quat = find_keypoint_and_prepare_grasp(
-                env, target_entity, prior_eulers, specific_keypoint_id=specific_keypoint, move_vector=prepare_quat)
-            if key_pos is None or prepare_key_pos is None:
-                print("DEBUG [gently_pick]: can not find valid keypoint and prepare point, reset the env")
-                return None
-        else:
-            key_pos, key_quat = target_pos, target_quat
-            if prepare_quat is None:
-                gripper_pcd, move_quat = env.robot.gripper_pcd(key_pos, key_quat)
-            else:
-                move_quat = prepare_quat
-            prepare_key_pos = key_pos + move_quat * prepare_distance
-
-        start_pos, start_quat = env.robot.get_end_effector_pos(env.physics), env.robot.get_end_effector_quat(env.physics)
-        obstacle_pcd = np.asarray(env.get_obstacle_pcd().points)
-        start_pos, start_quat, key_quat, prepare_pos, key_pos = (
-            np.array(start_pos), np.array(start_quat), np.array(key_quat),
-            np.array(prepare_key_pos), np.array(key_pos)
-        )
-
-        # 1) RRT 规划：start -> prepare -> key
-        init2prepare_path = rrt_motion_planning(tuple(start_pos),
-                                                tuple(prepare_pos),
-                                                obstacle_pcd,
-                                                **motion_planning_kwargs)
-        if init2prepare_path is None:
-            init2prepare_path = [start_pos, prepare_pos]
-        quats_in_path = [start_quat for _ in range(len(init2prepare_path) - 1)]
-        quats_in_path.append(key_quat)
-        init2prepare_path.append(tuple(key_pos))
-        path = np.array(init2prepare_path)
-        quats_in_path.append(key_quat)
-
-        interplate_path, interplate_quat = interpolate_path(path, quats_in_path, target_velocity)
-
-        waypoints = []
-        observations = [env.get_observation()]
-        stage_success = False
-        task_success = False
-
-        # 2) 张开夹爪移动到抓取点
-        gripper_state = np.ones(2) * 0.04
-        new_obs, new_waypoints, _, task_success = SkillLib.step_trajectory(
-            env, interplate_path, interplate_quat, gripper_state, **kwargs)
-        observations.extend(new_obs)
-        waypoints.extend(new_waypoints)
-
-        # 3) 逐步闭合夹爪，检测两侧接触
-        import mujoco as mj
-        raw_m = env.physics.model._model
-        raw_d = env.physics.data._data
-
-        left_geoms = env.robot.mjcf_model.find("body", "left_finger").find_all("geom")
-        right_geoms = env.robot.mjcf_model.find("body", "right_finger").find_all("geom")
-        left_geom_ids = {env.physics.bind(g).element_id for g in left_geoms}
-        right_geom_ids = {env.physics.bind(g).element_id for g in right_geoms}
-        target_geom_ids = {env.physics.bind(g).element_id for g in target_entity.geoms}
-
-        # 获取两侧 pad geom 的世界坐标中点
-        def _get_finger_pad_centers():
-            left_pad_pos = np.zeros(3)
-            right_pad_pos = np.zeros(3)
-            for g in left_geoms:
-                eid = env.physics.bind(g).element_id
-                gname = mj.mj_id2name(raw_m, mj.mjtObj.mjOBJ_GEOM, eid) or ''
-                if 'pad' in gname.lower():
-                    left_pad_pos = raw_d.geom_xpos[eid].copy()
-                    break
-            for g in right_geoms:
-                eid = env.physics.bind(g).element_id
-                gname = mj.mj_id2name(raw_m, mj.mjtObj.mjOBJ_GEOM, eid) or ''
-                if 'pad' in gname.lower():
-                    right_pad_pos = raw_d.geom_xpos[eid].copy()
-                    break
-            return left_pad_pos, right_pad_pos
-
-        def _side_has_contact(side_ids):
-            for c in raw_d.contact:
-                if c.dist > contact_dist_threshold:
-                    continue
-                if (c.geom1 in side_ids and c.geom2 in target_geom_ids) or \
-                   (c.geom2 in side_ids and c.geom1 in target_geom_ids):
-                    return True
-            return False
-
-        # 关键修复：闭合开始时记录 arm qpos，整个闭合过程保持不变
-        # 原因：像 close_gripper 一样，避免每次循环读取当前 qpos 导致微小扰动累积
-        arm_qpos = np.array(env.robot.get_qpos(env.physics)).reshape(-1)
-        both_touched = False
-        touch_pad_dist = None  # 双侧接触瞬间两指 pad 的实际距离
-        for i in range(n_close_steps):
-            # 从 0.04 线性合到 0
-            target = 0.04 * (1.0 - (i + 1) / n_close_steps)
-            gripper_state = np.ones(2) * target
-            # 使用固定的 arm_qpos，而不是每次重新读取
-            action = np.concatenate([arm_qpos, gripper_state])
-            timestep = env.step(action)
-            if timestep.last():
-                task_success = True
-                break
-
-            waypoint = np.concatenate([
-                env.robot.get_end_effector_pos(env.physics),
-                quaternion_to_euler(env.robot.get_end_effector_quat(env.physics)),
-                gripper_state,
-            ])
-            observations.append(env.get_observation())
-            waypoints.append(waypoint)
-
-            if _side_has_contact(left_geom_ids) and _side_has_contact(right_geom_ids):
-                both_touched = True
-                # 记录双侧接触瞬间两指 pad 的实际距离（而非 finger joint 的目标值）
-                left_pad_pos, right_pad_pos = _get_finger_pad_centers()
-                touch_pad_dist = np.linalg.norm(left_pad_pos - right_pad_pos)
-                print(f"DEBUG [gently_pick]: 两侧均已接触目标 @ step {i}, "
-                      f"pad 间距={touch_pad_dist:.4f}m, target={target:.4f}")
-                break
-
-        if not both_touched:
-            # 走完所有步仍未两侧接触 → 退化：直接读取两指 pad 距离作为 fallback
-            print("DEBUG [gently_pick]: 警告：未检测到双侧接触，使用当前 pad 距离作为 fallback")
-            left_pad_pos, right_pad_pos = _get_finger_pad_centers()
-            touch_pad_dist = np.linalg.norm(left_pad_pos - right_pad_pos)
-
-        # 4) 基于 pad 实际距离轻压 extra_close_ratio 比例
-        # 逻辑：双侧接触时两指 pad 距离为 touch_pad_dist；
-        #      再缩小该距离的 extra_close_ratio 比例（默认 20%）
-        # 最终 pad 目标距离 = touch_pad_dist * (1 - extra_close_ratio)
-        # 然后把这个距离转换为每侧 finger joint 的目标位置（除以 2）
-        extra_pad_dist = max(touch_pad_dist * (1 - extra_close_ratio), 0.0)
-        # gripper_state 是单侧 finger joint 的位移（0~0.04），pad 距离 ≈ 2 * gripper_state
-        extra_target = extra_pad_dist / 2.0
-        print(f"DEBUG [gently_pick]: 轻压 pad 距离: {touch_pad_dist:.4f} -> {extra_pad_dist:.4f} "
-              f"(gripper_state: {touch_pad_dist/2:.4f} -> {extra_target:.4f})")
-
-        # 轻压开始前重新读取 arm_qpos，避免闭合循环中的微小累积误差
-        arm_qpos = np.array(env.robot.get_qpos(env.physics)).reshape(-1)
-        touch_gripper = touch_pad_dist / 2.0  # 双侧接触时的单侧 gripper 宽度
-
-        # 短时间内逐步逼近 extra_target，避免瞬时跳变
-        for j in range(3):
-            interp = touch_gripper + (extra_target - touch_gripper) * (j + 1) / 3.0
-            gripper_state = np.ones(2) * interp
-            # 使用重新读取的 arm_qpos
-            action = np.concatenate([arm_qpos, gripper_state])
-            timestep = env.step(action)
-            if timestep.last():
-                task_success = True
-                break
-            waypoint = np.concatenate([
-                env.robot.get_end_effector_pos(env.physics),
-                quaternion_to_euler(env.robot.get_end_effector_quat(env.physics)),
-                gripper_state,
-            ])
-            observations.append(env.get_observation())
-            waypoints.append(waypoint)
-
-        # 5) 稳定几步，继续发 extra_target 目标
-        # 原因：轻压阶段已经基于 pad 距离计算了 extra_target
-        # 直接用 extra_target 作为 gripper_state，避免读取"被物体撑开后的实际宽度"
-        # 对于轻小物体（如滴管），读取实际宽度会导致过松而滑落
-        print(f"DEBUG [gently_pick]: 稳定 {hold_steps} 步，gripper_state 固定为 {extra_target:.4f}")
-        for _ in range(hold_steps):
-            arm_qpos = np.array(env.robot.get_qpos(env.physics)).reshape(-1)
-            gripper_state = np.ones(2) * extra_target  # 使用目标宽度，不是实际宽度
-            action = np.concatenate([arm_qpos, gripper_state])
-            timestep = env.step(action)
-            if timestep.last():
-                task_success = True
-                break
-            waypoint = np.concatenate([
-                env.robot.get_end_effector_pos(env.physics),
-                quaternion_to_euler(env.robot.get_end_effector_quat(env.physics)),
-                gripper_state,
-            ])
-            observations.append(env.get_observation())
-            waypoints.append(waypoint)
-
-        # 最终保持的目标宽度
-        final_hold_width = np.ones(2) * extra_target
-        print(f"DEBUG [gently_pick]: 最终保持宽度: {final_hold_width} (基于 extra_target {extra_target:.4f})")
-        # 设置 _lock_gripper_state 让后续 moveto/lift/place 技能继续用这个宽度
-        env._lock_gripper_state = final_hold_width
-        print(f"DEBUG [gently_pick]: ✓ _lock_gripper_state 已设为 {final_hold_width}")
-
-        observations.pop(-1)
-        assert len(observations) == len(waypoints), \
-            f"observations and waypoints should have the same length, {len(observations)} and {len(waypoints)}"
-        if env.task.entities[target_entity_name].is_grasped(env.physics, env.robot):
-            stage_success = True
-            print(f"DEBUG [gently_pick]: ✓ 轻抓成功! stage_success=True")
-
-            # ========== 启用 grasp lock substep 同步 ==========
-            # 与 pick() 函数相同的 lock 机制：在 substep 层面同步物体到夹爪
-            if hasattr(env, "_grasp_lock_mode") and env._grasp_lock_mode > 0:
-                raw_m = env.physics.model._model
-                raw_d = env.physics.data._data
-                hand_id = mujoco.mj_name2id(raw_m, mujoco.mjtObj.mjOBJ_BODY, "franka/hand")
-                if hand_id >= 0:
-                    hand_pos = raw_d.xpos[hand_id].copy()
-                    hand_quat = raw_d.xquat[hand_id].copy()
-                    obj_pos = np.array(env.task.entities[target_entity_name].get_xpos(env.physics))
-                    obj_quat = np.array(env.task.entities[target_entity_name].get_xqaut(env.physics))
-                    rel_pos = obj_pos - hand_pos
-                    rel_quat = _quat_mul(_quat_conjugate(hand_quat), obj_quat)
-                    env._grasped_entity_info = {
-                        "name": target_entity_name,
-                        "rel_pos_local": _quat_rotate(_quat_conjugate(hand_quat), rel_pos),
-                        "rel_quat_local": rel_quat,
-                    }
-                    # lock 模式下，手指宽度已在上面设为 final_hold_width（由 _lock_gripper_state 保存）
-                    # Mode 2: 创建 weld 约束
-                    if env._grasp_lock_mode == 2 and hasattr(env, "_setup_weld_constraint"):
-                        env._setup_weld_constraint()
-
-                    # 等几帧让 lock 同步稳定
-                    for wait_frame in range(5):
-                        arm_qpos = np.array(env.robot.get_qpos(env.physics))
-                        action = np.concatenate([arm_qpos, env._lock_gripper_state])
-                        env.step(action)
-                        mujoco.mj_forward(raw_m, raw_d)
-                    print(f"DEBUG [gently_pick]: ✓ grasp lock 模式 {env._grasp_lock_mode} 已启用")
-        else:
-            print(f"DEBUG [gently_pick]: ✗ 轻抓未通过 is_grasped 判定")
         return observations, waypoints, stage_success, False
 
     @staticmethod
@@ -763,6 +485,76 @@ class SkillLib:
         return observations, waypoints, stage_success, task_success
 
     @staticmethod
+    def _find_free_drop_position(env, grasped_entity, drop_height=0.05):
+        """
+        在桌面 XY 范围 [-0.25, 0.25] 内搜索空位，放置被抓取的物体。
+
+        筛选条件：
+        1. 候选点距其他任务物体中心 X/Y > 0.10m（避开已有物体）
+        2. 候选点距被抓取物当前位置 > 0.15m（防自我碰撞）
+
+        注意：此处不使用 obstacle_pcd，因为 Table 表面点云在搜索范围内
+        几乎处处存在，导致永远找不到候选。
+
+        return: np.array([x, y, z]) 或 None（无空位时返回 None）
+        """
+        TABLE_Z_FALLBACK = 0.78
+        MARGIN_OBJECT = 0.10  # 距其他物体的最小水平距离
+        MARGIN_SELF = 0.15    # 距被抓取物自身的最小水平距离
+
+        # 桌面 Z 高度（用 max(geom.xpos.z)，不用 get_xpos——因为 Table worldbody 根位置是 (0,0,0)，
+        # 几何体偏移在内部，不能反映真实桌面顶面。仿照 condition.py:149-150 的方法。）
+        table_z = TABLE_Z_FALLBACK
+        for entity in env.task.entities.values():
+            if entity.__class__.__name__ != "Table":
+                continue
+            try:
+                max_geom_z = max(
+                    float(np.array(env.physics.bind(geom).xpos)[2])
+                    for geom in entity.geoms
+                )
+                table_z = max_geom_z
+                break
+            except Exception:
+                pass
+
+        # 场景其他物体 X/Y（排除 Table 和被抓取物）
+        object_xy_list = []
+        for entity in env.task.entities.values():
+            if entity is grasped_entity:
+                continue
+            if entity.__class__.__name__ == "Table":
+                continue
+            try:
+                object_xy_list.append(np.array(entity.get_xpos(env.physics))[:2])
+            except Exception:
+                pass
+        object_xy = np.array(object_xy_list) if object_xy_list else np.zeros((0, 2))
+
+        # 被抓取物当前位置
+        cur_xy = np.array(grasped_entity.get_xpos(env.physics))[:2]
+
+        # 网格搜索
+        candidates = []
+        for x in np.arange(-0.25, 0.251, 0.05):
+            for y in np.arange(-0.25, 0.251, 0.05):
+                pt = np.array([x, y])
+                # 条件 1: 距其他物体足够远
+                if object_xy.size > 0 and np.any(np.linalg.norm(object_xy - pt, axis=1) < MARGIN_OBJECT):
+                    continue
+                # 条件 2: 距自身当前位置足够远
+                if np.linalg.norm(cur_xy - pt) < MARGIN_SELF:
+                    continue
+                candidates.append(pt)
+
+        if not candidates:
+            return None
+
+        candidates.sort(key=lambda p: -np.linalg.norm(p - cur_xy))
+        best = candidates[0]
+        return np.array([best[0], best[1], table_z + drop_height])
+
+    @staticmethod
     def drop(env,
              target_surface_pos=None,
              target_quat=None,
@@ -776,9 +568,12 @@ class SkillLib:
         - drop() 适用于放到桌面/平台等平坦表面
         - place() 用于精确放置到容器内部（不需要 ee_offset）
 
+        当 target_surface_pos 为 None 时，会在桌面 XY 范围 [-0.25, 0.25] 内搜索空位放置物体，
+        优先选择距被抓取物当前位置最远的空位。
+
         param:
             env: LM4manipEnv object
-            target_surface_pos: np.array, 目标表面位置。如果为 None，使用当前位置正下方的桌面位置。
+            target_surface_pos: np.array, 目标表面位置。如果为 None，在桌面上自动寻找空位。
             target_quat: np.array, 目标姿态。如果为 None，使用当前姿态。
             drop_height: float, 物体底部距离表面的高度（m），默认 0.05m。
             motion_planning_kwargs: dict, 运动规划参数。
@@ -791,11 +586,19 @@ class SkillLib:
         start_pos, start_quat = env.robot.get_end_effector_pos(env.physics), env.robot.get_end_effector_quat(env.physics)
 
         if target_surface_pos is None:
-            # 默认：物体正下方的桌面位置
             grasped_names, grasped_entities = env.get_grasped_entity()
             if grasped_entities:
-                obj_pos = np.array(grasped_entities[0].get_xpos(env.physics))
-                target_surface_pos = np.array([obj_pos[0], obj_pos[1], obj_pos[2] - drop_height])
+                # 在桌面上找空位
+                free_pos = SkillLib._find_free_drop_position(
+                    env, grasped_entities[0], drop_height)
+                if free_pos is not None:
+                    target_surface_pos = free_pos
+                    print(f"DEBUG [drop]: 选择桌面空位作为放置目标: ({free_pos[0]:.3f}, {free_pos[1]:.3f}, {free_pos[2]:.3f})")
+                else:
+                    # Fallback: 物体当前 X/Y 不变
+                    obj_pos = np.array(grasped_entities[0].get_xpos(env.physics))
+                    target_surface_pos = np.array([obj_pos[0], obj_pos[1], obj_pos[2] - drop_height])
+                    print(f"DEBUG [drop]: 未找到空位，fallback 到物体当前正下方")
             else:
                 target_surface_pos = np.array([start_pos[0], start_pos[1], start_pos[2] - 0.1])
 
@@ -887,14 +690,43 @@ class SkillLib:
         """
         target_container = env.task.entities[target_container_name]
         start_pos, start_quat = env.robot.get_end_effector_pos(env.physics), env.robot.get_end_effector_quat(env.physics)
-        
+        observations = [env.get_observation()]
+        waypoints = []
+
+        # Step 1: pick the door handle first (must grasp before pulling open)
+        print(f"[open_door] Step 1: picking door handle on {target_container_name}")
+        pick_obs, pick_wp, pick_success, _ = SkillLib.pick(
+            env,
+            target_entity_name=target_container_name,
+            prior_eulers=[[-np.pi/2, -np.pi/2, 0]],  # face forward, horizontal — 适用于旋转后的干燥箱门把手
+            specific_keypoint=0,  # door_handle_grasp is the first (and only) grasp site on the door
+        )
+        observations.extend(pick_obs)
+        waypoints.extend(pick_wp)
+        if not pick_success:
+            print(f"[open_door] pick failed, stage_success=False")
+            return observations, waypoints, False, False
+
+        # ========== Grasp lock 启用 hinge 关节同步 ==========
+        # _sync_grasped_entity_pose 已扩展支持带 door_joint 的实体（hinge/slide lock）
+        # 让 door_joint.qpos 跟随手相对 anchor 的方位角，门会随机械臂绕 hinge 轴旋转
+        # 注意：dm_env 默认 _GRASP_LOCK_SYNC_INTERVAL=10，但 n_sub_steps=1，sync 永远不触发
+        # 这里临时改成 1，确保每个 step 都同步
+        old_sync_interval = type(env)._GRASP_LOCK_SYNC_INTERVAL
+        type(env)._GRASP_LOCK_SYNC_INTERVAL = 1
+        print(f"[open_door] hinge lock active: door qpos will follow hand position (sync_interval=1)")
+        # 关键修复：start_quat 必须是 pick 之后的当前夹爪姿态，而不是 open_door 入口时的默认姿态。
+        # 否则 step_trajectory 会让夹爪从"水平抓握"突变回"默认向下"，破坏抓取关系。
+        start_pos, start_quat = env.robot.get_end_effector_pos(env.physics), env.robot.get_end_effector_quat(env.physics)
         trajectory = target_container.get_open_trajectory(env.physics)
         trajectory_quats = []
         door_joint = target_container.door_joint
         rotation_axis = env.physics.bind(door_joint).xaxis
-        # rotation_anchor = env.physics.bind(door_joint).xanchor
-        observations = [env.get_observation()]
-        waypoints = []
+        print(f"[open_door] start_ee_pos=[{start_pos[0]:.4f},{start_pos[1]:.4f},{start_pos[2]:.4f}]")
+        print(f"[open_door] trajectory[0]=[{trajectory[0][0]:.4f},{trajectory[0][1]:.4f},{trajectory[0][2]:.4f}]")
+        print(f"[open_door] trajectory[-1]=[{trajectory[-1][0]:.4f},{trajectory[-1][1]:.4f},{trajectory[-1][2]:.4f}]")
+        print(f"[open_door] rotation_axis={rotation_axis}")
+        print(f"[open_door] start_quat=[{start_quat[0]:.4f},{start_quat[1]:.4f},{start_quat[2]:.4f},{start_quat[3]:.4f}]")
         stage_success = False
         task_success = False
         for i in range(len(trajectory)):
@@ -903,10 +735,19 @@ class SkillLib:
             trajectory_quats.append(new_quat)
         # init_qpos = np.array(env.robot.get_qpos(env.physics)).reshape(-1)
         interplate_path, interplate_quat = interpolate_path(trajectory, trajectory_quats)
+        print(f"[open_door] interplate_path[0]=[{interplate_path[0][0]:.4f},{interplate_path[0][1]:.4f},{interplate_path[0][2]:.4f}]")
+        print(f"[open_door] interplate_path[-1]=[{interplate_path[-1][0]:.4f},{interplate_path[-1][1]:.4f},{interplate_path[-1][2]:.4f}]")
         new_obs, new_waypoints, _, task_success = SkillLib.step_trajectory(env,
-                                                            interplate_path, 
-                                                            interplate_quat, 
+                                                            interplate_path,
+                                                            interplate_quat,
                                                             np.zeros(2))
+        print(f"[open_door] step_trajectory done, {len(new_waypoints)} waypoints")
+        if new_waypoints:
+            print(f"[open_door] waypoint[0] ee_pos=[{new_waypoints[0][0]:.4f},{new_waypoints[0][1]:.4f},{new_waypoints[0][2]:.4f}]")
+            print(f"[open_door] waypoint[-1] ee_pos=[{new_waypoints[-1][0]:.4f},{new_waypoints[-1][1]:.4f},{new_waypoints[-1][2]:.4f}]")
+        print(f"[open_door] door_qpos after trajectory: {float(env.physics.bind(door_joint).qpos[0]):.4f}")
+        # 恢复 sync_interval
+        type(env)._GRASP_LOCK_SYNC_INTERVAL = old_sync_interval
         observations.extend(new_obs)
         waypoints.extend(new_waypoints)
         qpos = np.array(env.robot.get_qpos(env.physics)).reshape(-1)
@@ -993,9 +834,11 @@ class SkillLib:
     
     @staticmethod
     def press(env, target_pos, target_quat=None, move_vector=[0, 0, 0.1], max_n_substep=100): #TODO move vector to determine the press direction
+        target_pos = SkillLib._resolve_press_target(env, target_pos)
         prepare_pos = target_pos + np.array(move_vector) if move_vector is not None else target_pos
-        observations, waypoints, _, _ = SkillLib.moveto(env, 
-                                                     prepare_pos, 
+        print(f"[press] target_pos={target_pos}, prepare_pos={prepare_pos}, move_vector={move_vector}")
+        observations, waypoints, _, _ = SkillLib.moveto(env,
+                                                     prepare_pos,
                                                      target_quat,
                                                      max_n_substep=max_n_substep)
         # close gripper
@@ -1016,6 +859,35 @@ class SkillLib:
         waypoints.extend(new_waypoints)
         assert len(observations) == len(waypoints), f"observations and waypoints should have the same length, {len(observations)} and {len(waypoints)}"
         return observations, waypoints, stage_success, task_success
+
+    @staticmethod
+    def _resolve_press_target(env, target):
+        """
+        Normalize the press target into an array-like position in world space.
+
+        Accepts either:
+        - a coordinate-like object (np.ndarray / list / tuple of 3 numbers)
+        - a string entity name from env.task.entities (preferred)
+
+        Resolution priority when given a string:
+        1. EntityWithButton mixin: target the start_button world-space position.
+        2. Fallback: entity center xpos.
+        """
+        print(f"[_resolve_press_target] input target={target}, type={type(target)}")
+        if isinstance(target, str):
+            entity = env.task.entities[target]
+            print(f"[_resolve_press_target] entity type={type(entity).__name__}, hasattr get_start_button_pos={hasattr(entity, 'get_start_button_pos')}")
+            if hasattr(entity, "get_start_button_pos"):
+                try:
+                    pos = entity.get_start_button_pos(env.physics)
+                    print(f"[_resolve_press_target] get_start_button_pos returned={pos}")
+                    if pos is not None:
+                        return np.array(pos)
+                except Exception as e:
+                    print(f"[_resolve_press_target] get_start_button_pos failed: {e}")
+            print(f"[_resolve_press_target] fallback to get_xpos")
+            return np.array(entity.get_xpos(env.physics))
+        return np.asarray(target, dtype=float)
     
     @staticmethod
     def pull(env, target_pos=None, target_quat=None, gripper_state=None, pull_distance=0.3):
@@ -1675,15 +1547,20 @@ class SkillLib:
         return observations, waypoints, True, False  # Don't return task_success, let loop continue
 
     @staticmethod
-    def shake(env, n_shakes=3, shake_angle=0.5, steps_per_swing=5, gripper_state=None):
+    def shake(env, n_shakes=3, shake_angle=0.5, steps_per_swing=5,
+              gripper_state=None, max_n_substep=10, pos_tolerance=0.005):
         """
         摇晃操作：在当前位置保持不动，通过快速交替偏转末端姿态实现摇摆。
+
+        优化版本：每步用当前真实位置重新解算IK，严格控制位置偏差。
 
         参数：
             n_shakes: 摇摆次数（一次 = 正→负 完整往返）
             shake_angle: 摇摆幅度（弧度），默认0.5（约30度）
             steps_per_swing: 每段摇摆的插值步数，默认5
             gripper_state: 夹爪状态，默认保持当前状态
+            max_n_substep: 每个姿态点的最大执行步数，默认10
+            pos_tolerance: 位置容差（米），默认5mm
         """
         start_pos = np.array(env.robot.get_end_effector_pos(env.physics))
         start_quat = np.array(env.robot.get_end_effector_quat(env.physics))
@@ -1713,24 +1590,52 @@ class SkillLib:
 
         current_quat = start_quat
         for target_quat in shake_targets:
-            # 手动生成插值点（interpolate_path 对 distance=0 只返回1个点）
-            interp_positions = []
-            interp_quats = []
             for t in np.linspace(0, 1, steps_per_swing, endpoint=True):
-                interp_positions.append(start_pos.copy())
-                interp_quats.append(qauternion_slerp(current_quat, target_quat, t))
+                interp_quat = qauternion_slerp(current_quat, target_quat, t)
 
-            obs, new_waypoints, stage_success, ts = SkillLib.step_trajectory(
-                env, interp_positions, interp_quats, gripper_state
-            )
-            observations.extend(obs)
-            waypoints.extend(new_waypoints)
+                # 用当前真实位置（而不是预设的start_pos）解算IK
+                current_actual_pos = np.array(env.robot.get_end_effector_pos(env.physics))
 
-            if ts:
-                task_success = True
-                break
+                success, target_qpos = env.robot.get_qpos_from_ee_pos(
+                    env.physics, current_actual_pos, interp_quat
+                )
+
+                if not success:
+                    continue
+
+                action = np.concatenate([target_qpos, gripper_state])
+
+                # 多次substep执行，直到位置+qpos都收敛
+                for substep in range(max_n_substep):
+                    timestep = env.step(action)
+                    if timestep.last():
+                        task_success = True
+                        break
+
+                    actual_pos = np.array(env.robot.get_end_effector_pos(env.physics))
+                    pos_err = np.linalg.norm(actual_pos - current_actual_pos)
+
+                    current_qpos = np.array(env.robot.get_qpos(env.physics)).reshape(-1)
+                    qpos_err = np.max(np.abs(current_qpos - target_qpos))
+
+                    if pos_err < pos_tolerance and qpos_err < 0.02:
+                        break
+
+                obs = env.get_observation()
+                waypoint = np.concatenate([
+                    env.robot.get_end_effector_pos(env.physics),
+                    quaternion_to_euler(env.robot.get_end_effector_quat(env.physics)),
+                    gripper_state
+                ])
+                observations.append(obs)
+                waypoints.append(waypoint)
+
+                if task_success:
+                    break
 
             current_quat = target_quat
+            if task_success:
+                break
 
         observations.pop(-1)
         assert len(observations) == len(waypoints), \
@@ -1858,7 +1763,7 @@ class SkillLib:
         return observations, waypoints, True, task_success
 
     @staticmethod
-    def stir_entity_with_tool(env, target_container_name, stir_radius=0.01, stir_duration=5, insert_ratio=2/3):
+    def stir_entity_with_tool(env, target_container_name, stir_radius=0.01, stir_duration=2, insert_ratio=2/3):
         """
         使用搅拌工具搅动容器内的液体。
 
@@ -2060,4 +1965,323 @@ class SkillLib:
             stage_success = (current_slide - initial_slide) > 0.003
             print(f"[unscrew_cap] final slide qpos: {current_slide:.6f}, delta: {current_slide - initial_slide:.6f}, stage_success: {stage_success}")
         return observations, waypoints, stage_success, task_success
+
+    @staticmethod
+    def aspirate(env,
+                 source_container_name,
+                 dwell_steps=20,
+                 descend_below_surface=0.005,
+                 gripper_state=None):
+        """
+        Aspirate (取样) — insert held pipette/dropper tip into source container's liquid,
+        wait for contact + dwell, then store the solution info on the tool entity.
+
+        Success condition: aspirate_site geom contacts source container geoms
+        for dwell_steps consecutive steps (~2s @ 10fps).
+
+        Args:
+            env: LM4manipEnv object
+            source_container_name: name of the source container entity
+            dwell_steps: number of consecutive contact steps required (default 20 ≈ 2s)
+            descend_below_surface: how far below the liquid surface to push the tip (m)
+            gripper_state: gripper state, default uses lock mode or closed
+        Returns:
+            observations: list of observations
+            waypoints: list of waypoints
+            stage_success: bool, whether aspiration succeeded
+            task_success: bool, always False (intermediate step)
+        """
+        import mujoco as mj
+
+        source = env.task.entities[source_container_name]
+        observations = [env.get_observation()]
+        waypoints = []
+        stage_success = False
+        task_success = False
+
+        if gripper_state is None:
+            gripper_state = SkillLib._get_gripper_state(env)
+
+        # ── 1. Resolve liquid surface Z from container top_site / bottom_site ──
+        top_site = source.mjcf_model.find("site", "top_site")
+        bottom_site = source.mjcf_model.find("site", "bottom_site")
+        if top_site is None:
+            print(f"[aspirate] WARNING: {source_container_name} has no top_site, using place_point")
+            place_points = source.get_place_point(env.physics)
+            if place_points:
+                top_z = np.array(place_points[0])[2] if isinstance(place_points, list) else np.array(place_points)[2]
+            else:
+                top_z = np.array(source.get_xpos(env.physics))[2] + 0.05
+        else:
+            top_z = env.physics.bind(top_site).xpos[2]
+
+        if bottom_site is None:
+            bottom_z = top_z - 0.1  # fallback: assume 10cm internal height
+        else:
+            bottom_z = env.physics.bind(bottom_site).xpos[2]
+
+        internal_height = max(top_z - bottom_z, 0.01)
+        liquid_surface_z = top_z - 0.005  # 5mm below the rim, inside liquid
+        aspirate_target_z = liquid_surface_z - descend_below_surface
+        print(f"[aspirate] liquid_surface_z={liquid_surface_z:.4f}, aspirate_target_z={aspirate_target_z:.4f}")
+
+        # ── 2. Get aspirate site from grasped pipette/dropper ──
+        grasped_names, grasped_entities = env.get_grasped_entity()
+        if not grasped_entities:
+            print("[aspirate] no grasped entity, cannot aspirate")
+            return [env.get_observation()], [], False, False
+
+        tool = grasped_entities[0]
+        aspirate_site = tool.get_aspirate_site()
+        if aspirate_site is None:
+            print(f"[aspirate] WARNING: {grasped_names[0]} has no aspirate_site, using EE position")
+            aspirate_pos = np.array(env.robot.get_end_effector_pos(env.physics))
+            aspirate_geom_id = None
+        else:
+            aspirate_geom_id = env.physics.bind(aspirate_site).element_id
+            aspirate_pos = env.physics.bind(aspirate_site).xpos
+
+        # Compute tool Z offset: aspirate site world Z - grasped keypoint world Z
+        grasp_keypoints = tool.get_grasped_keypoints(env.physics)
+        tool_z_offset = 0.0
+        if grasp_keypoints:
+            tool_z_offset = aspirate_pos[2] - grasp_keypoints[0][2]
+
+        # Target XY: center of the source container
+        source_xpos = np.array(source.get_xpos(env.physics))
+        aspirate_xy = source_xpos[:2]
+
+        # ── 3. moveto hover position (vertical-down EE) ──
+        vertical_quat = euler_to_quaternion(-np.pi, 0, 0)
+        hover_z = liquid_surface_z + 0.10 + tool_z_offset  # 10cm above liquid surface
+        hover_pos = np.array([aspirate_xy[0], aspirate_xy[1], hover_z])
+
+        print(f"[aspirate] hovering at {hover_pos}")
+        obs, wp, stage_success_mv, _ = SkillLib.moveto(
+            env, target_pos=hover_pos, target_quat=vertical_quat, gripper_state=gripper_state)
+        observations.extend(obs)
+        waypoints.extend(wp)
+        if not stage_success_mv:
+            return observations, waypoints, False, False
+
+        # ── 4. lift (negative) to descend tip to liquid surface ──
+        descend_lift = aspirate_target_z - hover_pos[2]
+        print(f"[aspirate] descending {descend_lift:.4f}m to target Z={aspirate_target_z:.4f}")
+        obs, wp, _, _ = SkillLib.lift(env, lift_height=descend_lift, gripper_state=gripper_state)
+        observations.extend(obs)
+        waypoints.extend(wp)
+
+        # ── 5. Contact + dwell loop ──
+        raw_m = env.physics.model._model
+        raw_d = env.physics.data._data
+        source_geom_ids = {env.physics.bind(g).element_id for g in source.geoms}
+
+        consecutive_contact = 0
+        for step in range(dwell_steps):
+            timestep = env.step(np.concatenate([np.array(env.robot.get_qpos(env.physics)), gripper_state]))
+            if timestep.last():
+                task_success = True
+                break
+
+            # Check contact between aspirate_site and source container geoms
+            has_contact = False
+            for c in raw_d.contact:
+                if c.dist > 0.005:  # ignore distant contacts
+                    continue
+                if aspirate_geom_id is not None:
+                    if c.geom1 == aspirate_geom_id and c.geom2 in source_geom_ids:
+                        has_contact = True
+                        break
+                    if c.geom2 == aspirate_geom_id and c.geom1 in source_geom_ids:
+                        has_contact = True
+                        break
+                else:
+                    # Fallback: check if any gripper geom contacts source
+                    gripper_geom_ids = {env.physics.bind(g).element_id for g in env.robot.gripper_geoms}
+                    if (c.geom1 in gripper_geom_ids and c.geom2 in source_geom_ids) or \
+                       (c.geom2 in gripper_geom_ids and c.geom1 in source_geom_ids):
+                        has_contact = True
+                        break
+
+            if has_contact:
+                consecutive_contact += 1
+            else:
+                consecutive_contact = 0  # reset on contact loss
+
+            waypoint = np.concatenate([
+                env.robot.get_end_effector_pos(env.physics),
+                quaternion_to_euler(env.robot.get_end_effector_quat(env.physics)),
+                gripper_state
+            ])
+            observations.append(env.get_observation())
+            waypoints.append(waypoint)
+
+            if consecutive_contact >= dwell_steps:
+                stage_success = True
+                print(f"[aspirate] ✓ contact maintained for {consecutive_contact} steps, aspiration success!")
+                break
+
+        if not stage_success:
+            print(f"[aspirate] ✗ contact lost after {consecutive_contact}/{dwell_steps} steps")
+
+        # ── 6. On success: read source solution and store on tool ──
+        if stage_success:
+            # Read solution info from source container
+            if hasattr(source, 'solutes') and source.solutes:
+                solution = source.solutes[0]
+            elif hasattr(source, 'solution') and source.solution:
+                solution = source.solution
+            else:
+                solution = None
+
+            if hasattr(source, 'get_solution_rgba'):
+                solution_rgba = source.get_solution_rgba(env.physics)
+            elif hasattr(source, '_current_solution_rgba') and source._current_solution_rgba:
+                solution_rgba = source._current_solution_rgba
+            else:
+                solution_rgba = None
+
+            tool.store_solution(solution, solution_rgba)
+            print(f"[aspirate] stored solution: {solution}, rgba={solution_rgba}")
+
+        # ── 7. Withdraw ──
+        obs, wp, _, _ = SkillLib.lift(env, lift_height=0.10, gripper_state=gripper_state)
+        observations.extend(obs)
+        waypoints.extend(wp)
+
+        observations.pop(-1)
+        assert len(observations) == len(waypoints), \
+            f"observations and waypoints should have same length: {len(observations)} vs {len(waypoints)}"
+        return observations, waypoints, stage_success, task_success
+
+    @staticmethod
+    def dispense(env,
+                 target_container_name,
+                 contact_steps=5,
+                 gripper_state=None):
+        """
+        Dispense (点样) — move held pipette/dropper over target container and
+        trigger the target to display the solution with correct color.
+
+        The solution info is read from the currently grasped tool entity
+        (set by a prior aspirate call).
+
+        Args:
+            env: LM4manipEnv object
+            target_container_name: name of the target container entity
+            contact_steps: number of steps to dwell near the target before triggering (visual)
+            gripper_state: gripper state, default uses lock mode or closed
+        Returns:
+            observations: list of observations
+            waypoints: list of waypoints
+            stage_success: bool, always True on success
+            task_success: bool, always False (intermediate step)
+        """
+        target = env.task.entities[target_container_name]
+        observations = [env.get_observation()]
+        waypoints = []
+        task_success = False
+
+        if gripper_state is None:
+            gripper_state = SkillLib._get_gripper_state(env)
+
+        # ── 1. Resolve target XY from top_site / place_point ──
+        top_site = target.mjcf_model.find("site", "top_site")
+        if top_site is None:
+            place_points = target.get_place_point(env.physics)
+            if place_points:
+                target_xy = np.array(place_points[0])[:2] if isinstance(place_points, list) else np.array(place_points)[:2]
+            else:
+                target_xy = np.array(target.get_xpos(env.physics))[:2]
+        else:
+            target_xy = env.physics.bind(top_site).xpos[:2]
+
+        if top_site is not None:
+            target_z = env.physics.bind(top_site).xpos[2]
+        else:
+            target_z = np.array(target.get_xpos(env.physics))[2]
+
+        # ── 2. Get tool aspirate site for Z offset ──
+        grasped_names, grasped_entities = env.get_grasped_entity()
+        tool_z_offset = 0.0
+        if grasped_entities:
+            tool = grasped_entities[0]
+            aspirate_pos = tool.get_aspirate_pos(env.physics)
+            grasp_keypoints = tool.get_grasped_keypoints(env.physics)
+            if aspirate_pos is not None and grasp_keypoints:
+                tool_z_offset = aspirate_pos[2] - grasp_keypoints[0][2]
+
+        # ── 3. moveto hover above target (vertical-down EE) ──
+        vertical_quat = euler_to_quaternion(-np.pi, 0, 0)
+        hover_z = target_z + 0.15 + tool_z_offset
+        hover_pos = np.array([target_xy[0], target_xy[1], hover_z])
+
+        print(f"[dispense] hovering at {hover_pos}")
+        obs, wp, stage_success_mv, _ = SkillLib.moveto(
+            env, target_pos=hover_pos, target_quat=vertical_quat, gripper_state=gripper_state)
+        observations.extend(obs)
+        waypoints.extend(wp)
+        if not stage_success_mv:
+            return observations, waypoints, False, False
+
+        # ── 4. lift (negative) to lower tip inside the container rim ──
+        descend_z = target_z + 0.02  # just inside the rim
+        descend_lift = descend_z - hover_pos[2]
+        print(f"[dispense] descending {descend_lift:.4f}m to Z={descend_z:.4f}")
+        obs, wp, _, _ = SkillLib.lift(env, lift_height=descend_lift, gripper_state=gripper_state)
+        observations.extend(obs)
+        waypoints.extend(wp)
+
+        # ── 5. Dwell steps (visual — tip near liquid surface) ──
+        for _ in range(contact_steps):
+            timestep = env.step(np.concatenate([np.array(env.robot.get_qpos(env.physics)), gripper_state]))
+            if timestep.last():
+                task_success = True
+                break
+            waypoint = np.concatenate([
+                env.robot.get_end_effector_pos(env.physics),
+                quaternion_to_euler(env.robot.get_end_effector_quat(env.physics)),
+                gripper_state
+            ])
+            observations.append(env.get_observation())
+            waypoints.append(waypoint)
+
+        # ── 6. Trigger liquid display on target container ──
+        if grasped_entities:
+            tool = grasped_entities[0]
+            solution = getattr(tool, 'solution', None)
+            solution_rgba = getattr(tool, 'solution_rgba', None)
+
+            if solution is not None or solution_rgba is not None:
+                if hasattr(target, 'set_solution_rgba'):
+                    target.set_solution_rgba(env.physics,
+                                            solution_name=solution,
+                                            target_rgba=solution_rgba)
+                    print(f"[dispense] called target.set_solution_rgba: solution={solution}, rgba={solution_rgba}")
+                elif hasattr(target, 'show_fluid'):
+                    target.show_fluid(env.physics)
+                    print(f"[dispense] called target.show_fluid()")
+                elif hasattr(target, 'fill_solution'):
+                    target.fill_solution(env.physics,
+                                         source_solutes=[solution] if solution else None,
+                                         source_solution_rgba=solution_rgba)
+                    print(f"[dispense] called target.fill_solution()")
+                else:
+                    print(f"[dispense] WARNING: target {target_container_name} has no solution display method")
+
+                # Clear tool's stored solution
+                tool.clear_solution()
+                print(f"[dispense] cleared tool solution state")
+            else:
+                print(f"[dispense] WARNING: tool has no stored solution, cannot dispense")
+
+        # ── 7. Withdraw ──
+        obs, wp, _, _ = SkillLib.lift(env, lift_height=0.15, gripper_state=gripper_state)
+        observations.extend(obs)
+        waypoints.extend(wp)
+
+        observations.pop(-1)
+        assert len(observations) == len(waypoints), \
+            f"observations and waypoints should have same length: {len(observations)} vs {len(waypoints)}"
+        return observations, waypoints, True, task_success
 

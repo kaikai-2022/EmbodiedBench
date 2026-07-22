@@ -65,6 +65,8 @@ STANDARD_ASSET_LIBRARY = [
     "tripod",
     "pipette",
     "florence_flask",
+    "petri_dish_base",
+    "petri_dish_lid",
 ]
 
 

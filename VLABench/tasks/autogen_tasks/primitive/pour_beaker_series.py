@@ -19,6 +19,7 @@ class PourBeakerConfigManager(BenchTaskConfigManager):
             name="small_beaker_0",
             xml_path=name2class_xml["small_beaker"][-1],
             position=[random.uniform(0.05, 0.15), random.uniform(-0.15, -0.05), 0.8],
+            solution="CuSO4",
             solution_rgba=[0.0, 0.45, 1.0, 0.4],
         )
         obj_config["class"] = "ChemistryBeaker"

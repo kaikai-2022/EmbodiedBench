@@ -57,6 +57,16 @@ def check_asset_exists(object_name: str) -> Dict:
 
         if object_name in name2class_xml:
             class_type, xml_path = name2class_xml[object_name]
+            # For procedurally-built entities (e.g. Button), xml_path is None
+            if xml_path is None:
+                logger.info(f"  ✓ 在 name2class_xml 中找到 {object_name}: {class_type.__name__} (procedural)")
+                return {
+                    "found": True,
+                    "xml_path": None,
+                    "class": class_type.__name__,
+                    "builtin": True,
+                    "procedural": True,
+                }
             xml_path_str = xml_path if isinstance(xml_path, str) else xml_path[0]
             logger.info(f"  ✓ 在 name2class_xml 中找到 {object_name}: {xml_path_str}")
             return {

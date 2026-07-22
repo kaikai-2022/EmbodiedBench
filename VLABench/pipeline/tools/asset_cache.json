@@ -289,13 +289,13 @@
     "source_type": "local",
     "is_physical": true
   },
-  "florence flask": {
-    "spec": "florence_flask",
+  "beaker_small": {
+    "spec": "small_beaker",
     "source_type": "local",
     "is_physical": true
   },
-  "beaker_small": {
-    "spec": "small_beaker",
+  "petri_dish_lid": {
+    "spec": "petri_dish_lid",
     "source_type": "local",
     "is_physical": true
   },
@@ -304,13 +304,38 @@
     "source_type": "local",
     "is_physical": true
   },
+  "mid_flask": {
+    "spec": "conical_flask_mid",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "FeCl3": {
+    "spec": "FeCl3",
+    "source_type": "local",
+    "is_physical": false
+  },
+  "NaOH solution": {
+    "spec": "NaOH solution",
+    "source_type": "local",
+    "is_physical": false
+  },
+  "button": {
+    "spec": "button",
+    "source_type": "local",
+    "is_physical": true
+  },
+  "drying_box": {
+    "spec": "drying_box",
+    "source_type": "local",
+    "is_physical": true
+  },
   "table": {
     "spec": "chemistry_lab_table",
     "source_type": "local",
     "is_physical": true
   },
-  "green solution": {
-    "spec": "green solution",
+  "red solution": {
+    "spec": "red solution",
     "source_type": "local",
     "is_physical": false
   },
@@ -319,153 +344,33 @@
     "source_type": "local",
     "is_physical": false
   },
-  "Erlenmeyer flask": {
-    "spec": "conical_flask",
-    "source_type": "local",
-    "is_physical": true
-  },
-  "colorless solution": {
-    "spec": "colorless solution",
-    "source_type": "local",
-    "is_physical": false
-  },
-  "pink solution": {
-    "spec": "pink solution",
-    "source_type": "local",
-    "is_physical": false
-  },
-  "KMnO₄ solution": {
-    "spec": "KMnO₄ solution",
-    "source_type": "local",
-    "is_physical": false
-  },
-  "test tube": {
-    "spec": "chemistry_tube",
-    "source_type": "local",
-    "is_physical": true
-  },
   "blue solution": {
     "spec": "blue solution",
     "source_type": "local",
     "is_physical": false
   },
-  "FeCl₂ solution": {
-    "spec": "FeCl₂ solution",
-    "source_type": "local",
-    "is_physical": false
-  },
-  "K₂Cr₂O₇ solution": {
-    "spec": "K₂Cr₂O₇ solution",
-    "source_type": "local",
-    "is_physical": false
-  },
-  "CuCl₂ solution": {
-    "spec": "CuCl₂ solution",
-    "source_type": "local",
-    "is_physical": false
-  },
-  "red solution": {
-    "spec": "red solution",
-    "source_type": "local",
-    "is_physical": false
-  },
-  "NiSO₄ solution": {
-    "spec": "NiSO₄ solution",
-    "source_type": "local",
-    "is_physical": false
-  },
-  "acidic K₂Cr₂O₇ solution": {
-    "spec": "acidic K₂Cr₂O₇ solution",
-    "source_type": "local",
-    "is_physical": false
-  },
-  "cobalt(II) salt (Co²⁺) solution": {
-    "spec": "cobalt(II) salt (Co²⁺) solution",
-    "source_type": "local",
-    "is_physical": false
-  },
-  "light green solution": {
-    "spec": "light green solution",
-    "source_type": "local",
-    "is_physical": false
-  },
-  "starch-potassium iodide (KI) solution": {
-    "spec": "starch-potassium iodide (KI) solution",
-    "source_type": "local",
-    "is_physical": false
-  },
-  "acidic litmus indicator solution": {
-    "spec": "acidic litmus indicator solution",
-    "source_type": "local",
-    "is_physical": false
-  },
-  "beakers": {
-    "spec": "beaker",
+  "dryingbox": {
+    "spec": "drying_box",
     "source_type": "local",
     "is_physical": true
   },
-  "orange solution": {
-    "spec": "orange solution",
+  "hot_device": {
+    "spec": "heat_device",
     "source_type": "local",
-    "is_physical": false
+    "is_physical": true
   },
-  "acidic methyl red indicator solution": {
-    "spec": "acidic methyl red indicator solution",
+  "stirring_rod": {
+    "spec": "stirring_rod",
+    "source_type": "objaverse",
+    "is_physical": true
+  },
+  "cylinder": {
+    "spec": "cylinder_mid",
     "source_type": "local",
-    "is_physical": false
+    "is_physical": true
   },
-  "red liquid": {
-    "spec": "red liquid",
-    "source_type": "local",
-    "is_physical": false
-  },
-  "acidic potassium chromate (K₂CrO₄) solution": {
-    "spec": "acidic potassium chromate (K₂CrO₄) solution",
-    "source_type": "local",
-    "is_physical": false
-  },
-  "yellow liquid": {
-    "spec": "yellow liquid",
-    "source_type": "local",
-    "is_physical": false
-  },
-  "purple solution": {
-    "spec": "purple solution",
-    "source_type": "local",
-    "is_physical": false
-  },
-  "anthocyanin": {
-    "spec": "anthocyanin",
-    "source_type": "local",
-    "is_physical": false
-  },
-  "chlorophyll": {
-    "spec": "chlorophyll",
-    "source_type": "local",
-    "is_physical": false
-  },
-  "litmus": {
-    "spec": "litmus",
-    "source_type": "local",
-    "is_physical": false
-  },
-  "carotene": {
-    "spec": "carotene",
-    "source_type": "local",
-    "is_physical": false
-  },
-  "ethanol (C₂H₅OH) extract containing chlorophyll": {
-    "spec": "ethanol extract containing chlorophyll",
-    "source_type": "local",
-    "is_physical": false
-  },
-  "solutions": {
-    "spec": "solutions",
-    "source_type": "local",
-    "is_physical": false
-  },
-  "ethanol (C₂H₅OH) extract": {
-    "spec": "ethanol extract",
+  "FeCl3 solution": {
+    "spec": "FeCl3 solution",
     "source_type": "local",
     "is_physical": false
   }

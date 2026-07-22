@@ -6,7 +6,7 @@
       <geom group="2" type="mesh" contype="0" conaffinity="0" density="50"/>
     </default>
     <default class="collision">
-      <geom group="3" type="mesh" density="50" friction="1 1 0.001" solimp="0.999 0.999 0.001" solref="0.001 2"/>
+      <geom group="3" type="mesh" density="50" friction="1 1 0.001" solimp="0.998 0.998 0.001" solref="0.01 2"/>
     </default>
     <default class="grasppoint">
       <site type="sphere" size="0.005" group="4" rgba="0 0 1 1"/>
@@ -76,7 +76,18 @@
       <geom mesh="small_beaker_collision_20" class="collision"/>
       <geom mesh="small_beaker_collision_21" class="collision"/>
       <geom mesh="small_beaker_collision_22" class="collision"/>
-      <site class="grasppoint" pos="0.0000 0.0000 0.0650"/>
+      <site class="grasppoint" pos="0.0000 0.0040 0.0650"/>
+      <!-- Anti-slip plates: 2 crossing vertical plates through center. Width=diameter+2cm=0.081m, height=full beaker. -->
+      <!-- Visual plates (contype=0 conaffinity=0 → rgba renders fully). Rotated 45° around Z. -->
+      <!-- <geom name="grip_plate_x_v_1" type="box" size="0.0105 0.005 0.0446" pos="0.0286 0.0286 0.0446" quat="0.9238795 0 0 0.3826834" contype="0" conaffinity="0" group="2" rgba="1 0 0 0.8"/>
+      <geom name="grip_plate_y_v_1" type="box" size="0.005 0.0105 0.0446" pos="-0.0286 0.0286 0.0446" quat="0.9238795 0 0 0.3826834" contype="0" conaffinity="0" group="2" rgba="1 0 0 0.8"/>
+      <geom name="grip_plate_x_v_2" type="box" size="0.0105 0.005 0.0446" pos="0.0286 -0.0286 0.0446" quat="-0.9238795 0 0 0.3826834" contype="0" conaffinity="0" group="2" rgba="1 0 0 0.8"/>
+      <geom name="grip_plate_y_v_2" type="box" size="0.005 0.0105 0.0446" pos="-0.0286 -0.0286 0.0446" quat="-0.9238795 0 0 0.3826834" contype="0" conaffinity="0" group="2" rgba="1 0 0 0.8"/> -->
+      <!-- Collision plates: only collide with finger pads (contype=2 conaffinity=2). Rotated 45° around Z. -->
+      <geom name="grip_plate_x" type="box" size="0.0105 0.005 0.0446" pos="0.0286 0.0286 0.0446" quat="0.9238795 0 0 0.3826834" contype="2" conaffinity="2" group="3" friction="1 1 0.1" density="50" solref="0.001 1"/>
+      <geom name="grip_plate_y" type="box" size="0.005 0.0105 0.0446" pos="-0.0286 0.0286 0.0446" quat="0.9238795 0 0 0.3826834" contype="2" conaffinity="2" group="3" friction="1 1 0.1" density="50" solref="0.001 1"/>
+      <geom name="grip_plate_x2" type="box" size="0.0105 0.005 0.0446" pos="0.0286 -0.0286 0.0446" quat="-0.9238795 0 0 0.3826834" contype="2" conaffinity="2" group="3" friction="1 1 0.1" density="50" solref="0.001 1"/>
+      <geom name="grip_plate_y2" type="box" size="0.005 0.0105 0.0446" pos="-0.0286 -0.0286 0.0446" quat="-0.9238795 0 0 0.3826834" contype="2" conaffinity="2" group="3" friction="1 1 0.1" density="50" solref="0.001 1"/>
       <geom name="solution" type="cylinder" size="0.0305 0.0225" pos="-0.001494 -0.000163 0.0225" material="CaSO4" class="visual"/>
       <site name="top_site" pos="0 0 0.0892" size="0.01" rgba="1 0 0 0"/>
       <site name="bottom_site" pos="0 0 0.000000" size="0.01" rgba="0 1 0 0"/>

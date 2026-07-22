@@ -36,7 +36,7 @@ class PlaceFlorenceFlaskConfigManager(BenchTaskConfigManager):
         self.target_entity = "florence_flask_0"
 
     def get_instruction(self, target_entity, **kwargs):
-        self.config["task"]["instructions"] = ["place <florence_flask_0> on the <tripod_0>"]
+        self.config["task"]["instructions"] = ["Place the <florence_flask_0> on the <tripod_0>."]
 
     def get_condition_config(self, target_entity, **kwargs):
         conditions_config = [
@@ -52,7 +52,7 @@ class PlaceFlorenceFlaskTask(PrimitiveTask):
 
     def get_expert_skill_sequence(self, physics):
         skill_sequence = [
-            partial(SkillLib.gently_pick, target_entity_name="florence_flask_0"),
+            partial(SkillLib.pick, target_entity_name="florence_flask_0", prior_eulers=[[-3.141592653589793, 0, 0]]),
             partial(SkillLib.place, target_container_name="tripod_0"),
         ]
         return skill_sequence

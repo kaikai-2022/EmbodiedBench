@@ -22,7 +22,7 @@ class PickTubeLiftTubeConfigManager(BenchTaskConfigManager):
             container_config = dict(
                 name="chemistry_tube_stand",
                 xml_path=name2class_xml["chemistry_tube_stand"][-1],
-                position=[random.uniform(-0.15, -0.05), random.uniform(0.05, 0.15), 0.8],
+                position=[random.uniform(-0.1, 0.1), random.uniform(0.05, 0.15), 0.8],
             )
             container_config["class"] = "TubeStand"
             self.config["task"]["components"].append(container_config)
@@ -36,7 +36,8 @@ class PickTubeLiftTubeConfigManager(BenchTaskConfigManager):
             init_container_config["subentities"] = []
         obj_config = dict(
             name="tube_0",
-            solution="tube_0",
+            solution="CuSO4_solution_1",
+            solution_rgba=[0, 0.45, 1, 0.4],
             xml_path=name2class_xml["tube"][-1],
             position=pos,
         )
@@ -46,7 +47,7 @@ class PickTubeLiftTubeConfigManager(BenchTaskConfigManager):
         self.target_entity = "tube_0"
 
     def get_instruction(self, target_entity, init_container, **kwargs):
-        self.config["task"]["instructions"] = ["pick the <tube_0>"]
+        self.config["task"]["instructions"] = ["Pick the <tube_0> which contains <CuSO4 solution_0>."]
 
     def get_condition_config(self, target_entity, init_container, **kwargs):
         conditions_config = [

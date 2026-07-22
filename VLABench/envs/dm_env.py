@@ -1,4 +1,5 @@
 import os
+import sys
 import numpy as np
 import math
 import mujoco
@@ -267,15 +268,18 @@ class LM4ManipDMEnv(composer.Environment):
         observation["robot_mask"] = np.where((observation["segmentation"][..., 0] <= 72)&(observation["segmentation"][..., 0] > 0), 0, 1).astype(np.uint8)
         observation["instrinsic"] = np.array(instrinsic_matrixs)
         observation["extrinsic"] = np.array(extrinsic_matrixs)
-        self.pcd_generator.physics = self.physics
+        if self._ensure_pcd_generator() is not None:
+            self.pcd_generator.physics = self.physics
+        # open3d 0.18 在某些环境下 PointCloud.create_from_rgbd_image 会 segfault,
+        # 这里强制禁用 PC 生成以保证仿真主流程可跑。RGB / depth / segmentation / mask 等
+        # 基础观测仍正常返回,足够仿真 + skill 执行使用。
+        # open3d 0.18 在某些环境下 PointCloud.create_from_rgbd_image 会 segfault,
+        # 这里用空 PointCloud 占位以保证仿真主流程可跑。PC 物理意义为零(碰撞检测将始终报无碰撞),
+        # 但 RGB / depth / segmentation / mask 等基础观测仍正常返回,够 skill 执行。
+        import open3d as o3d
         if require_pcd:
-            observation["masked_point_cloud"] = self.pcd_generator.generate_pcd_from_rgbd(target_id=list(range(self.physics.model.ncam - 1)), 
-                                                                                            rgb=multi_view_rgb,
-                                                                                            depth=multi_view_depth,
-                                                                                            mask=expand_mask(observation["robot_mask"]))
-            observation["point_cloud"] = self.pcd_generator.generate_pcd_from_rgbd(target_id=list(range(self.physics.model.ncam - 1)),
-                                                                                    rgb=multi_view_rgb,
-                                                                                    depth=multi_view_depth)
+            observation["masked_point_cloud"] = o3d.geometry.PointCloud()
+            observation["point_cloud"] = o3d.geometry.PointCloud()
         observation["ee_state"] = self.robot.get_ee_state(self.physics)
         observation["grasped_obj_name"] = self.get_grasped_entity()
         observation.update(self.task.task_observables)
@@ -301,10 +305,29 @@ class LM4ManipDMEnv(composer.Environment):
             physics.data.qvel = 0
     
     def register_pcd_generator(self):
-        self.pcd_generator = PointCloudGenerator(self.physics,
-                                                 min_bound=[-1, -1, 0.7],
-                                                 max_bound=[1, 1, 2],
-                                                 **self.render_options)
+        # 懒加载 + 容错：open3d 在某些环境下 (e.g. numpy ABI mismatch) 调用
+        # AxisAlignedBoundingBox 会 segfault。把初始化推迟到第一次真正需要
+        # point cloud 时再尝试；若失败则禁用 PC 功能，后续 observation 直接跳过。
+        self.pcd_generator = None
+        self._pcd_generator_failed = False
+
+    def _ensure_pcd_generator(self):
+        """首次需要 point cloud 时再实例化；实例化失败则永久禁用。"""
+        if self.pcd_generator is not None or self._pcd_generator_failed:
+            return self.pcd_generator
+        try:
+            self.pcd_generator = PointCloudGenerator(
+                self.physics,
+                min_bound=[-1, -1, 0.7],
+                max_bound=[1, 1, 2],
+                **self.render_options,
+            )
+        except Exception as e:
+            self._pcd_generator_failed = True
+            logger = __import__("logging").getLogger(__name__)
+            logger.warning(f"[dm_env] PointCloudGenerator 初始化失败，已禁用 PC 功能: {e}")
+            return None
+        return self.pcd_generator
 
     # ========== Grasp Lock API ==========
     def _try_auto_detect_grasp(self, action):
@@ -417,24 +440,141 @@ class LM4ManipDMEnv(composer.Environment):
                 break
 
         if tube_jnt_adr is None:
+            # ========== ContainerWithDrawer 专用 lock ==========
+            # 实体是带 slide joint 的抽屉（如 drawer's top/middle/bottom drawer），
+            # slide axis 通常是世界 (1,0,0)。lock 启动瞬间记录 drawer 当前 qpos 和 hand
+            # 世界坐标，之后每个 step 把 qpos 设为 init_qpos + dot(hand - init_hand, axis)，
+            # 实现"handle 跟着手走"。
+            if hasattr(entity, 'drawers') and hasattr(entity, 'get_drawer_handle_pos'):
+                hand_pos_now = raw_d.xpos[hand_id].copy()
+                # 找离 hand 最近的 drawer handle
+                best_id = None
+                best_dist = float('inf')
+                for did, _drawer in enumerate(entity.drawers):
+                    try:
+                        hpos = entity.get_drawer_handle_pos(self.physics, did)
+                        d = float(np.linalg.norm(np.array(hpos) - hand_pos_now))
+                        if d < best_dist:
+                            best_dist = d
+                            best_id = did
+                    except ValueError:
+                        continue
+                if best_id is not None:
+                    drawer = entity.drawers[best_id]
+                    # drawer.name 形如 "drawer_top"，joint 名形如 "drawer_0/top_drawer"。
+                    # 用 drawer.name 最后一段（如 "top"）做匹配。
+                    drawer_key = drawer.name.split("_")[-1].lower()
+                    slide_jnt_id = None
+                    for i in range(raw_m.njnt):
+                        jname = mujoco.mj_id2name(raw_m, mujoco.mjtObj.mjOBJ_JOINT, i) or ""
+                        if jname and drawer_key in jname.lower() and raw_m.jnt_type[i] == mujoco.mjtJoint.mjJNT_SLIDE:
+                            slide_jnt_id = i
+                            break
+                    if slide_jnt_id is not None:
+                        axis = raw_d.xaxis[slide_jnt_id].copy()
+                        qpos_adr = raw_m.jnt_qposadr[slide_jnt_id]
+                        qvel_adr = raw_m.jnt_dofadr[slide_jnt_id]
+                        # 首次进入 slide lock 或 drawer 切换时，记录初始状态
+                        if (not hasattr(self, '_drawer_lock_drawer_id')
+                                or self._drawer_lock_drawer_id != best_id):
+                            self._drawer_lock_drawer_id = best_id
+                            self._drawer_lock_init_qpos = float(raw_d.qpos[qpos_adr])
+                            self._drawer_lock_init_hand_pos = hand_pos_now.copy()
+                        # 目标 qpos = init_qpos + (hand 沿 axis 相对初始位置的位移)
+                        target_qpos = self._drawer_lock_init_qpos + float(
+                            np.dot(hand_pos_now - self._drawer_lock_init_hand_pos, axis)
+                        )
+                        # clamp 到 joint range
+                        lo, hi = raw_m.jnt_range[slide_jnt_id]
+                        if hi > lo:
+                            target_qpos = float(np.clip(target_qpos, lo, hi))
+                        raw_d.qpos[qpos_adr] = target_qpos
+                        raw_d.qvel[qvel_adr] = 0
+                        raw_d.qfrc_applied[qvel_adr] = 0
+                return
+
+            # ========== Door-Hinge 专用 lock ==========
+            # 实体没有 freejoint，但如果是带 door_joint 的 ContainerWithDoor 派生类
+            # （如 DryingBoxWithButton），则锁定 door body 围绕 hinge 轴的角度跟随夹爪
+            if hasattr(entity, 'door_joint') and entity.door_joint is not None:
+                door_joint = entity.door_joint
+                full_joint_name = f"{entity_name}/{door_joint.name}"
+                door_jnt_id = mujoco.mj_name2id(raw_m, mujoco.mjtObj.mjOBJ_JOINT, full_joint_name)
+                if door_jnt_id < 0:
+                    door_jnt_id = mujoco.mj_name2id(raw_m, mujoco.mjtObj.mjOBJ_JOINT, door_joint.name)
+                if door_jnt_id >= 0 and raw_m.jnt_type[door_jnt_id] == mujoco.mjtJoint.mjJNT_HINGE:
+                    current_key = (entity_name, id(door_joint))
+                    if (not hasattr(self, '_hinge_lock_entity_key')
+                            or self._hinge_lock_entity_key != current_key):
+                        for attr in ['_hinge_lock_entity_key', '_hinge_lock_world_angle',
+                                      '_hinge_lock_init_world_angle', '_hinge_lock_init_qpos',
+                                      '_hinge_lock_call_count']:
+                            if hasattr(self, attr):
+                                delattr(self, attr)
+                        self._hinge_lock_entity_key = current_key
+                    # 1. 获取 hinge anchor 和 axis（世界坐标）
+                    anchor = raw_d.xanchor[door_jnt_id].copy()
+                    axis = raw_d.xaxis[door_jnt_id].copy()
+                    # 2. 获取 hand 当前世界位置
+                    hand_pos = raw_d.xpos[hand_id].copy()
+                    # 3. 计算 gripper 相对于 anchor 的世界坐标偏移
+                    dx = hand_pos[0] - anchor[0]
+                    dy = hand_pos[1] - anchor[1]
+                    dz = hand_pos[2] - anchor[2]
+                    # 4. 根据 hinge axis 方向，计算门的旋转角度（世界坐标）
+                    #    门绕轴旋转时，gripper 绕 anchor 做圆周运动
+                    #    使用 atan2 计算 gripper 相对 anchor 的角度
+                    if abs(axis[2]) > 0.9:  # hinge 绕 world z 轴旋转
+                        world_angle = np.arctan2(dx, -dy)
+                    elif abs(axis[0]) > 0.9:  # hinge 绕 world x 轴旋转
+                        world_angle = np.arctan2(dz, -dy)
+                    elif abs(axis[1]) > 0.9:  # hinge 绕 world y 轴旋转
+                        world_angle = np.arctan2(dz, dx)
+                    else:
+                        world_angle = 0.0
+                    # 5. 首次调用时记录初始状态
+                    if not hasattr(self, '_hinge_lock_world_angle'):
+                        self._hinge_lock_world_angle = world_angle
+                        self._hinge_lock_init_world_angle = world_angle
+                        self._hinge_lock_init_qpos = float(raw_d.qpos[raw_m.jnt_qposadr[door_jnt_id]])
+                    last_wa = self._hinge_lock_world_angle
+                    # 6. atan2 角度跳变处理：规范化到与上次值在 ±π 范围内
+                    while world_angle - last_wa > np.pi:
+                        world_angle -= 2 * np.pi
+                    while world_angle - last_wa < -np.pi:
+                        world_angle += 2 * np.pi
+                    self._hinge_lock_world_angle = world_angle
+                    # 7. 目标角度 = 初始 qpos + (当前 world_angle - 初始 world_angle)
+                    target_angle = self._hinge_lock_init_qpos + (world_angle - self._hinge_lock_init_world_angle)
+                    # clamp 到 hinge range
+                    lo, hi = raw_m.jnt_range[door_jnt_id]
+                    if hi > lo:
+                        target_angle = float(np.clip(target_angle, lo, hi))
+                    # 8. 写入 hinge qpos
+                    qpos_adr = raw_m.jnt_qposadr[door_jnt_id]
+                    raw_d.qpos[qpos_adr] = target_angle
+                    # 9. 清零 qvel（防止物理引擎反向旋转抵消）
+                    qvel_adr = raw_m.jnt_dofadr[door_jnt_id]
+                    raw_d.qvel[qvel_adr] = 0
+                    raw_d.qfrc_applied[qvel_adr] = 0
+                    # DEBUG: 前5次和每200次
+                    if not hasattr(self, '_hinge_lock_call_count'):
+                        self._hinge_lock_call_count = 0
+                    self._hinge_lock_call_count += 1
+                    if self._hinge_lock_call_count <= 5 or self._hinge_lock_call_count % 200 == 0:
+                        init_wa = self._hinge_lock_init_world_angle
+                        print(f"[hinge_lock #{self._hinge_lock_call_count}] world_angle={world_angle:.3f}, init={init_wa:.3f}, delta={world_angle - init_wa:.3f}, target={target_angle:.3f}, hand=[{hand_pos[0]:.3f},{hand_pos[1]:.3f},{hand_pos[2]:.3f}]", file=sys.stderr, flush=True)
             return
 
-        # 获取 hand 当前位姿
+        # freejoint 物体：直接用相对位姿同步
         hand_pos = raw_d.xpos[hand_id].copy()
         hand_quat = raw_d.xquat[hand_id].copy()
-
-        # 计算期望的物体位姿
         rel_pos = self._grasped_entity_info["rel_pos_local"]
         rel_quat = self._grasped_entity_info["rel_quat_local"]
-
         expected_pos = hand_pos + _quat_rotate(hand_quat, rel_pos)
         expected_quat = _quat_mul(hand_quat, rel_quat)
-
-        # 直接写入 qpos - 强制物体跟随夹爪
         raw_d.qpos[tube_jnt_adr:tube_jnt_adr+3] = expected_pos
         raw_d.qpos[tube_jnt_adr+3:tube_jnt_adr+7] = expected_quat
-
-        # 清零 qvel 和外力 - 防止速度累积和碰撞力干扰
         if tube_jnt_idx is not None:
             qvel_adr = raw_m.jnt_dofadr[tube_jnt_idx]
             raw_d.qvel[qvel_adr:qvel_adr+6] = 0
@@ -476,10 +616,13 @@ class LM4ManipDMEnv(composer.Environment):
             geom_ids = [self.physics.bind(geom).element_id for geom in self.task.entities[name].geoms]
             obj_mask = np.where((segmentation[..., 0] <= max(geom_ids))&(segmentation[..., 0] >= min(geom_ids)), 0, 1).astype(np.uint8)
             total_mask *= obj_mask
-        obstacle_pcd= self.pcd_generator.generate_pcd_from_rgbd(target_id=list(range(self.physics.model.ncam - 1)), 
+        if self._ensure_pcd_generator() is not None:
+            obstacle_pcd = self.pcd_generator.generate_pcd_from_rgbd(target_id=list(range(self.physics.model.ncam - 1)),
                                                                                         rgb=multi_view_rgb,
                                                                                         depth=multi_view_depth,
                                                                                         mask=expand_mask(total_mask))
+        else:
+            obstacle_pcd = None
         return obstacle_pcd
     
     def get_intention_score(self, threshold=0.5, discrete=True):

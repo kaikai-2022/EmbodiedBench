@@ -304,7 +304,7 @@ name2class_xml = {
     "mirrors": [components.Mirrors, get_object_list(os.path.join(xml_root, "obj/meshes/tools/mirror"))],
 
     # lab equipment
-    "petri_dish": [components.CommonGraspedEntity, "obj/meshes/lab_equipment/petri_dish/petri_dish.xml"],
+    "petri_dish": [components.ChemistryBeaker, "review/petri_dish/petri_dish_lid/petri_dish_lid/petri_dish.xml"],
     "beaker": [components.ChemistryBeaker, "obj/meshes/lab_equipment/beaker/chemistry_beaker/chemistry_beaker.xml"],
     "chemistry_beaker": [components.ChemistryBeaker, "obj/meshes/lab_equipment/beaker/chemistry_beaker/chemistry_beaker.xml"],
     "big_beaker": [components.ChemistryBeaker, "obj/meshes/lab_equipment/beaker/chemistry_beaker/chemistry_beaker.xml"],
@@ -337,8 +337,8 @@ name2class_xml = {
     "chemistry_tube_rack": [components.MediumTubeStand, "review/chemistry_tube_rack/chemistry_tube_rack/chemistry_tube_rack.xml"],
     "square_mat": [components.FlatContainer, "review/square_mat/square_mat/square_mat/square_mat.xml"],
     "thermometer": [components.CommonGraspedEntity, "review/thermometer/thermometer/thermometer.xml"],
-    "heat_device": [components.CommonContainer, "review/heat_device/heat_device/heat_device/heat_device.xml"],
-    "drying_box": [components.ContainerWithDoor, "review/drying_box/drying_box/drying_box/drying_box.xml"],
+    "heat_device": [components.HeatDevice, "review/heat_device/heat_device/heat_device/heat_device.xml"],
+    "drying_box": [components.DryingBoxWithButton, "review/drying_box/drying_box/drying_box/drying_box.xml"],
     "lab_table": [components.FlatContainer, "review/lab_table/lab_table/lab_table/lab_table.xml"],
     "cylinder_large": [components.ChemistryBeaker, "review/cylinder_large/cylinder_large/cylinder_large/cylinder_large.xml"],
     "pipette": [components.CommonGraspedEntity, "review/pipette/pipette/pipette_-_laboratory_essential_tool/pipette_-_laboratory_essential_tool.xml"],
@@ -347,6 +347,8 @@ name2class_xml = {
     "conical_flask_large": [components.ChemistryBeaker, "review/conical_flask_large/conical_flask_large/conical_flask_large/conical_flask_large.xml"],
     "tripod": [components.CommonContainer, "review/tripod/tripod/tripod/tripod.xml"],
     "florence_flask": [components.ChemistryBeaker, "review/florence_flask/florence_flask/florence_flask/florence_flask.xml"],
+    "petri_dish_base": [components.ChemistryBeaker, "review/petri_dish/petri_dish_lid/petri_dish_lid/petri_dish.xml"],
+    "petri_dish_lid": [components.CommonGraspedEntity, "review/petri_dish_lid/petri_dish/petri_dish/petri_dish_lid.xml"],
 
 }
 

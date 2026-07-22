@@ -36,10 +36,10 @@
       <geom mesh="cylinder_small_collision_7"  class="collision"/>
       <geom mesh="cylinder_small_collision_8"  class="collision"/>
       <!-- <site class="grasppoint" pos="0.0000 0.0000 0.0900"/> -->
-      <site class="grasppoint" pos="0.0000 0.0000 0.1400"/>
+      <site class="grasppoint" pos="0.0000 0.0000 0.1200"/>
       <!-- <site class="grasppoint" pos="0.0000 0.0000 0.1425"/> -->
-          <geom name="solution" type="cylinder" size="0.010938 0.045001" pos="0 0 0.044671" material="CaSO4" class="visual"/>
-      <site name="top_site" pos="0 0 11.307300" size="0.01" rgba="1 0 0 0"/>
+          <geom name="solution" type="cylinder" size="0.009038 0.035001" pos="0 0 0.037671" material="CaSO4" class="visual"/>
+      <site name="top_site" pos="0 0 0.1200" size="0.01" rgba="1 0 0 0"/>
       <site name="bottom_site" pos="0 0 0.000000" size="0.01" rgba="0 1 0 0"/>
 </body>
   </worldbody>

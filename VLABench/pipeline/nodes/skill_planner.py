@@ -35,14 +35,14 @@ SKILL_LIB_DOC = """
 
 - pick(target_uid, prior_eulers=[[-pi, 0, 0]]): 从上方抓取物体。prior_eulers 决定抓取朝向。**抓取时会完全闭合夹爪到 0
 - place(target_container_uid): **将当前抓取的物体精确放置到目标容器/表面上**。target_container_uid 必须是场景中具体的实体（如 hot_plate_0, beaker_0, shelf_0）。place 会使用目标实体的 place_point 作为放置位置。**当任务要求将物体放到某个特定目标上时，必须使用 place，不要用 drop**。
-- drop(): **将抓取的物体放到桌面上**。仅用于"使用完物品后腾出抓夹"的场景，即物体不需要放到任何特定位置，只需放到桌面即可。**drop 不接受 target 参数**。如果任务要求将物体放到某个特定实体上（如加热板、架子），必须使用 place(target_container_uid)，不要用 drop。
+- drop(): **将抓取的物体放到桌面上**。仅用于"使用完物品后腾出抓夹"的场景，即物体不需要放到任何特定位置，只需放到桌面即可。**drop 不接受 target 参数**。如果任务要求将物体放到某个特定实体上（如加热板、架子），必须使用 place(target_container_uid)，不要用 drop。在 `pour_to_entity` 之后，`drop` 是把容器放回桌面的**首选**方式（见 Core Constraint #6），以便后续 `pick` 再次抓起。
 - pour(): 倾倒动作（假设手里已抓着容器）。仅旋转腕部关节，末端位置会偏移。
 - pour_to_entity(target_uid, tilt_angle=1.8, wait_time=10): 倾倒到指定容器上方。使用 IK 保持末端位置不变，通过逐步倾斜实现稳定倾倒。**pour 操作优先使用此技能**。tilt_angle 默认 1.8 rad (~103°) 足以让液体流出。
 - insert_to_entity(target_uid, insert_depth=0.05): 将抓取的物体插入目标实体的孔位（如试管插入试管架）。自动松开夹爪，无需再添加 open_gripper。
 - lift(lift_height=0.15, gripper_state=np.zeros(2)): 举起当前抓取的物体。
 - moveto(target_pos, gripper_state=np.zeros(2)): 移动末端执行器到目标位置。
 - moveto_entity(target_uid, offset=[0,0,0.2], gripper_state=np.zeros(2)): 移动到指定实体上方，自动从实体运行时位置计算目标。
-- open_gripper(): 松开夹爪。用于在当前位置直接放下物体（不推荐用于精确放置）。
+- open_gripper(): 松开夹爪。**正常任务流程（特别是 pour_to_entity 之后）请用 drop()**，此技能仅用于 impossible-path 异常或临时调试场景；物体会从当前高度自由落体，可能导致容器摔落桌面。
 - close_gripper(): 闭合夹爪。
 - wait(wait_time=50): 等待指定步数。
 - shake(n_shakes=3, shake_angle=0.7, steps_per_swing=5): **独立的摇晃技能**。通过四元数球面插值（slerp）生成正负角度的平滑摇摆轨迹。n_shakes=3 表示完整往返 3 次，shake_angle=0.7 表示每次摆动 ±0.7 rad。
@@ -50,7 +50,8 @@ SKILL_LIB_DOC = """
 - rotate(rotation_angle=pi/2): 旋转腕部关节实现物体翻转或小幅摇晃。适合单次大幅旋转。
 - unscrew_cap(target_uid, rotation_angle=-4*np.pi, target_q_velocity=pi/40, max_n_substep=30, tolerance=0.01, lift_height=0.03): **拧开带盖容器（如 pill_bottle）的瓶盖**。内部已封装 pick + 旋转腕关节 + 自动松夹，模拟人手拧开瓶盖动作。target_uid 是带盖容器的 uid（如 pill_bottle_0）。**任务要求拧开/打开瓶盖时，必须使用此技能，不要拆解为 pick+rotate+open_gripper**。rotation_angle 默认 4π。
 - open_drawer(target_container_uid, pick_prior_eulers=[[-np.pi/2, 0, 0]], drawer_id=0): **打开抽屉的专用技能**。内部已封装 pick + 抽屉打开轨迹，自动处理抓取把手和推动抽屉动作。target_container_uid 是抽屉容器的 uid（如 drawer_0）。drawer_id 指定打开哪个抽屉：0=顶层，1=中层，2=底层。pick_prior_eulers 控制抓取姿态，默认 [[-np.pi/2, 0, 0]] 是侧向水平抓取（避免碰撞）。**任务要求打开抽屉时，必须使用此技能，不要拆解为 moveto_entity+push**。
-- press(target_pos): 按压目标位置。
+- open_door(target_container_name): **打开柜门的专用技能**。内部已封装 pick 把手 + 沿门轴打开的轨迹。target_container_name 是带门实体的 uid（如 drying_box_0、microwave_0、fridge_0）。技能会自动调用 entity.get_open_trajectory(physics) 围绕 door_joint 旋转打开。**任务要求打开带门的容器（如 drying_box、microwave、fridge）时，必须使用此技能，不要拆解为 moveto_entity+push，也不要用 press（press 是按按钮，不是开门）**。
+- press(target_pos): 按压目标。可以是实体名字符串（如 "drying_box_0"、"microwave_0"），框架会自动查找该实体的按钮世界坐标并移动机械臂去按压。也可以是坐标列表 [x, y, z]。**对于带按钮的实体（如 drying_box、microwave、coffee_machine），必须传实体名字符串**，不要传坐标。
 - push(target_pos, push_distance=0.1): 推动物体。
 - reset(): 重置环境。
 - wait_for(wait_duration=2.0, entity_name=None, change_type=None, solution=None, color=None): **等待外部状态变化的技能**。用于人机协同场景，机械臂保持不动，等待指定时间后自动应用环境变化。change_type 可选：
@@ -63,8 +64,10 @@ SKILL_LIB_DOC = """
 
 - **place**: 将物体放置到指定的目标实体上（加热板、容器、架子等）。必须传 target_container_uid 参数。适用场景："put A on B", "place A onto B", "put A in B"。
 - **drop**: 仅用于将物体放到桌面上（无特定目标位置）。适用场景：使用完物品后腾出抓夹，需要抓取下一个物品时。**如果任务指定了放置目标，必须用 place，不能用 drop**。
-- **open_gripper**: 在当前位置直接松开夹爪，物体会掉落。仅用于不需要精确放置的场景。
+- **open_gripper**: 在当前位置直接松开夹爪，物体会掉落。仅用于不需要精确放置的场景，一般不使用！如果需要在抓取下一件物品之前放下手中的东西，则使用drop！。倒完一个容器后**绝对不要**使用 `open_gripper`，否则物体从空中跌落；使用 `drop()`。
 - **shake 任务的正确序列**:
+  - 试管类物体 (ChemistryTube): pick -> lift -> shake(n_shakes=3) -> insert_to_entity(target_uid=chemistry_tube_stand)。insert_to_entity 已包含松开夹爪，不需要额外 open_gripper。
+  - 其他物体 (烧杯等): pick -> lift -> shake(n_shakes=3) -> drop。用 drop 把物体放到桌面。
 """
 
 # ========== 原子技能白名单 ==========
@@ -80,14 +83,12 @@ VALID_SKILLS = {
 # ========== 动作 → 技能模式映射 (LLM 参考，非硬编码) ==========
 ACTION_TO_SKILL_HINT = {
     "pour": ["pick", "lift", "moveto_entity", "pour"],
-    "remove": ["moveto", "pick", "open_gripper"],
     "place": ["moveto", "place"],
     "lift": ["moveto", "pick", "lift"],
     "shake": ["moveto", "pick", "wait"],
     "dispense": ["moveto", "pick", "pour"],
     "heat": ["moveto", "pick", "lift", "moveto", "wait"],
-    "move": ["moveto", "pick", "lift", "moveto", "open_gripper"],
-    "open": ["open_drawer"],  # 优先使用专用技能
+    "open": ["open_door", "open_drawer"],  # 优先按实体类型选 open_door（带门）或 open_drawer（带抽屉）
     "wait_for": ["wait_for"],  # wait_for 是独立的技能
     "light": ["wait_for"],  # 点燃酒精灯等 -> wait_for
 }
@@ -214,7 +215,7 @@ def build_skill_planner_prompt(
 
 1. **State Tracking (CoT)**: Before planning each step's atomic_sequence, you MUST first write pre_state_assertion to reason about the robot state after the previous step.
    - If the gripper is ALREADY HOLDING the target object, do NOT generate another pick.
-   - If the gripper is NOT empty before picking a new object, you MUST first generate open_gripper.
+   - If the gripper is NOT empty before picking a new object, you MUST first generate drop.
 
 2. **Explicit UIDs**: All uid parameters in atomic_sequence params MUST use the real UIDs from the asset inventory (e.g. beaker_0, tube_0).
    Do NOT use any placeholder like $TARGET_ENTITY.
@@ -225,9 +226,14 @@ def build_skill_planner_prompt(
 
 5. **Special Rule for open_drawer**: When the action is "open" and the target is a drawer (ContainerWithDrawer), use open_drawer(target_container_uid="drawer_0", drawer_id=0). drawer_id=0 for top drawer, 1 for middle, 2 for bottom. The skill automatically handles grasp and push.
 
-5. **Use moveto_entity for targeting objects**: When you need to move to a specific object (e.g. to pour into a beaker), use moveto_entity(target_uid=<container_uid>) instead of moveto with hardcoded coordinates. NEVER use moveto with hardcoded target_pos for pour operations.
+6. **Special Rule for open_door**: When the action is "open" and the target is a container with a door (class_name includes "WithDoor", "Microwave", "Fridge", or "DryingBox"), use open_door(target_container_name="<uid>"). The skill automatically grasps the door handle and rotates around the door hinge joint. NEVER use press for "open" actions — press is for buttons only.
 
-6. **pour_to_entity replaces moveto+pour**: pour_to_entity already handles moving to the container and tilting. After pour_to_entity, just use open_gripper to release the container. Do NOT use place after pour_to_entity.
+7. **Use moveto_entity for targeting objects**: When you need to move to a specific object (e.g. to pour into a beaker), use moveto_entity(target_uid=<container_uid>) instead of moveto with hardcoded coordinates. NEVER use moveto with hardcoded target_pos for pour operations.
+
+8. **After pour_to_entity, release the held container with drop (not open_gripper)**:
+   - `pour_to_entity` already handles moving to the container and tilting.
+   - After `pour_to_entity`, use `drop()` to safely place the held container onto the table so it can be picked up again later. Do NOT use `open_gripper` or `place` after `pour_to_entity`.
+   - Exception: when the held object is a ChemistryTube (test tube), follow the "Special Rule for Test Tubes" below — use `insert_to_entity(target_uid="chemistry_tube_stand")` instead of `drop`.
 
 ## Execution Script
 {steps_info}
@@ -242,10 +248,13 @@ def build_skill_planner_prompt(
 For each step, you MUST fill in:
 - pre_state_assertion: Describe robot gripper state and object positions BEFORE this step.
 - atomic_sequence: Autonomously decide skills based on action type. Reference hints:
-  - pour -> pick -> lift -> pour_to_entity -> insert_to_entity (insert_to_entity already includes open_gripper, do NOT add another open_gripper after it)
+  - pour (general container, e.g. beaker/flask) -> pick -> lift -> pour_to_entity -> drop
+  - pour (ChemistryTube / test tube)          -> pick -> lift -> pour_to_entity -> insert_to_entity (insert_to_entity already releases gripper, do NOT add open_gripper or drop after it)
   - remove -> pick -> open_gripper
   - lift -> pick -> lift
   - place -> place
+  - open (container with door, e.g. drying_box/microwave/fridge) -> open_door  # open_door 内部已封装 pick 把手 + 拉门轨迹，直接调用即可
+  - open (container with drawer) -> open_drawer
 - post_state_assertion: Describe robot gripper state and object position changes AFTER this step.
 
 ## Special Rule for Test Tubes (ChemistryTube)

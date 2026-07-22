@@ -19,15 +19,16 @@ class PickSmallBeakerPourObjectConfigManager(BenchTaskConfigManager):
             name="small_beaker_0",
             xml_path=name2class_xml["small_beaker"][-1],
             position=[random.uniform(0.05, 0.15), random.uniform(-0.15, -0.05), 0.8],
-            solution_rgba=[0.0, 0.45, 1.0, 0.4],
+            solution="FeCl3_1",
+            solution_rgba=[0.65, 0.57, 0.02, 0.4],
         )
         obj_config["class"] = "ChemistryBeaker"
         obj_config["randomness"] = dict(pos=[0.02, 0.02, 0], quat=[0, 0, 0.05])
         self.config["task"]["components"].append(obj_config)
 
         obj_config = dict(
-            name="large_beaker_0",
-            xml_path=name2class_xml["large_beaker"][-1],
+            name="petri_dish_0",
+            xml_path=name2class_xml["petri_dish"][-1],
             position=[random.uniform(0.35, 0.45), random.uniform(-0.05, 0.05), 0.8],
         )
         obj_config["class"] = "ChemistryBeaker"
@@ -37,15 +38,17 @@ class PickSmallBeakerPourObjectConfigManager(BenchTaskConfigManager):
         self.target_entity = "small_beaker_0"
 
     def get_instruction(self, target_entity, **kwargs):
-        self.config["task"]["instructions"] = ["pick the <small_beaker_0> which contains <CuSO4 solution_0>"]
+        self.config["task"]["instructions"] = ["pick the <small_beaker_0> which contains <FeCl3_0>."]
 
     def get_condition_config(self, target_entity, **kwargs):
         conditions_config = [
             dict(is_grasped=dict(entities=['small_beaker_0'], robot='robot')),
             dict(pour_into=dict(
             target_entity='small_beaker_0',
-            receiver_container='large_beaker_0',
+            receiver_container='petri_dish_0',
             robot='robot',
+            tilt_threshold=0,
+            z_clearance=0.01,
         )),
         ]
         self.config["task"]["conditions"] = conditions_config
@@ -60,7 +63,7 @@ class PickSmallBeakerPourObjectTask(PrimitiveTask):
         skill_sequence = [
             partial(SkillLib.pick, target_entity_name="small_beaker_0"),
             partial(SkillLib.lift, lift_height=0.15),
-            partial(SkillLib.pour_to_entity, target_container_name="large_beaker_0", tilt_angle=1.8, wait_time=10),
-            partial(SkillLib.open_gripper),
+            partial(SkillLib.pour_to_entity, target_container_name="petri_dish_0", tilt_angle=1.8, wait_time=10),
+            partial(SkillLib.drop),
         ]
         return skill_sequence

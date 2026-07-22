@@ -22,6 +22,8 @@ def get_args():
     parser.add_argument('--host', default="localhost", type=str, help="The host to the remote server")
     parser.add_argument('--port', default=5555, type=int, help="The port to the remote server")
     parser.add_argument('--replanstep', default=4, type=int, help="The step to replan")
+    parser.add_argument('--policy_config', default=None, type=str, help="Path to DP policy config YAML")
+    parser.add_argument('--normalizer_path', default=None, type=str, help="Path to normalization statistics")
     args = parser.parse_args()
     return args
 
@@ -66,6 +68,21 @@ def evaluate(args):
                          not args.model_ckpt.startswith("/remote-home"))
         policy = ACTPolicy(
             pretrained_policy_path=args.model_ckpt if use_checkpoint else None,
+            camera_indices=[2, 3],  # front + wrist
+            replan_steps=args.replanstep,
+            device="cuda",
+        )
+    elif args.policy.lower() == "dp":
+        from VLABench.evaluation.model.policy.dp import DPPolicy
+        # Check if model_ckpt is provided and valid
+        use_checkpoint = (hasattr(args, 'model_ckpt') and
+                         args.model_ckpt and
+                         args.model_ckpt != "none" and
+                         not args.model_ckpt.startswith("/remote-home"))
+        policy = DPPolicy(
+            pretrained_policy_path=args.model_ckpt if use_checkpoint else None,
+            policy_config_path=getattr(args, 'policy_config', None),
+            normalizer_path=getattr(args, 'normalizer_path', None),
             camera_indices=[2, 3],  # front + wrist
             replan_steps=args.replanstep,
             device="cuda",

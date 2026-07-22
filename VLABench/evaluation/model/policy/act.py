@@ -1,8 +1,9 @@
 import numpy as np
 import torch
 from collections import deque
+from PIL import Image
 import sys
-sys.path.insert(0, "/ssd/liuzirui/lerobot")
+sys.path.insert(0, "/ssd/qinmaokai/workspace/lerobot")
 
 from VLABench.evaluation.model.policy.base import Policy
 from VLABench.utils.utils import quaternion_to_euler
@@ -36,9 +37,15 @@ class ACTPolicy(Policy):
         # Create ACT configuration with proper input/output features
         config = ACTConfig(
             # Input/output features
+            # 当前目标分辨率: 256(匹配 checkpoint 训练)
+            # 如需改回 480: 1) 改回下方硬编码 shape;2) 删除 process_observation 中的 resize 逻辑
             input_features={
-                "observation.image": PolicyFeature(type=FeatureType.VISUAL, shape=(3, 480, 480)),
-                "observation.wrist_image": PolicyFeature(type=FeatureType.VISUAL, shape=(3, 480, 480)),
+                # 旧(480×480,如需恢复请改回):
+                # "observation.image": PolicyFeature(type=FeatureType.VISUAL, shape=(3, 480, 480)),
+                # "observation.wrist_image": PolicyFeature(type=FeatureType.VISUAL, shape=(3, 480, 480)),
+                # 当前(256×256,匹配 checkpoint 训练分辨率):
+                "observation.image": PolicyFeature(type=FeatureType.VISUAL, shape=(3, 256, 256)),
+                "observation.wrist_image": PolicyFeature(type=FeatureType.VISUAL, shape=(3, 256, 256)),
                 "observation.state": PolicyFeature(type=FeatureType.STATE, shape=(7,)),
             },
             output_features={
@@ -69,12 +76,20 @@ class ACTPolicy(Policy):
             # Create dummy stats for zero-shot testing
             dummy_stats = {
                 "observation.image": {
-                    "mean": torch.zeros(3, 480, 480),
-                    "std": torch.ones(3, 480, 480),
+                    # 旧(480×480):
+                    # "mean": torch.zeros(3, 480, 480),
+                    # "std": torch.ones(3, 480, 480),
+                    # 当前(256×256):
+                    "mean": torch.zeros(3, 256, 256),
+                    "std": torch.ones(3, 256, 256),
                 },
                 "observation.wrist_image": {
-                    "mean": torch.zeros(3, 480, 480),
-                    "std": torch.ones(3, 480, 480),
+                    # 旧(480×480):
+                    # "mean": torch.zeros(3, 480, 480),
+                    # "std": torch.ones(3, 480, 480),
+                    # 当前(256×256):
+                    "mean": torch.zeros(3, 256, 256),
+                    "std": torch.ones(3, 256, 256),
                 },
                 "observation.state": {
                     "mean": torch.zeros(7),
@@ -116,19 +131,29 @@ class ACTPolicy(Policy):
         ACT format:
             batch["observation.images"]: [n_cam, C, H, W] (torch tensor)
             batch["observation.state"]: [7] (torch tensor)
+        Note: images are resized to 256x256 to match checkpoint training resolution.
         """
         # Extract images (front + wrist)
         front_img = obs["rgb"][self.camera_indices[0]]  # index 2
         wrist_img = obs["rgb"][self.camera_indices[1]]  # index 3
 
-        # Convert to torch tensors, normalize to [0, 1]
-        front_tensor = torch.from_numpy(front_img).float() / 255.0
+        # 当前(256×256): VLABench obs 是 480×480,checkpoint 训练时是 256×256,需 resize
+        # 旧逻辑(480×480,如需恢复请删除以下 resize 块):
+        # front_tensor = torch.from_numpy(front_img).float() / 255.0
+        # front_tensor = front_tensor.permute(2, 0, 1)  # HWC -> CHW
+        # wrist_tensor = torch.from_numpy(wrist_img).float() / 255.0
+        # wrist_tensor = wrist_tensor.permute(2, 0, 1)
+        # images = torch.stack([front_tensor, wrist_tensor], dim=0)  # [2, 3, 480, 480]
+        TARGET_SIZE = 256  # 匹配 checkpoint 训练分辨率
+        front_pil = Image.fromarray(front_img).resize((TARGET_SIZE, TARGET_SIZE), Image.BILINEAR)
+        front_tensor = torch.from_numpy(np.array(front_pil)).float() / 255.0
         front_tensor = front_tensor.permute(2, 0, 1)  # HWC -> CHW
 
-        wrist_tensor = torch.from_numpy(wrist_img).float() / 255.0
+        wrist_pil = Image.fromarray(wrist_img).resize((TARGET_SIZE, TARGET_SIZE), Image.BILINEAR)
+        wrist_tensor = torch.from_numpy(np.array(wrist_pil)).float() / 255.0
         wrist_tensor = wrist_tensor.permute(2, 0, 1)
 
-        # Stack images: [2, 3, 480, 480]
+        # Stack images: [2, 3, 256, 256]
         images = torch.stack([front_tensor, wrist_tensor], dim=0)
 
         # Transform ee_state to robot-relative frame
@@ -152,8 +177,8 @@ class ACTPolicy(Policy):
 
         # Create batch dict
         batch = {
-            "observation.image": front_tensor.unsqueeze(0),  # [1, 3, 480, 480]
-            "observation.wrist_image": wrist_tensor.unsqueeze(0),  # [1, 3, 480, 480]
+            "observation.image": front_tensor.unsqueeze(0),  # [1, 3, 256, 256]
+            "observation.wrist_image": wrist_tensor.unsqueeze(0),  # [1, 3, 256, 256]
             "observation.state": torch.from_numpy(state).float().unsqueeze(0),  # [1, 7]
         }
 
@@ -196,8 +221,9 @@ class ACTPolicy(Policy):
         target_euler = raw_action[3:6]
 
         # Gripper conversion: 1D signal -> 2D gripper state
+        # Training data uses [0, 0.04] range (0=closed, 0.04=open)
         gripper_signal = raw_action[6]
-        gripper_state = np.ones(2) * 0.04 if gripper_signal >= 0.5 else np.zeros(2)
+        gripper_state = np.ones(2) * 0.04 if gripper_signal >= 0.02 else np.zeros(2)
 
         self.timestep += 1
 

@@ -9,7 +9,7 @@
     <material name="body_mdl_0008_mat" texture="body_mdl_0008_tex" specular="0.4" shininess="0.001" rgba="1 1 1 1"/>
     <material name="body_mdl_0009_mat" texture="body_mdl_0009_tex" specular="0.4" shininess="0.001" rgba="1 1 1 1"/>
     <material name="body_vcol_mat" specular="0.4" shininess="0.001" rgba="0.000 0.000 0.000 1.0"/>
-    <material name="button_vcol_mat" specular="0.4" shininess="0.001" rgba="0.400 0.400 0.400 1.0"/>
+    <material name="button_vcol_mat" specular="0.4" shininess="0.001" rgba="0.6 0.05 0.05 1.0"/>
     <material name="door_mdl_0007_mat" specular="0.4" shininess="0.001" rgba="0.059 0.102 0.353 1.0"/>
     <!-- Visual meshes -->
     <mesh file="body_aluminum_anodized_charcoal.obj"/>
@@ -109,19 +109,20 @@
         <site class="keypoint" name="door_p2" pos="-0.28820701490376166 -0.3704462501843404 0.626919157520663"/>
         <site class="keypoint" name="door_p3" pos="-0.28820701490376166 0.17519648199678195 0.626919157520663"/>
         <!-- Handle grasppoint -->
-        <site class="grasppoint" name="door_handle_grasp" pos="-0.2265 -0.0014 0.0569"/>
+        <site class="grasppoint" name="door_handle_grasp" pos="-0.2626 0.1274 0.3484"/>
+        <!-- <site class="grasppoint" name="door_handle_grasp" pos="-0.2226 0.1274 0.6154"/> -->
       </body>
 
       <!-- Button (sliding joint along X, can be pressed inward) -->
       <body name="button">
         <joint name="drying_box_button_joint" type="slide" axis="1 0 0"
-               pos="-0.2288 0.2430 0.3738"
+               pos="-0.2688 0.3030 0.3738"
                range="0 0.025"
                damping="5" frictionloss="3" armature="0.001" ref="0"/>
-        <inertial pos="0 0 0" mass="0.02" diaginertia="0.0001 0.0001 0.0001"/>
+        <inertial pos="0 0 0" mass="0.5" diaginertia="0.0033 0.0033 0.0033"/>
         <geom mesh="button_vcol" material="button_vcol_mat" class="visual"/>
         <!-- Button collision (simple box) -->
-        <geom type="box" size="0.0200 0.0200 0.0200" class="collision"/>
+        <geom type="box" size="0.0200 0.0200 0.0200" name="start_button" class="collision"/>
       </body>
     </body>
   </worldbody>

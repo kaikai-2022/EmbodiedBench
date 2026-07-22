@@ -254,15 +254,50 @@ class CommonGraspedEntity(Entity):
         """
         Judge whether the entity is grasped by the robot with the contact force
         """
+        import mujoco as mj
         gripper_geoms = robot.gripper_geoms
         gripper_geom_ids = [physics.bind(geom).element_id for geom in gripper_geoms]
         entity_geom_ids = [physics.bind(geom).element_id for geom in self.geoms]
         contacts = physics.data.contact
+        hit = False
+        ncon = physics.data.ncon
         for contact in contacts:
             if (contact.geom1 in gripper_geom_ids and contact.geom2 in entity_geom_ids) or \
                 (contact.geom2 in gripper_geom_ids and contact.geom1 in entity_geom_ids):
-                return True
-        return False
+                hit = True
+                break
+
+        # 调试：仅对玻璃搅拌棒生效，避免刷屏
+        ent_name = getattr(self, 'mjcf_model', None)
+        ent_name = ent_name.model if ent_name is not None else '?'
+        if 'glass_stirring_rod' in str(ent_name):
+            raw_m = physics.model._model
+            raw_d = physics.data._data
+            gnames = []
+            for gid in gripper_geom_ids:
+                nm = mj.mj_id2name(raw_m, mj.mjtObj.mjOBJ_GEOM, gid) or '?'
+                gnames.append(f"{gid}:{nm}")
+            enames = []
+            for gid in entity_geom_ids:
+                nm = mj.mj_id2name(raw_m, mj.mjtObj.mjOBJ_GEOM, gid) or '?'
+                enames.append(f"{gid}:{nm}")
+            # 列出所有与 finger 或 entity 相关的 contact
+            related = []
+            for i in range(ncon):
+                c = raw_d.contact[i]
+                if c.geom1 in gripper_geom_ids or c.geom2 in gripper_geom_ids or \
+                   c.geom1 in entity_geom_ids or c.geom2 in entity_geom_ids:
+                    g1 = mj.mj_id2name(raw_m, mj.mjtObj.mjOBJ_GEOM, c.geom1) or '?'
+                    g2 = mj.mj_id2name(raw_m, mj.mjtObj.mjOBJ_GEOM, c.geom2) or '?'
+                    related.append(f"  contact[{i}]: {c.geom1}({g1}) <-> {c.geom2}({g2}) dist={c.dist:.5f}")
+            print(f"[DEBUG is_grasped] entity={ent_name} hit={hit} ncon={ncon}")
+            print(f"[DEBUG is_grasped]   finger_geom_ids: {gnames}")
+            print(f"[DEBUG is_grasped]   entity_geom_ids: {enames}")
+            print(f"[DEBUG is_grasped]   related contacts ({len(related)}):")
+            for line in related:
+                print(line)
+
+        return hit
     
     def get_grasped_keypoints(self, physics):
         """
