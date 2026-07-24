@@ -4,3 +4,4 @@ from VLABench.tasks.autogen_tasks.primitive import *
 from VLABench.tasks.autogen_tasks.pick_cylinder_mid_pour_object_series import *
 from VLABench.tasks.autogen_tasks.open_drawer_series import *
 from VLABench.tasks.autogen_tasks.pick_tube_shake_tube_series import *
+from VLABench.tasks.autogen_tasks.stir_object_series import *

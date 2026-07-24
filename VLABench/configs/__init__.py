@@ -50,6 +50,8 @@ name2config = {
     "unscrew_bottle_series":["unscrew_bottle"],
     "open_drawer_series":["open_drawer"],
     "pour_object_stir_large_beaker_series":["pour_object_stir_large_beaker"],
+    "stir_object_series":["stir_object"],
+    "pick_tube_lift_tube_series":["pick_tube_lift_tube"],
     "place_beaker_on_the_mat_series":["place_beaker_on_the_mat"],
     "place_flask_on_the_mat_series":["place_flask_on_the_mat"],
     "pour_beaker_series":["pour_beaker"],

@@ -5020,5 +5020,32 @@
         }
       ]
     }
+  },
+  "pick_glass_stirring_rod_stir_solution_series": {
+    "task": {
+      "asset": {
+        "seen_object": [
+          "glass_stirring_rod",
+          "large_beaker"
+        ],
+        "unseen_object": [
+          "glass_stirring_rod",
+          "large_beaker"
+        ]
+      },
+      "scene": {
+        "name": "laboratory_0"
+      },
+      "components": [
+        {
+          "name": "table",
+          "xml_path": "obj/meshes/table/table.xml",
+          "class": "Table",
+          "randomness": {
+            "texture": false
+          }
+        }
+      ]
+    }
   }
 }
